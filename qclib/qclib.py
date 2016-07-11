@@ -11,7 +11,7 @@ class qclib:
 
 		## Runtime Options
 		self.trace = qtrace
-		self.disp_nulls = qzeros
+		self.disp_zeros = qzeros
 
 		## Convinience constants
 		self.pi = np.pi
@@ -26,36 +26,7 @@ class qclib:
 		for i in l:
 			self.sys_state = np.kron(self.sys_state,qbit[i])
 		if self.trace:
-			print "Initial State"
-			self.print_state()
-
-	## Gates Definitions
-	def pauli_x(self):
-		return ["PAULI_X", np.matrix([[0,1],[1,0]],dtype=complex)]
-	def pauli_y(self):
-		return ["PAULI_Y", np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
-	def pauli_z(self):
-		return ["PAULI_Z", np.matrix([[1,0],[0,-1]],dtype=complex)]
-	def hadamard(self): ## in case hdmd name is not acceptable to people
-		return self.hdmd()
-	def hdmd(self):
-		sqr2 = np.sqrt(2)
-		return ["HADAMARD", np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)]
-	def rphi(self,phi):
-		cphi = np.cos(phi)
-		sphi = np.sin(phi)
-		return ["R-PHI", np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)]
-	def swap(self):
-		return ["SWAP", np.matrix([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]],dtype=complex)]
-	def cnot(self):
-		return ["C-NOT", np.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
-
-
-	def qtrace(self, val):
-		self.trace = val
-
-	def qzeros(self, val):
-		self.disp_nulls = val
+			self.qreport(header="Initial State")
 
 	def shuffled_count(self, bitorder):
 		sz = len(bitorder)
@@ -78,11 +49,11 @@ class qclib:
 	## replaced by the bit in position 'a' in the original, next lower MSB 
 	## to be replaced by bit in potion 'b' in the original, and so on ...
 	def aligned_op(self, op, qbit_reorder):
-		# this is the counting with the given bit ordering
-		rr = self.shuffled_count(qbit_reorder)
 		if self.nqbits != len(qbit_reorder):
 			errmsg = "Internal Error. " + str(self.nqbits) + " qbit system. Alignment vector has incorrect size " + str(len(qbit_reorder))
 			raise QClibError(errmsg)
+		# this is the counting with the given bit ordering
+		rr = self.shuffled_count(qbit_reorder)
 		## create the rmat and rrmat
 		imat = np.matrix(np.eye(2**self.nqbits))
 		rmat = np.matrix(np.eye(2**self.nqbits))
@@ -116,8 +87,8 @@ class qclib:
 		a_op = self.aligned_op(c_op,reord_list)
 		self.sys_state = a_op * self.sys_state
 		if display or self.trace:
-			print "Applied " + opname + " Qbit" + opargs
-			self.print_state()
+			hdr = opname + " Qbit" + opargs
+			self.qreport(header=hdr)
 
 	## not sure if this batch operation is any use, but threw it in anyways...
 	def qgate_batch(self, op_arg_list, display=False):
@@ -153,36 +124,70 @@ class qclib:
 			qbit_val = 1
 			prob = amp_1
 		if display or self.trace:
-			print "Measured Qbit[" + str(qbit) + "] = " + str(qbit_val) + " with probality = " + str(prob) 
-			self.print_state()
+			hdr = "MEASURED Qbit[" + str(qbit) + "] = " + str(qbit_val) + " with probality = " + str(prob) 
+			self.qreport(header=hdr)
 
-	def print_state(self, st=None):
+	def qreport(self, header="State", st=None):
 		if st == None:
 			st = self.sys_state
+		print header
 		for i in range(len(st)):
-			if self.disp_nulls or np.absolute(st[i]) != 0:
+			if self.disp_zeros or np.absolute(st[i]) != 0:
 				print format(i,'0'+str(self.nqbits)+'b')+"    "+"{:.8f}".format(np.around(st[i].item(0),8))
 		print
 
-	def get_state(self):
-		state_copy = self.sys_state
-		return state_copy
+	def qstate(self):
+		state_array = np.squeeze(np.asarray(self.sys_state))
+		return state_array
+	def qsize(self):
+		return self.nqbits
+
+	def qtraceON(self, val):
+		self.trace = val
+
+	def qzerosON(self, val):
+		self.disp_zeros = val
+
+	## QC Gates
+	def X(self):
+		return ["PAULI_X", np.matrix([[0,1],[1,0]],dtype=complex)]
+	def Y(self):
+		return ["PAULI_Y", np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
+	def Z(self):
+		return ["PAULI_Z", np.matrix([[1,0],[0,-1]],dtype=complex)]
+	def H(self):
+		sqr2 = np.sqrt(2)
+		return ["HADAMARD", np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)]
+	def R(self,phi):
+		cphi = np.cos(phi)
+		sphi = np.sin(phi)
+		return ["R-PHI", np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)]
+	def SWAP(self):
+		return ["SWAP", np.matrix([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]],dtype=complex)]
+	def C(self):
+		return ["C-NOT", np.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
+
 
 class QClibError:
 	def __init__(self,arg):
 		self.args = arg
 
 if __name__ == "__main__":
-	qc = qclib(5,qtrace=True)
-	qc.qtrace(True)
+	q = qclib(8,qtrace=True)
+	q.qtraceON(True)
 
 	try:
-		qc.qgate(qc.hdmd(),[2])
-		qc.qgate(qc.hdmd(),[4])
-		qc.qgate(qc.cnot(),[2,1])
-		qc.qgate(qc.cnot(),[4,3])
-		qc.qtrace(True)
-		qc.qmeasure(2)
-		qc.qmeasure(1)
+		q.qgate(q.H(),[2])
+		q.qgate(q.H(),[4])
+		q.qgate(q.C(),[2,1])
+		q.qgate(q.C(),[4,3])
+		q.qtraceON(True)
+		q.qmeasure(2)
+		q.qmeasure(1)
+		q.qreport()
 	except QClibError, m:
 		print m.args
+
+	st = q.qstate()
+	for i in range(len(st)):
+		print '{:08b}'.format(i), st[i]
