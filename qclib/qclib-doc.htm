@@ -467,11 +467,11 @@ responsibility of the user. &lt;Perhaps an enhancement for later on.&gt;</p>
 <p class=MsoNormal>Here is an example of a simple way for a user to define a
 CNOT gate --</p>
 
-<p class=MsoNormal style='page-break-after:avoid'><span style='font-size:8.0pt;
-line-height:115%;font-family:"Courier New"'>def myCNOT():</span></p>
+<p class=MsoNormal style='margin-left:.5in;page-break-after:avoid'><span
+style='font-family:"Courier New"'>def myCNOT():</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;line-height:115%;font-family:
-"Courier New"'>       return [&quot;MY-CNOT&quot;,
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:"Courier New"'>     return
+[&quot;MY-CNOT&quot;,
 numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]</span></p>
 
 <p class=MsoNormal>As shown in the code above, while writing the unitary_matrix
@@ -505,21 +505,19 @@ incorrect, it throws an exception.</p>
 parameters. For instance, for a rotation gate, the rotation angle can be passed
 as a parameter -- </p>
 
-<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
-"Courier New"'>def myR(theta):</span></p>
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:"Courier New"'>def
+myR(theta):</span></p>
 
-<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
-"Courier New"'>          c = numpy.cos(theta)</span></p>
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:"Courier New"'>     c
+= numpy.cos(theta)</span></p>
 
-<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
-"Courier New"'>          s = numpy.sin(theta)</span></p>
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:"Courier New"'>     s
+= numpy.sin(theta)</span></p>
 
-<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
-"Courier New"'>          return [&quot;MY-Rotation({:0.4f})&quot;.format(theta),
-numpy.matrix([[1,0],[0,complex(c,s)]],dtype=complex)]</span></p>
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:"Courier New"'>     return
+[&quot;MY-Rotation({:0.4f})&quot;.format(theta), numpy.matrix([[1,0],[0,complex(c,s)]],dtype=complex)]</span></p>
 
-<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
-"Courier New"'>qc.qgate(myR(numpy.pi/2),[5])</span></p>
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:"Courier New"'>qc.qgate(myR(numpy.pi/2),[5])</span></p>
 
 <p class=MsoNormal>Note: To see some change in the state, perform an X() or H()
 or some such on the qbit before the phase rotation.</p>
