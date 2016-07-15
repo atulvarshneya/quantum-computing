@@ -7,9 +7,6 @@
 <!--
  /* Font Definitions */
  @font-face
-	{font-family:Wingdings;
-	panose-1:5 0 0 0 0 0 0 0 0 0;}
-@font-face
 	{font-family:"Cambria Math";
 	panose-1:2 4 5 3 5 4 6 3 2 4;}
 @font-face
@@ -362,9 +359,10 @@ of qbits.</p>
 
 <p class=MsoNormal>There are a number of gates pre-created within the qclib
 class, and additional gates can be defined by the users (see Section USER
-DEFINED GATE below). If a gate operates on more than 1 qbit (e.g., CNOT gate, or
-SWAP gate, etc.) then the list in the second argument (<span style='font-family:
-"Courier New"'>list_of_qbits</span>) would contain that many qbits.</p>
+DEFINED GATE below). If a gate operates on more than 1 qbit (e.g., CNOT gate,
+or SWAP gate, etc.) then the list in the second argument (<span
+style='font-family:"Courier New"'>list_of_qbits</span>) would contain that many
+qbits.</p>
 
 <p class=MsoNormal>The function qgate() validates the number of bits passed in <span
 style='font-family:"Courier New"'>list_of_qbits</span> against the number of
@@ -373,93 +371,6 @@ qbits required for the gate, if not correct, throws an exception.</p>
 <p class=MsoNormal>If <span style='font-family:"Courier New"'>display </span>is
 <span style='font-family:"Courier New"'>True</span>, the resulting state is
 printed out.</p>
-
-<h2>comb_op = qcombine_seq(name, op_list)</h2>
-
-<p class=MsoNormal>Combines a sequential application of gates into one equivalent
-gate. The parameter <span style='font-family:"Courier New"'>name</span> is the
-name of the resulting gate. Parameter <span style='font-family:"Courier New"'>op_list</span>
-is a list of gates each of the structure <span style='font-family:"Courier New"'>[name,matrix]</span>.</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>--[A]-–[B]--[C]--[D]—   
-</span><span style='font-family:Wingdings'>è</span><span style='font-family:
-"Courier New"'>   --[G]--</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
-
-<p class=MsoNormal>To combine the above –</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>G =
-qc.qcombine_seq(“SEQ”,[A,B,C,D])</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'>and to use it, for instance to apply it on qbit 2 --</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'>&nbsp;</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(G,[2])</span></p>
-
-<h2>comb_op = qcombine_par(name, op_list)</h2>
-
-<p class=MsoNormal>Combines a parallel application of gates into one equivalent
-gate. The parameter <span style='font-family:"Courier New"'>name</span> is the
-name of the resulting gate. Parameter <span style='font-family:"Courier New"'>op_list</span>
-is a list of gates each of the structure <span style='font-family:"Courier New"'>[name,matrix]</span>.</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>                       
-  _</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>3 --[A]----          3
---| |--</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>2 -–[B]----     </span><span
-style='font-family:Wingdings'>è</span><span style='font-family:"Courier New"'>    2
---| |--</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>1 --[C]----          1
---|G|--</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>0 --[D]----          0
---| |--</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>                      
-   -</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
-
-<p class=MsoNormal>To combine the above into one operation with 4 qbits as
-inputs –</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>G =
-qc.qcombine_par(“PAR”,[A,B,C,D])</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'>and to use it, for instance to apply it on qbits 7,5,3,1 --</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'>&nbsp;</p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(G,[7,5,3,1])</span></p>
 
 <h2>v = qmeasure(qbit_number,display=False)</h2>
 
@@ -556,16 +467,12 @@ responsibility of the user. &lt;Perhaps an enhancement for later on.&gt;</p>
 <p class=MsoNormal>Here is an example of a simple way for a user to define a
 CNOT gate --</p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>def myCNOT():</span></p>
+<p class=MsoNormal style='page-break-after:avoid'><span style='font-size:8.0pt;
+line-height:115%;font-family:"Courier New"'>def myCNOT():</span></p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>     return
-[&quot;MY-CNOT&quot;,
+<p class=MsoNormal><span style='font-size:8.0pt;line-height:115%;font-family:
+"Courier New"'>       return [&quot;MY-CNOT&quot;,
 numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
 
 <p class=MsoNormal>As shown in the code above, while writing the unitary_matrix
 for myCNOT we assumed as if the entire system has only 2 qbits.</p>
@@ -598,27 +505,21 @@ incorrect, it throws an exception.</p>
 parameters. For instance, for a rotation gate, the rotation angle can be passed
 as a parameter -- </p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>def
-myR(theta):</span></p>
+<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
+"Courier New"'>def myR(theta):</span></p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>     c =
-numpy.cos(theta)</span></p>
+<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
+"Courier New"'>          c = numpy.cos(theta)</span></p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>     s =
-numpy.sin(theta)</span></p>
+<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
+"Courier New"'>          s = numpy.sin(theta)</span></p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>     return
-[&quot;MY-Rotation({:0.4f})&quot;.format(theta), numpy.matrix([[1,0],[0,complex(c,s)]],dtype=complex)]</span></p>
+<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
+"Courier New"'>          return [&quot;MY-Rotation({:0.4f})&quot;.format(theta),
+numpy.matrix([[1,0],[0,complex(c,s)]],dtype=complex)]</span></p>
 
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(myR(numpy.pi/2),[5])</span></p>
-
-<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
-normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
+<p class=MsoNormal><span style='font-size:7.0pt;line-height:115%;font-family:
+"Courier New"'>qc.qgate(myR(numpy.pi/2),[5])</span></p>
 
 <p class=MsoNormal>Note: To see some change in the state, perform an X() or H()
 or some such on the qbit before the phase rotation.</p>

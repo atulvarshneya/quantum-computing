@@ -39,8 +39,9 @@ class qcsim:
 			shuffled.append(shfval)
 		return shuffled
 
-	def composite_op(self, op, opqbits):
+	def resize_opmatrix(self, op):
 		comp_op = op
+		opqbits = int(np.log2(op.shape[0]))
 		for i in range(self.nqbits-opqbits):
 			comp_op = np.kron(comp_op,np.eye(2))
 		return comp_op
@@ -67,7 +68,7 @@ class qcsim:
 		a_op = rrmat * op * rmat
 		return a_op
 
-	def qbit_reorder_list(self, qbit_list):
+	def qbit_realign_list(self, qbit_list):
 		reord_list = qbit_list
 		for i in range(self.nqbits):
 			if i not in reord_list:
@@ -76,16 +77,16 @@ class qcsim:
 
 	def qgate(self, oper, qbit_list, display=False):
 		opname = oper[0]
-		opargs = str(qbit_list)
 		op = oper[1]
+		opargs = str(qbit_list)
 		if (op.shape)[1] != (op.shape)[0]:
-			errmsg = "Error. Operator is not a sqare matrix. Dimension = (",(op.shape)[0],",",(op.shape)[1],")."
+			errmsg = "Error. Operator is not a square matrix. Dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
 			raise QClibError(errmsg)
 		if (2**len(qbit_list)) != (op.shape)[0]:
 			errmsg = "User Error. Wrong number of qbit args for operator "+opname+". Provided arguments = "+opargs+"."
 			raise QClibError(errmsg)
-		c_op = self.composite_op(op,len(qbit_list))
-		reord_list = self.qbit_reorder_list(qbit_list)
+		c_op = self.resize_opmatrix(op)
+		reord_list = self.qbit_realign_list(qbit_list)
 		a_op = self.aligned_op(c_op,reord_list)
 		self.sys_state = a_op * self.sys_state
 		if display or self.trace:
@@ -99,34 +100,65 @@ class qcsim:
 		for o in op_arg_list:
 			self.qgate(o[0],o[1],display=display)
 
+	def qcombine_seq(self,name,op_list):
+		d = ((op_list[0])[1]).shape[0]
+		res = np.matrix(np.eye(d),dtype=complex)
+		for opdef in op_list:
+			op = opdef[1]
+			r = op.shape[0]
+			c = op.shape[1]
+			if r != c:
+				errmsg = "Opearion is not a square matrix."
+				raise QClibError(errmsg)
+			if r != d:
+				errmsg = "Opearion matrices not the same size."
+				raise QClibError(errmsg)
+			res = op*res # remember order of multiplication is opposite of the visual order
+		return [name,res]
+
+	def qcombine_par(self,name,op_list):
+		res = None
+		first = True
+		for op in op_list:
+			mat = op[1]
+			if first:
+				res = mat
+				first = False
+			else:
+				res = np.kron(res,mat)
+		return [name,res]
+
 	def qmeasure(self, qbit, display=False):
 		bitmask = 0x1<<qbit
-		amp_0 = 0
-		amp_1 = 0
+		prob_0 = 0
+		prob_1 = 0
 		meas_0_state = self.sys_state
 		meas_1_state = self.sys_state
 		for i in range(len(self.sys_state)):
 			if (i & bitmask) == 0:
-				amp_0 += np.absolute(self.sys_state[i].item(0))**2
+				prob_0 += np.absolute(self.sys_state[i].item(0))**2
 			else:
-				amp_1 += np.absolute(self.sys_state[i].item(0))**2
+				prob_1 += np.absolute(self.sys_state[i].item(0))**2
+		if np.absolute((prob_0 + prob_1) - 1.0) > 0.000001:
+			errmsg = "Internal error, amplitudes ( {:0.4f} and {:0.4f} ) do not add to probability = 1.".format(prob_0,prob_1)
+			raise QClibError(errmsg)
 		toss = rnd.random()
-		if toss <= amp_0:
+		if toss <= prob_0:
 			for i in range(len(self.sys_state)):
 				if (i & bitmask) != 0:
 					meas_0_state[i] = 0
-			meas_0_state = meas_0_state / np.sqrt(amp_0)
+			meas_0_state = meas_0_state / np.sqrt(prob_0)
 			self.sys_state = meas_0_state
 			qbit_val = 0
-			prob = amp_0
-		else:
+			prob = prob_0
+		else: # toss > prob_0
 			for i in range(len(self.sys_state)):
 				if (i & bitmask) == 0:
 					meas_1_state[i] = 0
-			meas_1_state = meas_1_state / np.sqrt(amp_1)
+			meas_1_state = meas_1_state / np.sqrt(prob_1)
 			self.sys_state = meas_1_state
 			qbit_val = 1
-			prob = amp_1
+			prob = prob_1
 		if display or self.trace:
 			hdr = "MEASURED Qbit[" + str(qbit) + "] = " + str(qbit_val) + " with probality = " + str(prob) 
 			self.qreport(header=hdr)
@@ -203,16 +235,19 @@ if __name__ == "__main__":
 	q = qcsim(8,qtrace=True)
 
 	try:
-		q.qgate(q.X(),[7])
+		print "Entangling 4 bits -------------------------"
+		q.qgate(q.H(),[3])
+		for i in range(3):
+			q.qgate(q.C(),[3,i])
+		print "-------------------------------------------"
+		for i in range(4):
+			q.qgate(q.X(),[i+4])
 		q.qgate(q.R(q.pi/2),[7])
-		q.qgate(q.H(),[2])
-		q.qgate(q.H(),[4])
-		q.qgate(q.C(),[2,1])
-		q.qgate(q.C(),[4,3])
+		print "-------------------------------------------"
 		v = q.qmeasure(2)
-		print "Qbit value measured = ",v
+		print "Qbit 2 value measured = ",v
 		v = q.qmeasure(1)
-		print "Qbit value measured = ",v
+		print "Qbit 1 value measured = ",v
 		q.qreport()
 	except QClibError, m:
 		print m.args
