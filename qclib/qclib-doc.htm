@@ -376,9 +376,9 @@ printed out.</p>
 
 <h2>comb_op = qcombine_seq(name, op_list)</h2>
 
-<p class=MsoNormal>Combines a sequential application of gates into one equivalent
-gate. The parameter <span style='font-family:"Courier New"'>name</span> is the
-name of the resulting gate. Parameter <span style='font-family:"Courier New"'>op_list</span>
+<p class=MsoNormal>Combines a sequential application of gates into one
+equivalent gate. The parameter <span style='font-family:"Courier New"'>name</span>
+is the name of the resulting gate. Parameter <span style='font-family:"Courier New"'>op_list</span>
 is a list of gates each of the structure <span style='font-family:"Courier New"'>[name,matrix]</span>.</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
@@ -436,8 +436,8 @@ style='font-family:Wingdings'>è</span><span style='font-family:"Courier New"'>  
 --| |--</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>                      
-   -</span></p>
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                         
+-</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
@@ -460,6 +460,88 @@ normal'>&nbsp;</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(G,[7,5,3,1])</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
+
+<p class=MsoNormal>An interesting example is –</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                           _</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>1 --[H]----          1
+--|  |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                        
+|H2|</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>0 --[H]----          0
+--|  |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                         
+--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>H2 =
+qc.qcombine_par(“H2”,[H,H])</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                           _</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>3 ---.-----          1
+--|  |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>     |                  
+|  |</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>2 ---O-----          1
+--|  |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                        
+|C2|</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>1 ---.-----          0
+--|  |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>     |                  
+|  |</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>0 ---O-----          0
+--|  |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                           --</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>C2 =
+qc.qcombine_par(“C2”,[C,C])</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal'><span style='font-family:"Courier New"'>Create 2 bell states between
+quits 7,6 and 5,4 using these --</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(H2,[7,5])</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(C2,[7,6,5,4])</span></p>
 
 <h2>v = qmeasure(qbit_number,display=False)</h2>
 
@@ -585,10 +667,10 @@ would be invoked as --</p>
 matrix to handle all the qbits of the system, and performing the gate operation
 only on the speciic qbits.</p>
 
-<p class=MsoNormal>So, in general, if the gate operates on n qbits, then it
-should be written as if the entire system consists of only n qbits, and when
-calling <span style='font-family:"Courier New"'>qgate()</span>, the order of
-qbits should be <span style='font-family:"Courier New"'>[msb, ..., lsb]</span>.</p>
+<p class=MsoNormal>So, in general, if the gate operates on n qbits, then it should
+be written as if the entire system consists of only n qbits, and when calling <span
+style='font-family:"Courier New"'>qgate()</span>, the order of qbits should be <span
+style='font-family:"Courier New"'>[msb, ..., lsb]</span>.</p>
 
 <p class=MsoNormal>The system looks at the size of the matrix specifying the
 gate to determine the number of qbits required for that gate. If the number is
