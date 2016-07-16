@@ -2,6 +2,7 @@
 
 import numpy as np
 import random as rnd
+from copy import deepcopy
 
 class qcsim:
 
@@ -28,7 +29,7 @@ class qcsim:
 		if self.trace:
 			self.qreport(header="Initial State")
 
-	def shuffled_count(self, bitorder):
+	def __shuffled_count(self, bitorder):
 		sz = len(bitorder)
 		shuffled = []
 		for i in range(2**sz):
@@ -39,14 +40,14 @@ class qcsim:
 			shuffled.append(shfval)
 		return shuffled
 
-	def resize_opmatrix(self, op):
-		comp_op = op
+	def __resize_opmatrix(self, op):
+		comp_op = deepcopy(op)
 		opqbits = int(np.log2(op.shape[0]))
 		for i in range(self.nqbits-opqbits):
 			comp_op = np.kron(comp_op,np.eye(2))
 		return comp_op
 
-	def aligned_op(self, op, qbit_reorder):
+	def __aligned_op(self, op, qbit_reorder):
 		"""
 		qbit_reorder is 'visually correct'. So [a,b,c,d] implies MSB to be 
 		replaced by the bit in position 'a' in the original, next lower MSB 
@@ -56,7 +57,7 @@ class qcsim:
 			errmsg = "Internal Error. " + str(self.nqbits) + " qbit system. Alignment vector has incorrect size " + str(len(qbit_reorder))
 			raise QClibError(errmsg)
 		# this is the counting with the given bit ordering
-		rr = self.shuffled_count(qbit_reorder)
+		rr = self.__shuffled_count(qbit_reorder)
 		## create the rmat and rrmat
 		imat = np.matrix(np.eye(2**self.nqbits))
 		rmat = np.matrix(np.eye(2**self.nqbits))
@@ -68,28 +69,37 @@ class qcsim:
 		a_op = rrmat * op * rmat
 		return a_op
 
-	def qbit_realign_list(self, qbit_list):
-		reord_list = qbit_list
+	def __qbit_realign_list(self, qbit_list):
+		reord_list = deepcopy(qbit_list)
 		for i in range(self.nqbits):
 			if i not in reord_list:
 				reord_list.append(i)
 		return reord_list
 
-	def qgate(self, oper, qbit_list, display=False):
-		opname = oper[0]
+	def __stretched_mat(self,oper,qbit_list):
+		orignm = oper[0]
 		op = oper[1]
 		opargs = str(qbit_list)
 		if (op.shape)[1] != (op.shape)[0]:
-			errmsg = "Error. Operator is not a square matrix. Dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
+			errmsg = "Error. Operator is not a square matrix. "+orignm+"'s dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
 			raise QClibError(errmsg)
 		if (2**len(qbit_list)) != (op.shape)[0]:
-			errmsg = "User Error. Wrong number of qbit args for operator "+opname+". Provided arguments = "+opargs+"."
+			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
 			raise QClibError(errmsg)
-		c_op = self.resize_opmatrix(op)
-		reord_list = self.qbit_realign_list(qbit_list)
-		a_op = self.aligned_op(c_op,reord_list)
+		c_op = self.__resize_opmatrix(op)
+		reord_list = self.__qbit_realign_list(qbit_list)
+		a_op = self.__aligned_op(c_op,reord_list)
+		return a_op
+
+	def qstretch(self,oper,qbit_list):
+		return ["{:d}Q-{:s}{:s}".format(self.nqbits,oper[0],qbit_list),self.__stretched_mat(oper,qbit_list)]
+
+	def qgate(self, oper, qbit_list, display=False):
+		a_op = self.__stretched_mat(oper,qbit_list)
 		self.sys_state = a_op * self.sys_state
 		if display or self.trace:
+			opname = oper[0]
+			opargs = str(qbit_list)
 			hdr = opname + " Qbit" + opargs
 			self.qreport(header=hdr)
 
