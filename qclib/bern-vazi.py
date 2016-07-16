@@ -52,9 +52,10 @@ print "Step 3: Again Applied H to all |x> qbits"
 
 ###########################################################################
 ## Step 4: Measure all qbits of |x>
+res = 0
 for i in range(vec_x_sz):
-	qc.qmeasure(i)
+	v = qc.qmeasure(i)
+	res += (v << i)
 print "Step 4: Measured all qbits of |x>"
 
-qc.qreport("Result")
-
+print "Result =","{:0b}".format(res)
