@@ -63,6 +63,40 @@ p.MsoFooter, li.MsoFooter, div.MsoFooter
 	margin-bottom:.0001pt;
 	font-size:11.0pt;
 	font-family:"Calibri","sans-serif";}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:.5in;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoListParagraphCxSpFirst, li.MsoListParagraphCxSpFirst, div.MsoListParagraphCxSpFirst
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoListParagraphCxSpMiddle, li.MsoListParagraphCxSpMiddle, div.MsoListParagraphCxSpMiddle
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoListParagraphCxSpLast, li.MsoListParagraphCxSpLast, div.MsoListParagraphCxSpLast
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:.5in;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
 span.Heading1Char
 	{mso-style-name:"Heading 1 Char";
 	mso-style-link:"Heading 1";
@@ -479,7 +513,7 @@ normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>0 --[H]----          0
---|  |--</span></p>
+--|  |--</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>                         
@@ -496,7 +530,7 @@ normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
 .5in;line-height:normal'><span style='font-family:"Courier New"'>                           _</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>3 ---.-----          1
+.5in;line-height:normal'><span style='font-family:"Courier New"'>3 ---.-----          3
 --|  |--</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
@@ -504,7 +538,7 @@ normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
 |  |</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>2 ---O-----          1
+.5in;line-height:normal'><span style='font-family:"Courier New"'>2 ---O-----          2
 --|  |--</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
@@ -512,8 +546,8 @@ normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
 |C2|</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
-.5in;line-height:normal'><span style='font-family:"Courier New"'>1 ---.-----          0
---|  |--</span></p>
+.5in;line-height:normal'><span style='font-family:"Courier New"'>1 ---.-----          1
+--|  |--</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>     |                  
@@ -521,7 +555,7 @@ normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>0 ---O-----          0
---|  |--</span></p>
+--|  |--</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>                           --</span></p>
@@ -542,6 +576,65 @@ quits 7,6 and 5,4 using these --</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>qc.qgate(C2,[7,6,5,4])</span></p>
+
+<h2>newgate = qstretch(gate_function, list_of_qbits)</h2>
+
+<p class=MsoNormal>qstretch takes a gate and a specifc ordered list of qbits on
+which it would operate and ‘stretches’ it to handle *all* qbits in the system.
+Basically, the resulting <span style='font-family:"Courier New"'>newgate</span>
+takes as input all the qbits in the system provided as [msb,…,lsb], but
+performs the original operation only on the given <span style='font-family:
+"Courier New"'>list_of_qbits</span>, and passes through all the other qbits unaffected.</p>
+
+<p class=MsoNormal>For instance, lets assume we created a 4 qbit system (<span
+style='font-family:"Courier New"'>qclib.qcsim(4)</span>), and in that we use C
+gate on qbits 3 and 0 (<span style='font-family:"Courier New"'>qgate(C(),[3,0])</span>).
+That is shown on the left side. Stretch takes the same arguments and creates a gate
+that operates on 4 qbits, but still affects only qbits 3 and 0, passing the
+others through. </p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                         
+--- </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>3 ---.-----          3
+--| . |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>     |                  
+| | |</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>2 ---|-----          2
+--| | |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal'><span style='font-family:"Courier New"'>          |                   |
+| |</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>1 ---|-----          1
+--| | |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>     |                  
+| | |</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>0 ---O-----          0
+--| o |--</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                         
+---</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>qgate(C(),[3,0])     ng
+= qstretch(C(),[3,0])</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+.5in;line-height:normal'><span style='font-family:"Courier New"'>                     qgate(ng,[3,2,1,0])</span></p>
 
 <h2>v = qmeasure(qbit_number,display=False)</h2>
 
@@ -643,8 +736,7 @@ CNOT gate --</p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
 .5in;line-height:normal'><span style='font-family:"Courier New"'>     return
-[&quot;MY-CNOT&quot;,
-numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]</span></p>
+[&quot;MY-CNOT&quot;, numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]</span></p>
 
 <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
 normal'><span style='font-family:"Courier New"'>&nbsp;</span></p>
@@ -667,10 +759,10 @@ would be invoked as --</p>
 matrix to handle all the qbits of the system, and performing the gate operation
 only on the speciic qbits.</p>
 
-<p class=MsoNormal>So, in general, if the gate operates on n qbits, then it should
-be written as if the entire system consists of only n qbits, and when calling <span
-style='font-family:"Courier New"'>qgate()</span>, the order of qbits should be <span
-style='font-family:"Courier New"'>[msb, ..., lsb]</span>.</p>
+<p class=MsoNormal>So, in general, if the gate operates on n qbits, then it
+should be written as if the entire system consists of only n qbits, and when
+calling <span style='font-family:"Courier New"'>qgate()</span>, the order of
+qbits should be <span style='font-family:"Courier New"'>[msb, ..., lsb]</span>.</p>
 
 <p class=MsoNormal>The system looks at the size of the matrix specifying the
 gate to determine the number of qbits required for that gate. If the number is
