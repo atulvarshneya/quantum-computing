@@ -7,6 +7,7 @@ qc = qclib.qcsim(vec_x_sz+1)
 
 def get_fx():
 	secret_code = 0b11101
+	print "Pssst... the secret code is ","{:b}".format(secret_code)
 	fx_oplist = []
 	for i in range(vec_x_sz):
 		if secret_code & (0x1<<i):
