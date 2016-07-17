@@ -104,7 +104,14 @@ The function qgate() validates the number of bits passed in list_of_qbits agains
 
 If display is True, the resulting state is printed out.
 
-2.3	comb_op = qcombine_seq(name, op_list)
+2.3	v = qmeasure(qbit_number,display=False)
+--------
+Returns the measured value of the qbit, 0 or 1.
+If the bit is in a superposition with some amplitude, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
+Cleary, the computations can continue after the measurement operations.
+If display is True, the resulting state is printed out.
+
+2.4	comb_op = qcombine_seq(name, op_list)
 --------
 Combines a sequential application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
 
@@ -118,7 +125,7 @@ and to use it, for instance to apply it on qbit 2 --
  
 	qc.qgate(G,[2])
 
-2.4	comb_op = qcombine_par(name, op_list)
+2.5	comb_op = qcombine_par(name, op_list)
 --------
 Combines a parallel application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
 	                          _
@@ -160,7 +167,7 @@ Create 2 bell states between quits 7,6 and 5,4 using these --
 	qc.qgate(H2,[7,5])
 	qc.qgate(C2,[7,6,5,4])
 
-2.5	newgate = qstretch(gate_function, list_of_qbits)
+2.6	newgate = qstretch(gate_function, list_of_qbits)
 --------
 qstretch takes a gate and a specifc ordered list of qbits on which it would operate and ‘stretches’ it to handle *all* qbits in the system. Basically, the resulting newgate takes as input all the qbits in the system provided as [msb,…,lsb], but performs the original operation only on the given list_of_qbits, and passes through all the other qbits unaffected.
 
@@ -178,13 +185,6 @@ For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in th
 	                     qgate(ng,[3,2,1,0])
 
 qstretch() is useful in cases where you want to make a 'blackbox' function which does an equivalent of a series of operations in one go (see the accompanying bern_vazy.py). To do that you would typically use qcombine_seq()'s qcombine_par()'s in conjunction with qstretch()'s.
-
-2.6	v = qmeasure(qbit_number,display=False)
---------
-Returns the measured value of the qbit, 0 or 1.
-If the bit is in a superposition with some amplitude, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
-Cleary, the computations can continue after the measurement operations.
-If display is True, the resulting state is printed out.
 
 2.7	qreport(state=None, header="State")
 --------
