@@ -142,8 +142,6 @@ class qcsim:
 		bitmask = 0x1<<qbit
 		prob_0 = 0
 		prob_1 = 0
-		meas_0_state = self.sys_state
-		meas_1_state = self.sys_state
 		for i in range(len(self.sys_state)):
 			if (i & bitmask) == 0:
 				prob_0 += np.absolute(self.sys_state[i].item(0))**2
@@ -153,20 +151,19 @@ class qcsim:
 			errmsg = "Internal error, amplitudes ( {:0.4f} and {:0.4f} ) do not add to probability = 1.".format(prob_0,prob_1)
 			raise QClibError(errmsg)
 		toss = rnd.random()
+		# should round toss to 6 decimal places to align with the error check above (error < 0.000001)
 		if toss <= prob_0:
 			for i in range(len(self.sys_state)):
 				if (i & bitmask) != 0:
-					meas_0_state[i] = 0
-			meas_0_state = meas_0_state / np.sqrt(prob_0)
-			self.sys_state = meas_0_state
+					self.sys_state[i] = 0
+			self.sys_state = self.sys_state / np.sqrt(prob_0)
 			qbit_val = 0
 			prob = prob_0
 		else: # toss > prob_0
 			for i in range(len(self.sys_state)):
 				if (i & bitmask) == 0:
-					meas_1_state[i] = 0
-			meas_1_state = meas_1_state / np.sqrt(prob_1)
-			self.sys_state = meas_1_state
+					self.sys_state[i] = 0
+			self.sys_state = self.sys_state / np.sqrt(prob_1)
 			qbit_val = 1
 			prob = prob_1
 		if display or self.trace:
