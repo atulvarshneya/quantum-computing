@@ -138,6 +138,31 @@ class qcsim:
 				res = np.kron(res,mat)
 		return [name,res]
 
+	def qinverse(self,op,name=None):
+		if name == None:
+			name = "INV-"+op[0]
+		mat = deepcopy(op[1])
+		invmat = np.conjugate(np.transpose(mat))
+		return [name,invmat]
+
+	def qisunitary(self,op):
+		maxerr = 0.000001
+		mat = op[1]
+		(r,c) = mat.shape
+		if r != c:
+			return False
+		invmat = np.conjugate(np.transpose(mat))
+		pmat = np.asarray(mat * invmat)
+		for i in range(r):
+			for j in range(c):
+				if i != j:
+					if np.absolute(pmat[i][j]) > maxerr:
+						return False
+				else:
+					if np.absolute(pmat[i][j]-1.0) > maxerr:
+						return False
+		return True
+
 	def qmeasure(self, qbit, display=False):
 		bitmask = 0x1<<qbit
 		prob_0 = 0

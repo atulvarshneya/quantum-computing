@@ -115,11 +115,11 @@ If display is True, the resulting state is printed out.
 --------
 Combines a sequential application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
 
-	--[A]-–[B]--[C]--[D]—    ==>   --[G]--
+	--[A]-[B]--[C]--[D]    ==>   --[G]--
  
-To combine the above –
+To combine the above 
 
-	G = qc.qcombine_seq(“SEQ”,[A,B,C,D])
+	G = qc.qcombine_seq(SEQ,[A,B,C,D])
  
 and to use it, for instance to apply it on qbit 2 --
  
@@ -130,26 +130,26 @@ and to use it, for instance to apply it on qbit 2 --
 Combines a parallel application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
 	                          _
 	3 --[A]----          3 --| |--
-	2 -–[B]----     ==>  2 --| |--
+	2 -[B]----     ==>  2 --| |--
 	1 --[C]----          1 --|G|--
 	0 --[D]----          0 --| |--
 	                          -
 
-To combine the above into one operation with 4 qbits as inputs –
+To combine the above into one operation with 4 qbits as inputs 
 
-	G = qc.qcombine_par(“PAR”,[A,B,C,D])
+	G = qc.qcombine_par(PAR,[A,B,C,D])
  
 and to use it, for instance to apply it on qbits 7,5,3,1 --
 
 	qc.qgate(G,[7,5,3,1])
  
-An interesting illustrative example is –
+An interesting illustrative example is 
 	                          --
 	1 --[H]----          1 --|  |--
 	                         |H2|
 	0 --[H]----          0 --|  |--
 	                          --
-	H2 = qc.qcombine_par(“H2”,[H,H])
+	H2 = qc.qcombine_par(H2,[H,H])
  
 	                          --
 	3 ---.-----          3 --|  |--
@@ -160,7 +160,7 @@ An interesting illustrative example is –
 	     |                   |  |
 	0 ---O-----          0 --|  |--
 	                          --
-	C2 = qc.qcombine_par(“C2”,[C,C])
+	C2 = qc.qcombine_par(C2,[C,C])
  
 Create 2 bell states between quits 7,6 and 5,4 using these --
 
@@ -169,7 +169,7 @@ Create 2 bell states between quits 7,6 and 5,4 using these --
 
 2.6	newgate = qstretch(gate_function, list_of_qbits)
 --------
-qstretch takes a gate and a specifc ordered list of qbits on which it would operate and ‘stretches’ it to handle *all* qbits in the system. Basically, the resulting newgate takes as input all the qbits in the system provided as [msb,…,lsb], but performs the original operation only on the given list_of_qbits, and passes through all the other qbits unaffected.
+qstretch takes a gate and a specifc ordered list of qbits on which it would operate and stretches it to handle *all* qbits in the system. Basically, the resulting newgate takes as input all the qbits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qbits, and passes through all the other qbits unaffected.
 
 For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in that we use C gate on qbits 3 and 0 (qgate(C(),[3,0])). Shown on the left side of the figure below. Stretch takes the same arguments and creates a gate that operates on 4 qbits, but still affects only qbits 3 and 0, passing the others through.
 	                          ---
@@ -185,6 +185,14 @@ For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in th
 	                     qgate(ng,[3,2,1,0])
 
 qstretch() is useful in cases where you want to make a 'blackbox' function which does an equivalent of a series of operations in one go (see the accompanying bern_vazy.py). To do that you would typically use qcombine_seq()'s qcombine_par()'s in conjunction with qstretch()'s.
+
+2.7	invop = qinverse(op,name=None)
+--------
+Returns the inverse of the operator. If name argument is not provided, it generates a name by prefixing the name of the provided operator with "INV-"
+
+2.7	u = qisunitary(op)
+--------
+Checks if the provided operator is unitary opperator or not. Returns boolean value (True or False).
 
 2.7	qreport(state=None, header="State")
 --------
