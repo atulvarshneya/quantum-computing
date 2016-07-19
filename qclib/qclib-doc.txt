@@ -190,28 +190,28 @@ qstretch() is useful in cases where you want to make a 'blackbox' function which
 --------
 Returns the inverse of the operator. If name argument is not provided, it generates a name by prefixing the name of the provided operator with "INV-"
 
-2.7	u = qisunitary(op)
+2.8	u = qisunitary(op)
 --------
 Checks if the provided operator is unitary opperator or not. Returns boolean value (True or False).
 
-2.7	qreport(state=None, header="State")
+2.9	qreport(state=None, header="State")
 --------
 Prints the current state of the system. if state parameter is provided with a column numpy.matrix, it prints that state instead.
 The parameter header provides the text to be printed above the state information.
 
-2.8	st = qstate()
+2.10	st = qstate()
 --------
 Returns a Python array of the complex amplitudes of all possible superpositions of the qbits in the system.
 
-2.9	n = qsize()
+2.11	n = qsize()
 --------
 Returns the number of qbits in the system.
 
-2.10	qtraceON(boolean)
+2.12	qtraceON(boolean)
 --------
 Turns ON or OFF outputting of state after each qgate() and qmeasure() function call.
 
-2.11	qzerosON(boolean)
+2.13	qzerosON(boolean)
 --------
 Turns ON or OFF of zero amplitude states in trace outputs and qreport() outputs.
 
