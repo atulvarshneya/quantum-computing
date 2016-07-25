@@ -86,9 +86,14 @@ and, here is its output --
 2. FUNCTIONS
 --------------------------------------------------------------------------------
 
-2.1	qclib.qcsim(nqbits, qtrace=False, qzeros=False)
+2.1	qclib.qcsim(nqbits, preapre=None, qtrace=False, qzeros=False)
 --------
 First argument specifies the number of qbits in the system. Prepares all qbits to |0>.
+
+Parameter 'prepare' can be used to pass a numpy.matrix of shape (n,2) to start with that prepared state. The state to prepare is given in terms of the states of the qbits in the system. The qbits are specified in the 'visual' order starting with MSB, as in [MSB, ... ]. The number of qbits given in 'prepare' can be less than the number of qbits in the system, the remaining lower significance qbits are prepared in |0>. For example,
+	prep = numpy.matrix([[0,1],[0,1],[0,1]],dtype=complex)
+	qcsim(8,prepare=prep)
+instantiates an 8-qbit system, with its MSB 3 qbits in state |1> and the rest lower qbits in |0>, as [[0,1],[0,1],[0,1],[1,0],[1,0],[1,0],[1,0]]1.
 
 If qtrace=True, causes each operation (gate, measurement) to emit resulting state.
 
@@ -268,8 +273,20 @@ Since the gate is defined in form of a function, it can take parameters. For ins
  
 (Note: To see some change in the state, perform an X() or H() or some such on the qbit before the phase rotation.)
 
+4. ERROR HANDLING, EXCEPTIONS
+--------------------------------------------------------------------------------
+Various function calls raise exceptions, mostly in cases where user passed parameters are incorrect. The exceptions are raised using class qclib.QClibError, having an argument of a text string describing the error encountered.
 
-4. PERFORMANCE
+Following is an example shows how these exceptions are handled --
+
+	try:
+		q = qclib.qcsim(8)
+		q.qgate(q.H(),[0])
+		q.qgate(q.C(),[0,1])
+	exception QClibError, exp:
+		print exp.args
+
+5. PERFORMANCE
 --------------------------------------------------------------------------------
 On my laptop PC, I could go upto 11 qbits. Up until 8 qbits the simulator runs pretty fast. Beyond that the speed starts slowing down. At 11 qbits the simulator takes several seconds to apply 1 gate. At 12 qbits I get Memory Error.
 
