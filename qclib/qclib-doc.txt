@@ -273,7 +273,7 @@ Since the gate is defined in form of a function, it can take parameters. For ins
  
 (Note: To see some change in the state, perform an X() or H() or some such on the qbit before the phase rotation.)
 
-4. ERROR HANDLING, EXCEPTIONS
+5. ERROR HANDLING, EXCEPTIONS
 --------------------------------------------------------------------------------
 Various function calls raise exceptions, mostly in cases where user passed parameters are incorrect. The exceptions are raised using class qclib.QClibError, having an argument of a text string describing the error encountered.
 
@@ -286,7 +286,7 @@ Following is an example shows how these exceptions are handled --
 	exception QClibError, exp:
 		print exp.args
 
-5. PERFORMANCE
+6. PERFORMANCE
 --------------------------------------------------------------------------------
 On my laptop PC, I could go upto 11 qbits. Up until 8 qbits the simulator runs pretty fast. Beyond that the speed starts slowing down. At 11 qbits the simulator takes several seconds to apply 1 gate. At 12 qbits I get Memory Error.
 
