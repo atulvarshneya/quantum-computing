@@ -3,10 +3,11 @@
 import numpy as np
 import random as rnd
 from copy import deepcopy
+import types
 
 class qcsim:
 
-	def __init__(self, nq, qtrace=False, qzeros=False):
+	def __init__(self, nq, prepare=None, qtrace=False, qzeros=False):
 		# System Variables
 		self.nqbits = nq
 
@@ -14,13 +15,40 @@ class qcsim:
 		self.trace = qtrace
 		self.disp_zeros = qzeros
 
-		# Convinience constants
+		# Useful constants
 		self.pi = np.pi
+		self.maxerr = 0.000001
 
 		# Initial State
+		# Check the validity of the 'prepared' state passed
+		preplen = 0
+		if not prepare is None:
+			# if prepare id provided, check its sanity first
+			if not type(prepare) is np.matrixlib.defmatrix.matrix:
+				errmsg = "User Error. Wrong type. Prepared qbits not a numpy.matrix."
+				raise QClibError(errmsg)
+			(preplen,w) = prepare.shape
+			if w != 2:
+				errmsg = "User Error. wrong dimensions. Prepared qbits shape not (n,2)."
+				raise QClibError(errmsg)
+			if preplen > self.nqbits:
+				errmsg = "User Error. Parameter 'prepare' has too many qbits."
+				raise QClibError(errmsg)
+		prepqb = np.asarray(prepare)
+		for qb in prepqb:
+			qbmag = np.sqrt(np.absolute(qb[0])**2 + np.absolute(qb[1])**2)
+			if np.absolute(qbmag - 1) > self.maxerr:
+				errmsg = "User Error. Parameter 'prepare' qbit not normalized."
+				raise QClibError(errmsg)
+		offst = self.nqbits - preplen
+		# initialize the qbits
 		qbit = [None]*self.nqbits
 		for i in range(self.nqbits):
-			qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
+			if i >= offst:
+				qbit[i] = np.transpose(np.matrix(prepqb[self.nqbits-i-1],dtype=complex))
+			else:
+				qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
+		# Now create the state as a tensor product of the qbits (MSB to the left)
 		self.sys_state = qbit[self.nqbits-1]
 		l = range(self.nqbits-1)
 		l.reverse()
@@ -146,7 +174,6 @@ class qcsim:
 		return [name,invmat]
 
 	def qisunitary(self,op):
-		maxerr = 0.000001
 		mat = op[1]
 		(r,c) = mat.shape
 		if r != c:
@@ -156,10 +183,10 @@ class qcsim:
 		for i in range(r):
 			for j in range(c):
 				if i != j:
-					if np.absolute(pmat[i][j]) > maxerr:
+					if np.absolute(pmat[i][j]) > self.maxerr:
 						return False
 				else:
-					if np.absolute(pmat[i][j]-1.0) > maxerr:
+					if np.absolute(pmat[i][j]-1.0) > self.maxerr:
 						return False
 		return True
 
