@@ -18,6 +18,7 @@ class qcsim:
 		# Useful constants
 		self.pi = np.pi
 		self.maxerr = 0.000001
+		self.maxproberr = 0.000001
 
 		# Initial State
 		# Check the validity of the 'prepared' state passed
@@ -25,21 +26,21 @@ class qcsim:
 		if not prepare is None:
 			# if prepare id provided, check its sanity first
 			if not type(prepare) is np.matrixlib.defmatrix.matrix:
-				errmsg = "User Error. Wrong type. Prepared qbits not a numpy.matrix."
+				errmsg = "User Error. Wrong type. Prepared qbits must be a numpy.matrix."
 				raise QClibError(errmsg)
 			(preplen,w) = prepare.shape
 			if w != 2:
-				errmsg = "User Error. wrong dimensions. Prepared qbits shape not (n,2)."
+				errmsg = "User Error. wrong dimensions. Prepared qbits shape must be (n,2)."
 				raise QClibError(errmsg)
 			if preplen > self.nqbits:
 				errmsg = "User Error. Parameter 'prepare' has too many qbits."
 				raise QClibError(errmsg)
-		prepqb = np.asarray(prepare)
-		for qb in prepqb:
-			qbmag = np.sqrt(np.absolute(qb[0])**2 + np.absolute(qb[1])**2)
-			if np.absolute(qbmag - 1) > self.maxerr:
-				errmsg = "User Error. Parameter 'prepare' qbit not normalized."
-				raise QClibError(errmsg)
+			prepqb = np.asarray(prepare)
+			for qb in prepqb:
+				qbmag = np.sqrt(np.absolute(qb[0])**2 + np.absolute(qb[1])**2)
+				if np.absolute(qbmag - 1) > self.maxerr:
+					errmsg = "User Error. Parameter 'prepare' qbit not normalized."
+					raise QClibError(errmsg)
 		offst = self.nqbits - preplen
 		# initialize the qbits
 		qbit = [None]*self.nqbits
@@ -58,7 +59,7 @@ class qcsim:
 			self.qreport(header="Initial State")
 
 	def __shuffled_count(self, bitorder):
-		sz = len(bitorder)
+		sz = self.nqbits
 		shuffled = []
 		for i in range(2**sz):
 			shfval = 0
@@ -75,15 +76,7 @@ class qcsim:
 			comp_op = np.kron(comp_op,np.eye(2))
 		return comp_op
 
-	def __aligned_op(self, op, qbit_reorder):
-		"""
-		qbit_reorder is 'visually correct'. So [a,b,c,d] implies MSB to be 
-		replaced by the bit in position 'a' in the original, next lower MSB 
-		to be replaced by bit in potion 'b' in the original, and so on ...
-		"""
-		if self.nqbits != len(qbit_reorder):
-			errmsg = "Internal Error. " + str(self.nqbits) + " qbit system. Alignment vector has incorrect size " + str(len(qbit_reorder))
-			raise QClibError(errmsg)
+	def __rmat_rrmat(self, qbit_reorder):
 		# this is the counting with the given bit ordering
 		rr = self.__shuffled_count(qbit_reorder)
 		## create the rmat and rrmat
@@ -94,15 +87,27 @@ class qcsim:
 			s = rr[i]
 			rmat[i] = imat[s]
 			rrmat[s] = imat[i]
-		a_op = rrmat * op * rmat
-		return a_op
+		return (rmat, rrmat)
 
 	def __qbit_realign_list(self, qbit_list):
 		reord_list = deepcopy(qbit_list)
-		for i in range(self.nqbits):
+		iter = range(self.nqbits)
+		iter.reverse() # to maintain significance order of the other qbits; poetic correctness :-)
+		for i in iter:
 			if i not in reord_list:
 				reord_list.append(i)
 		return reord_list
+
+	def __aligned_op(self, op, qbit_list):
+		"""
+		qbit_reorder is 'visually correct'. So [a,b,c,d] implies bring to MSB 
+		the bit in position 'a' in the original, brint to the next lower MSB 
+		the bit in potion 'b' in the original, and so on ...
+		"""
+		qbit_reorder = self.__qbit_realign_list(qbit_list)
+		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
+		a_op = rrmat * op * rmat
+		return a_op
 
 	def __stretched_mat(self,oper,qbit_list):
 		orignm = oper[0]
@@ -115,8 +120,8 @@ class qcsim:
 			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
 			raise QClibError(errmsg)
 		c_op = self.__resize_opmatrix(op)
-		reord_list = self.__qbit_realign_list(qbit_list)
-		a_op = self.__aligned_op(c_op,reord_list)
+		# reord_list = self.__qbit_realign_list(qbit_list)
+		a_op = self.__aligned_op(c_op,qbit_list)
 		return a_op
 
 	def qstretch(self,oper,qbit_list):
@@ -130,13 +135,6 @@ class qcsim:
 			opargs = str(qbit_list)
 			hdr = opname + " Qbit" + opargs
 			self.qreport(header=hdr)
-
-	def qgate_batch(self, op_arg_list, display=False):
-		"""
-		Not sure if this batch operation is of any use, but threw it in anyways...
-		"""
-		for o in op_arg_list:
-			self.qgate(o[0],o[1],display=display)
 
 	def qcombine_seq(self,name,op_list):
 		d = ((op_list[0])[1]).shape[0]
@@ -190,7 +188,74 @@ class qcsim:
 						return False
 		return True
 
-	def qmeasure(self, qbit, basis=None, display=False):
+	def qmeasure(self, qbit_list, basis=None, display=False):
+		##
+		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+		##
+
+		# align the qbits to measure to the MSB
+		qbit_reorder = self.__qbit_realign_list(qbit_list)
+		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
+		self.sys_state = rmat * self.sys_state
+
+		# align with basis
+		if not basis is None:
+			pass
+			# Convert the mentioned qbits in the state to the given basis
+
+		list_len = len(qbit_list)
+		qbitmask = 0
+		for b in range(list_len):
+			qbitmask |= 0x1 << (self.nqbits-b-1)
+		shift_bits = self.nqbits - list_len
+
+		# add up the probability of the various combinations of the qbits to measure
+		prob = [0]*(2**list_len)
+		for i in range(len(self.sys_state)):
+			prob_idx = (i & qbitmask) >> shift_bits # Hmmm, could have kept the opposite bit order; too late now!!
+			prob[prob_idx] += np.absolute(self.sys_state[i].item(0))**2
+		# ... and verify the total probability adds up to 1.0, within the acceptable margin
+		totprob = 0
+		for p in prob:
+			totprob += p
+		if np.absolute(totprob - 1.0) > self.maxproberr:
+			errmsg = "Internal error, total probability != 1  (total prob = {:f}".format(totprob)
+			raise QClibError(errmsg)
+
+		# OK, now see which one should be selected
+		toss = rnd.random()
+		sel = len(prob) - 1 # to default if all the probs add up just short of 1, and toss == 1
+		prob_val = prob[sel]
+		cumprob = 0
+		for i in range(len(prob)):
+			if toss > cumprob and toss <= (cumprob + prob[i]):
+				sel = i
+			cumprob += prob[i]
+		prob_val = prob[sel]
+		meas_val = []
+		for i in reversed(range(list_len)):
+			if (sel & (0x1<<i)) == 0:
+				meas_val.append(0)
+			else:
+				meas_val.append(1)
+
+		# now, collapse to the selected state (all other amplitudes = 0, and normlize the amplitudes
+		to_match = sel << shift_bits
+		for i in range(len(self.sys_state)):
+			if (i & qbitmask) == to_match:
+				self.sys_state[i] = self.sys_state[i] / np.sqrt(prob_val)
+			else:
+				self.sys_state[i] = 0
+
+		# align the qbits back to original
+		self.sys_state = rrmat * self.sys_state
+
+		if display or self.trace:
+			hdr = "MEASURED Qbit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
+			self.qreport(header=hdr)
+		return meas_val
+
+	def qmeasure_old(self, qbit, basis=None, display=False):
 		bitmask = 0x1<<qbit
 		prob_0 = 0
 		prob_1 = 0
@@ -299,6 +364,7 @@ class QClibError:
 		self.args = arg
 
 if __name__ == "__main__":
+
 	q = qcsim(8,qtrace=True)
 
 	try:
@@ -311,9 +377,9 @@ if __name__ == "__main__":
 			q.qgate(q.X(),[i+4])
 		q.qgate(q.R(q.pi/2),[7])
 		print "-------------------------------------------"
-		v = q.qmeasure(2)
+		v = q.qmeasure([2])
 		print "Qbit 2 value measured = ",v
-		v = q.qmeasure(1)
+		v = q.qmeasure([1])
 		print "Qbit 1 value measured = ",v
 		q.qreport()
 	except QClibError, m:
