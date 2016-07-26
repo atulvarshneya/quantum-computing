@@ -201,6 +201,7 @@ class qcsim:
 		# align with basis
 		if not basis is None:
 			pass
+			# check sanity of the basis
 			# Convert the mentioned qbits in the state to the given basis
 
 		list_len = len(qbit_list)
@@ -254,39 +255,6 @@ class qcsim:
 			hdr = "MEASURED Qbit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
 			self.qreport(header=hdr)
 		return meas_val
-
-	def qmeasure_old(self, qbit, basis=None, display=False):
-		bitmask = 0x1<<qbit
-		prob_0 = 0
-		prob_1 = 0
-		for i in range(len(self.sys_state)):
-			if (i & bitmask) == 0:
-				prob_0 += np.absolute(self.sys_state[i].item(0))**2
-			else:
-				prob_1 += np.absolute(self.sys_state[i].item(0))**2
-		if np.absolute((prob_0 + prob_1) - 1.0) > 0.000001:
-			errmsg = "Internal error, amplitudes ( {:0.4f} and {:0.4f} ) do not add to probability = 1.".format(prob_0,prob_1)
-			raise QClibError(errmsg)
-		toss = rnd.random()
-		# should round toss to 6 decimal places to align with the error check above (error < 0.000001)
-		if toss <= prob_0:
-			for i in range(len(self.sys_state)):
-				if (i & bitmask) != 0:
-					self.sys_state[i] = 0
-			self.sys_state = self.sys_state / np.sqrt(prob_0)
-			qbit_val = 0
-			prob = prob_0
-		else: # toss > prob_0
-			for i in range(len(self.sys_state)):
-				if (i & bitmask) == 0:
-					self.sys_state[i] = 0
-			self.sys_state = self.sys_state / np.sqrt(prob_1)
-			qbit_val = 1
-			prob = prob_1
-		if display or self.trace:
-			hdr = "MEASURED Qbit[" + str(qbit) + "] = " + str(qbit_val) + " with probality = " + str(prob) 
-			self.qreport(header=hdr)
-		return qbit_val
 
 	def qreport(self, header="State", state=None):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
@@ -356,7 +324,7 @@ class qcsim:
 
 	# Basis Matrices
 	def BELL_BASIS(self):
-		return np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)
+		return np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)/np.sqrt(2)
 
 
 class QClibError:

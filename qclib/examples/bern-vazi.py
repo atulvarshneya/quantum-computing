@@ -5,9 +5,11 @@ import qclib
 vec_x_sz = 6 # size of the vector |x>
 qc = qclib.qcsim(vec_x_sz+1)
 
+code_fmt = "{:0"+"{:d}".format(vec_x_sz)+"b}"
+
 def get_fx():
 	secret_code = 0b11101
-	print "Pssst... the secret code is ","{:b}".format(secret_code)
+	print "Pssst... the secret code is ",code_fmt.format(secret_code)
 	fx_oplist = []
 	for i in range(vec_x_sz):
 		if secret_code & (0x1<<i):
@@ -52,10 +54,10 @@ print "Step 3: Again Applied H to all |x> qbits"
 
 ###########################################################################
 ## Step 4: Measure all qbits of |x>
-v = qc.qmeasure(range(vec_x_sz))
+v = qc.qmeasure(range(vec_x_sz)) # this will give [LSB, ..., MSB]
 res = 0
 for i in range(vec_x_sz):
 	res += (v[i] << i)
 print "Step 4: Measured all qbits of |x>"
 
-print "Result =","{:0b}".format(res)
+print "Result = "+code_fmt.format(res)

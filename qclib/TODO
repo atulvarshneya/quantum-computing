@@ -1,7 +1,1 @@
-qmeasure returns result in wrong order 1. in reverse of teh convention, 2. not in the order of the qbit_list
-
-to handle the basis in qmeasure
-
-fix bern_vazi.py to constrcut the result value from qmeasure
-
-update the documentaion for qmeasure
+To handle the basis in qmeasure
