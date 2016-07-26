@@ -17,5 +17,8 @@ q.qreport("0 and 1 in bell state")
 # qbit 0 is kept 'here' and qbit 1 is sent 'far away'; and we have the input qbit to be teleported, qbit 3, also 'here'.
 
 # at 'here' we measure the qbit to be teleported and qbit 0 in bell basis.
+q.qmeasure([3,0],basis=q.BELL_BASIS())
+
+q.qreport()
 
 # now we send these classicla bits b0 and b1 to 'far away' and apply appropriate gates to recover the input bit's state in qbit 1

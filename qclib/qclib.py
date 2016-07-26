@@ -201,8 +201,10 @@ class qcsim:
 		# align with basis
 		if not basis is None:
 			pass
-			# check sanity of the basis
 			# Convert the mentioned qbits in the state to the given basis
+			# TODO -- check sanity of the basis
+			full_sz_basis_mat = np.kron(basis, np.eye(2**(self.nqbits-len(qbit_list))))
+			self.sys_state = full_sz_basis_mat * self.sys_state
 
 		list_len = len(qbit_list)
 		qbitmask = 0
