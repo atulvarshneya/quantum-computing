@@ -190,7 +190,7 @@ class qcsim:
 						return False
 		return True
 
-	def qmeasure(self, qbit, display=False):
+	def qmeasure(self, qbit, basis=None, display=False):
 		bitmask = 0x1<<qbit
 		prob_0 = 0
 		prob_1 = 0
@@ -224,6 +224,7 @@ class qcsim:
 		return qbit_val
 
 	def qreport(self, header="State", state=None):
+		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		if state == None:
 			state = self.sys_state
 		print
@@ -233,6 +234,7 @@ class qcsim:
 				print format(i,'0'+str(self.nqbits)+'b')+"    "+"{:.8f}".format(np.around(state[i].item(0),8))
 
 	def qstate(self):
+		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		state_array = np.squeeze(np.asarray(self.sys_state))
 		return state_array
 
@@ -240,9 +242,11 @@ class qcsim:
 		return self.nqbits
 
 	def qtraceON(self, val):
+		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		self.trace = val
 
 	def qzerosON(self, val):
+		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		self.disp_zeros = val
 
 	## QC Gates
@@ -284,6 +288,10 @@ class qcsim:
 		Controlled NOT gate.
 		"""
 		return ["C-NOT", np.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
+
+	# Basis Matrices
+	def BELL_BASIS(self):
+		return np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)
 
 
 class QClibError:
