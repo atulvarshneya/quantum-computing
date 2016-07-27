@@ -23,16 +23,30 @@ b1 = mvals[0]
 
 # now we send these classicla bits b0 and b1 to 'far away' and apply appropriate gates to recover the input bit's state in qbit 1
 if b1 == 0 and b0 == 0:
-	print "00"
-	pass
+	q.qgate(q.C(),[3,1])
+	q.qgate(q.H(),[3])
 elif b1 == 0 and b0 == 1:
-	print "01"
 	q.qgate(q.Z(),[0])
+
+	# reset the state of 3 and 1, for clarity
+	q.qgate(q.C(),[3,1])
+	q.qgate(q.H(),[3])
+	q.qgate(q.X(),[3])
 elif b1 == 1 and b0 == 0:
-	print "10"
 	q.qgate(q.X(),[0])
+
+	# reset the state of 3 and 1, for clarity
+	q.qgate(q.C(),[3,1])
+	q.qgate(q.H(),[3])
+	q.qgate(q.X(),[1])
 else:
-	print "11"
 	q.qgate(q.X(),[0])
 	q.qgate(q.Z(),[0])
+
+	# reset the state of 3 and 1, for clarity
+	q.qgate(q.C(),[3,1])
+	q.qgate(q.H(),[3])
+	q.qgate(q.X(),[3])
+	q.qgate(q.X(),[1])
+
 q.qreport("Final state")
