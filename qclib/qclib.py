@@ -69,13 +69,6 @@ class qcsim:
 			shuffled.append(shfval)
 		return shuffled
 
-	def __resize_opmatrix(self, op):
-		comp_op = deepcopy(op)
-		opqbits = int(np.log2(op.shape[0]))
-		for i in range(self.nqbits-opqbits):
-			comp_op = np.kron(comp_op,np.eye(2))
-		return comp_op
-
 	def __rmat_rrmat(self, qbit_reorder):
 		# this is the counting with the given bit ordering
 		rr = self.__shuffled_count(qbit_reorder)
@@ -119,8 +112,7 @@ class qcsim:
 		if (2**len(qbit_list)) != (op.shape)[0]:
 			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
 			raise QClibError(errmsg)
-		c_op = self.__resize_opmatrix(op)
-		# reord_list = self.__qbit_realign_list(qbit_list)
+		c_op = np.kron(op,np.eye(2**(self.nqbits-len(qbit_list))))
 		a_op = self.__aligned_op(c_op,qbit_list)
 		return a_op
 
@@ -342,9 +334,9 @@ class QClibError:
 
 if __name__ == "__main__":
 
-	q = qcsim(8,qtrace=True)
-
 	try:
+		q = qcsim(8,qtrace=True)
+
 		print "Entangling 4 bits -------------------------"
 		q.qgate(q.H(),[3])
 		for i in range(3):
