@@ -283,10 +283,12 @@ Since the gate is defined in form of a function, it can take parameters. For ins
 --------------------------------------------------------------------------------
 Users can define a function which returns an np.matrix([[...],[...],...[...]],dtype=complex), with each row giving the vector for a basis vector each.
 Note, the row number (top row is row 0) is the value that will be measured for that basis vector. E.g., for Bell Basis, shown below, the rows represent, respectively |Phi+>, |Phi->, |Psi+>, |Psi->. So if a qbit-pair is in |Phi+> state, the measurement of the 2 qbits will be (0,0); if in |Psi+> they will be measured as (1,0).
-	1  0  0  1
-	1  0  0 -1
-	0  1  1  0
-	0  1 -1  0
+	          -           -
+	|phi+>   /  1  0  0  1  \
+	|phi->   |  1  0  0 -1  |
+	|psi+>   |  0  1  1  0  |
+	|psi->   \  0  1 -1  0  /
+	          -           -
 
 7. ERROR HANDLING, EXCEPTIONS
 --------------------------------------------------------------------------------
