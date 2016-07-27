@@ -58,7 +58,7 @@ The qmeasure() function measures qbit 0.
 >>> qc.qreport()
 This last qreport() function call outputs the state after the measurement of the qbit 0.
  
-Now, let us run the same code with trace turned on (therefore removed the qreport() calls). Turning trace ON, it outputs the state after init and each gate and measurement step (see accompanying helloworld_traceON.py) --
+Now, let us run the same code with trace turned on (therefore removed the qreport() calls). Turning trace ON, it outputs the state after init and each gate and measurement steps (see accompanying helloworld_traceON.py) --
 
 	import qclib
 	qc = qclib.qclib(8, qtrace=True)
@@ -111,13 +111,13 @@ If display is True, the resulting state is printed out.
 
 2.3	v = qmeasure(qbit_list, basis=None, display=False)
 --------
-Returns the measured values of the qbits in the qbit_list, each 0 or 1, as a list, in the same order as the qbits in teh qbit_list.
+Returns the measured values of the qbits in the qbit_list, each 0 or 1, as a list, in the same order as the qbits in the qbit_list.
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
 
-Parameter 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below.
+Parameter 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that the measurement of the specified qbits is done in that basis, the system's state continues to be in the 'standard' basis.
 
-Cleary, the computations can continue after the measurement operations.
+Cleary, the computations can continue after the measurement operations. Just that the measurement will collapse the state of the measured qbits.
 
 If display is True, the resulting state is printed out.
 
