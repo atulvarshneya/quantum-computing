@@ -1,0 +1,21 @@
+#!/bin/bash
+
+list=`ls *.py`
+
+for f in $list; do
+	logfile=runlogs/${f}.log
+	python $f > ${logfile}
+	explist=`ls expected/${f}.log*`
+	succ=0
+	for e in $explist; do
+		cmp -s $logfile $e
+		if [ $? = 0 ]; then 
+			succ=1
+		fi
+	done
+	if [ $succ = 1 ]; then
+		echo "SUCCESS - $f"
+	else
+		echo ">>>>>>> FAILED - $f"
+	fi
+done
