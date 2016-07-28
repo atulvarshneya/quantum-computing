@@ -139,10 +139,10 @@ and to use it, for instance to apply it on qbit 2 --
 --------
 Combines a parallel application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
 	                         +-+
-	3 --[A]----          3 --| |--
-	2 --[B]----     ==>  2 --| |--
-	1 --[C]----          1 --|G|--
-	0 --[D]----          0 --| |--
+	3 --[A]----          3 --| |--
+	2 --[B]----     ==>  2 --| |--
+	1 --[C]----          1 --|G|--
+	0 --[D]----          0 --| |--
 	                         +-+
 
 To combine the above into one operation with 4 qbits as inputs 
@@ -156,18 +156,18 @@ and to use it, for instance to apply it on qbits 7,5,3,1 --
 An interesting illustrative example is 
 	                         +--+
 	1 --[H]----          1 --|  |--
-	                         |H2|
-	0 --[H]----          0 --|  |--
+	                         |H2|
+	0 --[H]----          0 --|  |--
 	                         +--+
 	H2 = qc.qcombine_par(H2,[H,H])
  
 	                         +--+
 	3 ---.-----          3 --|  |--
-	     |                   |  |
-	2 ---O-----          2 --|  |--
-	                         |C2|
-	1 ---.-----          1 --|  |--
-	     |                   |  |
+	     |                   |  |
+	2 ---O-----          2 --|  |--
+	                         |C2|
+	1 ---.-----          1 --|  |--
+	     |                   |  |
 	0 ---O-----          0 --|  |--
 	                         +--+
 	C2 = qc.qcombine_par(C2,[C,C])
