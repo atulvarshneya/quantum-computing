@@ -20,7 +20,7 @@ When run, the above code generates the following output --
 	State
 	00001001    1.00000000+0.00000000j
  
-With respect to the functionality, the above code starts with an 8-qbit system, and then sets up a bell state between qbits 3 and 0. And then measures qbit 0. This is depicted in the diagram below --
+With respect to the functionality, the above code starts with an 8-qbit system, and then sets up qbits 3 and 0 in bell state. And then measures qbit 0. This is depicted in the diagram below --
 
 	7 -------------------------
 	6 -------------------------
@@ -90,12 +90,12 @@ and, here is its output --
 --------
 First argument specifies the number of qbits in the system. Prepares all qbits to |0>.
 
-Parameter 'prepare' can be used to pass a numpy.matrix of shape (n,2) to start with that prepared state. The state to prepare is given in terms of the states of the qbits in the system. The qbits are specified in the 'visual' order starting with MSB, as in [MSB, ... ]. The number of qbits given in 'prepare' can be less than the number of qbits in the system, the remaining lower significance qbits are prepared in |0>. For example,
+Parameter 'prepare' can be used to pass a numpy.matrix of shape (n,2) to start with that prepared state. The state to prepare is given in terms of the states of the qbits in the system. The qbits are specified in the 'visual' order of significance, starting with MSB, as in [MSB, ... ]. The number of qbits given in 'prepare' can be less than the number of qbits in the system, the remaining lower significance qbits are prepared in |0>. For example,
 	prep = numpy.matrix([[0,1],[0,1],[0,1]],dtype=complex)
 	qcsim(8,prepare=prep)
-instantiates an 8-qbit system, with its MSB 3 qbits in state |1> and the rest lower qbits in |0>, as [[0,1],[0,1],[0,1],[1,0],[1,0],[1,0],[1,0]]1.
+instantiates an 8-qbit system, with its MSB 3 qbits in state |1> and the rest lower qbits in |0>, as [[0,1],[0,1],[0,1],[1,0],[1,0],[1,0],[1,0],[1,0]].
 
-If qtrace=True, causes each operation (gate, measurement) to emit resulting state.
+If qtrace=True, it causes each operation (gate, measurement) to emit the resulting state.
 
 If qzeros=True, prints even those whose amplitude is 0.
 
@@ -115,9 +115,9 @@ Returns the measured values of the qbits in the qbit_list, each 0 or 1, as a lis
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
 
-Parameter 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that the measurement of the specified qbits is done in that basis, the system's state continues to be in the 'standard' basis.
+Parameter 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qbits is done in that basis, the system's state after teh measurement continues to be represented in the 'standard' basis.
 
-Cleary, the computations can continue after the measurement operations. Just that the measurement will collapse the state of the measured qbits.
+Cleary, the computations can continue after the measurement operations. Just that the measurement will appropriately collapse the state of the measured qbits.
 
 If display is True, the resulting state is printed out.
 
@@ -131,7 +131,7 @@ To combine the above
 
 	G = qc.qcombine_seq(SEQ,[A,B,C,D])
  
-and to use it, for instance to apply it on qbit 2 --
+and to use it, for instance to apply it on qbit 2 
  
 	qc.qgate(G,[2])
 
@@ -149,26 +149,26 @@ To combine the above into one operation with 4 qbits as inputs
 
 	G = qc.qcombine_par(PAR,[A,B,C,D])
  
-and to use it, for instance to apply it on qbits 7,5,3,1 --
+and to use it, for example to apply it on qbits 7,5,3,1 
 
 	qc.qgate(G,[7,5,3,1])
  
 An interesting illustrative example is 
 	                         +--+
-	1 --[H]----          1 --|  |--
+	1 --[H]----          1 --|  |--
 	                         |H2|
 	0 --[H]----          0 --|  |--
 	                         +--+
 	H2 = qc.qcombine_par(H2,[qc.H(),qc.H()])
  
 	                         +--+
-	3 ---.-----          3 --|  |--
+	3 ---.-----          3 --|  |--
 	     |                   |  |
 	2 ---O-----          2 --|  |--
 	                         |C2|
 	1 ---.-----          1 --|  |--
 	     |                   |  |
-	0 ---O-----          0 --|  |--
+	0 ---O-----          0 --|  |--
 	                         +--+
 	C2 = qc.qcombine_par(C2,[qc.C(),qc.C()])
  
@@ -183,13 +183,13 @@ qstretch takes a gate and a specifc ordered list of qbits on which it would oper
 
 For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in that we use C gate on qbits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. Stretch takes the same arguments and creates a gate that operates on 4 qbits, but still affects only qbits 3 and 0, passing the others through.
 	                         +---+
-	3 ---.-----          3 --| . |--
-	     |                   | | |
-	2 ---|-----          2 --| | |--
-	     |                   | | |
-	1 ---|-----          1 --| | |--
-	     |                   | | |
-	0 ---O-----          0 --| O |--
+	3 ---.-----          3 --| . |--
+             |                   | | |
+	2 ---|-----          2 --| | |--
+             |                   | | |
+	1 ---|-----          1 --| | |--
+             |                   | | |
+	0 ---O-----          0 --| O |--
 	                         +---+
     qc.qgate(qc.C(),[3,0])   ng = qc.qstretch(qc.C(),[3,0])
 	                     qc.qgate(ng,[3,2,1,0])
