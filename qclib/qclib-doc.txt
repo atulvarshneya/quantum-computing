@@ -300,7 +300,7 @@ Following is an example shows how these exceptions are handled --
 		q = qclib.qcsim(8)
 		q.qgate(q.H(),[0])
 		q.qgate(q.C(),[0,1])
-	exception QClibError, exp:
+	except qclib.QClibError, exp:
 		print exp.args
 
 Following is the list of error messages with the name of the function, thrown in an exception --
