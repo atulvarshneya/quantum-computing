@@ -159,7 +159,7 @@ An interesting illustrative example is
 	                         |H2|
 	0 --[H]----          0 --|  |--
 	                         +--+
-	H2 = qc.qcombine_par(H2,[H,H])
+	H2 = qc.qcombine_par(H2,[qc.H(),qc.H()])
  
 	                         +--+
 	3 ---.-----          3 --|  |--
@@ -170,7 +170,7 @@ An interesting illustrative example is
 	     |                   |  |
 	0 ---O-----          0 --|  |--
 	                         +--+
-	C2 = qc.qcombine_par(C2,[C,C])
+	C2 = qc.qcombine_par(C2,[qc.C(),qc.C()])
  
 Create 2 bell states between quits 7,6 and 5,4 using these --
 
@@ -181,7 +181,7 @@ Create 2 bell states between quits 7,6 and 5,4 using these --
 --------
 qstretch takes a gate and a specifc ordered list of qbits on which it would operate and stretches it to handle *all* qbits in the system. Basically, the resulting newgate takes as input all the qbits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qbits, and passes through all the other qbits unaffected.
 
-For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in that we use C gate on qbits 3 and 0 (qgate(C(),[3,0])). Shown on the left side of the figure below. Stretch takes the same arguments and creates a gate that operates on 4 qbits, but still affects only qbits 3 and 0, passing the others through.
+For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in that we use C gate on qbits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. Stretch takes the same arguments and creates a gate that operates on 4 qbits, but still affects only qbits 3 and 0, passing the others through.
 	                         +---+
 	3 ---.-----          3 --| . |--
 	     |                   | | |
@@ -191,10 +191,10 @@ For instance, lets assume we created a 4 qbit system (qclib.qcsim(4)), and in th
 	     |                   | | |
 	0 ---O-----          0 --| O |--
 	                         +---+
-	qgate(C(),[3,0])     ng = qstretch(C(),[3,0])
-	                     qgate(ng,[3,2,1,0])
+    qc.qgate(qc.C(),[3,0])   ng = qc.qstretch(qc.C(),[3,0])
+	                     qc.qgate(ng,[3,2,1,0])
 
-qstretch() is useful in cases where you want to make a 'blackbox' function which does an equivalent of a series of operations in one go (see the accompanying bern_vazy.py). To do that you would typically use qcombine_seq()'s qcombine_par()'s in conjunction with qstretch()'s.
+qstretch() is useful in cases where you want to make a 'blackbox' function which does an equivalent of a series of operations in one go (see the accompanying bern_vazy.py). To do that you would typically use qcombine_seq()'s and qcombine_par()'s in conjunction with qstretch()'s.
 
 2.7	invop = qinverse(op,name=None)
 --------
@@ -261,7 +261,7 @@ Or, if qbit 7 is to be the controlling qbit, then as --
 
 Qclib does all the trickery required to convert the gate matrix to handle all the qbits of the system, and performing the gate operation only on the speciic qbits.
 
-So, in general, if the gate operates on n qbits, then it should be written as if the entire system consists of only n qbits, and when calling qgate(), the order of qbits should be [msb, ..., lsb].
+So, in general, if the gate operates on n qbits, then it should be written as if the entire system consists of only n qbits, and when calling qgate(), the order of qbits should be [MSB, ..., LSB].
 
 The system looks at the size of the matrix specifying the gate to determine the number of qbits required for that gate. If the number is incorrect, it throws an exception.
 
@@ -283,12 +283,12 @@ Since the gate is defined in form of a function, it can take parameters. For ins
 --------------------------------------------------------------------------------
 Users can define a function which returns an np.matrix([[...],[...],...[...]],dtype=complex), with each row giving the vector for a basis vector each.
 Note, the row number (top row is row 0) is the value that will be measured for that basis vector. E.g., for Bell Basis, shown below, the rows represent, respectively |Phi+>, |Phi->, |Psi+>, |Psi->. So if a qbit-pair is in |Phi+> state, the measurement of the 2 qbits will be (0,0); if in |Psi+> they will be measured as (1,0).
-	          -           -
-	|phi+>   /  1  0  0  1  \
-	|phi->   |  1  0  0 -1  |
-	|psi+>   |  0  1  1  0  |
-	|psi->   \  0  1 -1  0  /
-	          -           -
+	                    -           -
+	|phi+>             /  1  0  0  1  \
+	|phi->   1/sqrt(2) |  1  0  0 -1  |
+	|psi+>             |  0  1  1  0  |
+	|psi->             \  0  1 -1  0  /
+	                    -           -
 
 7. ERROR HANDLING, EXCEPTIONS
 --------------------------------------------------------------------------------
@@ -302,6 +302,25 @@ Following is an example shows how these exceptions are handled --
 		q.qgate(q.C(),[0,1])
 	exception QClibError, exp:
 		print exp.args
+
+Following is the list of error messages with the name of the function, thrown in an exception --
+
+qclib.qcsim()
+	"User Error. Wrong type. Prepared qbits must be a numpy.matrix."
+	"User Error. wrong dimensions. Prepared qbits shape must be (n,2)."
+	"User Error. Parameter 'prepare' has too many qbits."
+	"User Error. Parameter 'prepare' qbit not normalized."
+
+qgate()
+	"Error. Operator is not a square matrix. operator's dimension = (r,c)."
+	"User Error. Wrong number of qbit args for operator <name>. Provided arguments = [list of arguments]."
+
+qcombine_seq()
+	"Opearion is not a square matrix."
+	"Opearion matrices not the same size."
+
+def qmeasure()
+	"Internal error, total probability != 1  (total prob = <number>).
 
 8. PERFORMANCE
 --------------------------------------------------------------------------------
