@@ -2,20 +2,23 @@
 
 list=`ls *.py`
 
+overall_ret=0
 for f in $list; do
 	logfile=runlogs/${f}.log
 	python $f > ${logfile}
 	explist=`ls expected/${f}.log*`
-	succ=0
+	succ=1
 	for e in $explist; do
 		cmp -s $logfile $e
 		if [ $? = 0 ]; then 
-			succ=1
+			succ=0
 		fi
 	done
-	if [ $succ = 1 ]; then
+	if [ $succ = 0 ]; then
 		echo "SUCCESS - $f"
 	else
 		echo ">>>>>>> FAILED - $f"
+		overall_ret=1
 	fi
 done
+exit $overall_ret
