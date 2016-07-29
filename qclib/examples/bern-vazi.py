@@ -31,7 +31,7 @@ print "Starting the VB algorithm..."
 # Step 0: Prepare the result bit |b> to |->
 qc.qgate(qc.X(),[vec_x_sz])
 qc.qgate(qc.H(),[vec_x_sz])
-print "Step 0: Preparing |b> as |->"
+print "Step 0: Prepared |b> as |->"
 
 ###########################################################################
 ## Step 1: Apply H on all qbits of |x>

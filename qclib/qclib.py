@@ -184,6 +184,27 @@ class qcsim:
 		##
 		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		##
+		if not basis is None:
+			(r,c) = basis.shape
+			if r != c:
+				errmsg = "User Error. Provided basis is not a square matrix."
+				raise self.QClibError(errmsg)
+			isok = True
+			if not basis is None:
+				isok = True
+				trpbasis = np.transpose(basis)
+				pmat = np.asarray(np.dot(basis,trpbasis))
+				for i in range(r):
+					for j in range(c):
+						if i != j:
+							if np.absolute(pmat[i][j]) > self.maxerr:
+								isok = False
+						else:
+							if np.absolute(pmat[i][j]-1.0) > self.maxerr:
+								isok = False
+				if not isok:
+					errmsg = "User Error. Provided basis does not have orthonormal vectors."
+					raise self.QClibError(errmsg)
 
 		# align the qbits to measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
