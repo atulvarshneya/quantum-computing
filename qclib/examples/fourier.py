@@ -36,10 +36,9 @@ try:
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 
 	q = qclib.qcsim(nqbits,initstate=initstate, qtrace=True, qzeros=True)
-	# for i in range(nqbits):
-	# 	qc.qgate(qc.H(),[i])
 	lst = range(nqbits)
 	lst.reverse()
+	q.qzerosON(False)
 	q.qgate(qft(nqbits), lst)
 	# print qft(nqbits)
 except qclib.QClibError,ex:

@@ -58,9 +58,7 @@ class qcsim:
 				qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
 			# Now create the state as a tensor product of the qbits (MSB to the left)
 			self.sys_state = qbit[self.nqbits-1]
-			l = range(self.nqbits-1)
-			l.reverse()
-			for i in l:
+			for i in reversed(range(self.nqbits-1)):
 				self.sys_state = np.kron(self.sys_state,qbit[i])
 		if self.trace:
 			self.qreport(header="Initial State")
@@ -91,9 +89,7 @@ class qcsim:
 
 	def __qbit_realign_list(self, qbit_list):
 		reord_list = deepcopy(qbit_list)
-		iter = range(self.nqbits)
-		iter.reverse() # to maintain significance order of the other qbits; poetic correctness :-)
-		for i in iter:
+		for i in reversed(range(self.nqbits)): # reversed to maintain significance order of the other qbits; poetic correctness :-)
 			if i not in reord_list:
 				reord_list.append(i)
 		return reord_list
