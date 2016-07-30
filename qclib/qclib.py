@@ -7,7 +7,7 @@ import types
 
 class qcsim:
 
-	def __init__(self, nq, initstate=None, qtrace=False, qzeros=False):
+	def __init__(self, nq, initstate=None, prepqbits=None, qtrace=False, qzeros=False):
 		# System Variables
 		self.nqbits = nq
 
@@ -39,6 +39,18 @@ class qcsim:
 				errmsg = "User Error. Initial state not normalized."
 				raise QClibError(errmsg)
 			self.sys_state = deepcopy(initstate)
+		elif not prepqbits is None:
+			if len(prepqbits) != self.nqbits:
+				errmsg = "User Error. wrong dimensions. prepqbits has incorrect number of qbits."
+				raise QClibError(errmsg)
+			prepstate = prepqbits[self.nqbits-1]
+			for i in reversed(range(self.nqbits-1)):
+				prepstate = np.kron(prepstate,prepqbits[i])
+			p = 0
+			for i in range(len(prepstate)):
+				p += np.absolute(prepstate[i].item(0))**2
+			prepstate = prepstate/np.sqrt(p)
+			self.sys_state = prepstate
 		else:
 			# initialize the qbits to |0>
 			qbit = [None]*self.nqbits
@@ -179,27 +191,28 @@ class qcsim:
 		##
 		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		##
+		bname = "STANDARD"
 		if not basis is None:
-			(r,c) = basis.shape
+			bname = basis[0]
+			bmat = basis[1]
+			(r,c) = bmat.shape
 			if r != c:
 				errmsg = "User Error. Provided basis is not a square matrix."
 				raise QClibError(errmsg)
 			isok = True
-			if not basis is None:
-				isok = True
-				trpbasis = np.transpose(basis)
-				pmat = np.asarray(np.dot(basis,trpbasis))
-				for i in range(r):
-					for j in range(c):
-						if i != j:
-							if np.absolute(pmat[i][j]) > self.maxerr:
-								isok = False
-						else:
-							if np.absolute(pmat[i][j]-1.0) > self.maxerr:
-								isok = False
-				if not isok:
-					errmsg = "User Error. Provided basis does not have orthonormal vectors."
-					raise QClibError(errmsg)
+			trpbasis = np.transpose(bmat)
+			pmat = np.asarray(np.dot(bmat,trpbasis))
+			for i in range(r):
+				for j in range(c):
+					if i != j:
+						if np.absolute(pmat[i][j]) > self.maxerr:
+							isok = False
+					else:
+						if np.absolute(pmat[i][j]-1.0) > self.maxerr:
+							isok = False
+			if not isok:
+				errmsg = "User Error. Provided basis does not have orthonormal vectors."
+				raise QClibError(errmsg)
 
 		# align the qbits to measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
@@ -210,7 +223,7 @@ class qcsim:
 		if not basis is None:
 			# Convert the mentioned qbits in the state to the given basis
 			# TODO -- check sanity of the basis
-			full_sz_basis_mat = np.kron(basis, np.eye(2**(self.nqbits-len(qbit_list))))
+			full_sz_basis_mat = np.kron(bmat, np.eye(2**(self.nqbits-len(qbit_list))))
 			self.sys_state = full_sz_basis_mat * self.sys_state
 
 		list_len = len(qbit_list)
@@ -261,7 +274,7 @@ class qcsim:
 		if not basis is None:
 			# Convert the mentioned qbits in the state to the given basis
 			# TODO -- check sanity of the basis
-			invbasis = np.conjugate(np.transpose(basis))
+			invbasis = np.conjugate(np.transpose(bmat))
 			full_sz_invbasis_mat = np.kron(invbasis, np.eye(2**(self.nqbits-len(qbit_list))))
 			self.sys_state = full_sz_invbasis_mat * self.sys_state
 
@@ -269,7 +282,7 @@ class qcsim:
 		self.sys_state = rrmat * self.sys_state
 
 		if qtrace or self.trace:
-			hdr = "MEASURED Qbit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
+			hdr = "MEASURED in basis "+bname+", Qbit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
 			self.qreport(header=hdr)
 		return meas_val
 
@@ -341,7 +354,7 @@ class qcsim:
 
 	# Basis Matrices
 	def BELL_BASIS(self):
-		return np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)/np.sqrt(2)
+		return ["BELL_BASIS",np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)/np.sqrt(2)]
 
 
 class QClibError:

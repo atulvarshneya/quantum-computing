@@ -3,8 +3,15 @@ import numpy as np
 
 try:
 	nqbits = 6
-	initstate = [None]*(2**nqbits)
 
+	# initialise with the default state of all qbits = |0>
+	q = qclib.qcsim(nqbits,qtrace=True)
+
+	# initialise with initial states of qbits
+	q = qclib.qcsim(nqbits,prepqbits=[[1,0],[0,1],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
+
+	# or build the full state yourself (good if you need a very custom state, e.g., for testing QFT)
+	initstate = [None]*(2**nqbits)
 	p = 0
 	stsz = 2**nqbits
 	for i in range(stsz):
@@ -14,5 +21,6 @@ try:
 		p += np.absolute(initstate[i])**2
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 	q = qclib.qcsim(nqbits,initstate=initstate, qtrace=True)
+
 except qclib.QClibError, ex:
 	print ex.args

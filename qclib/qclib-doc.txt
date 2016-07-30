@@ -41,7 +41,7 @@ Lets go line by line to understand the code --
 This line imports the qclib. Fairly straight forward.
 
 >>> qc = qclib.qcsim(8)
-The main class in the qclib library is qcsim. This line creates an instance of that class. As a convention in this document, qc is always used to represent an instance of the class qcsim. The qcsim class instance, qc, represents a quantum computer. The number 8 as the parameter to the constructor of class qclib, specifies the number of qbits in that quantum computer.
+The main class in the qclib library is qcsim. This line creates an instance of that class. As a convention in this document, qc is always used to represent an instance of the class qcsim. The qcsim class instance, qc, represents a quantum computer. The number 8 as the argument to the constructor of class qclib, specifies the number of qbits in that quantum computer.
 
 >>> qc.qgate(qc.H(),[0])
 qgate() is the function that applies a quantum gate on a given set of qbits in the system. In the above line of code, it applies the hadamard gate (H()), to qbit 0. See the documentation below for the gates available.
@@ -69,28 +69,30 @@ Now, let us run the same code with trace turned on (therefore removed the qrepor
 and, here is its output --
 
 	Initial State
-	00000000    1.00000000+0.00000000j
- 
+	00000000    1.00000000+0.00000000j
+
 	HADAMARD Qbit[0]
-	00000000    0.70710678+0.00000000j
-	00000001    0.70710678+0.00000000j
- 
+	00000000    0.70710678+0.00000000j
+	00000001    0.70710678+0.00000000j
+
 	C-NOT Qbit[0, 3]
-	00000000    0.70710678+0.00000000j
-	00001001    0.70710678+0.00000000j
- 
-	MEASURED Qbit[0] = [1] with probality = 0.5
-	00001001    1.00000000+0.00000000j
+	00000000    0.70710678+0.00000000j
+	00001001    0.70710678+0.00000000j
+
+	MEASURED in basis STANDARD, Qbit[0] = [0] with probality = 0.5
+	00000000    1.00000000+0.00000000j
 
 
 2. CORE FUNCTIONS
 --------------------------------------------------------------------------------
 
-2.1	qclib.qcsim(nqbits, initstate=None, preapre=None, qtrace=False, qzeros=False)
+2.1	qclib.qcsim(nqbits, initstate=None, prepqbits=None, qtrace=False, qzeros=False)
 --------
-First argument specifies the number of qbits in the system. Prepares all qbits to |0> unless 'initstate' is passed.
+First argument specifies the number of qbits in the system. if neither initstate ot prepqbits is provided, prepares all qbits to |0>.
 
-Parameter 'initstate' can be used to pass an initial state as a numpy.matrix of shape (2**nqbits,1). Also, the initstate should have the amplitudes normalized.
+Argument 'initstate' can be used to pass an initial state as a numpy.matrix of shape (2**nqbits,1). Also, the initstate should have the amplitudes normalized. See accompanying initialize-state.py for an example. If initstate is provided, it ignores any provided prepqbits.
+
+Argument 'prepqbits' can be provided to initialize the initial state by providing the states of all individual qbits in the system. The structure to use is a list, example [[a,b],[c,d], ... [x,y]]. Note that [a,b] is the MSB.
 
 If qtrace=True, it causes each operation (gate, measurement) to emit the resulting state.
 
@@ -112,7 +114,7 @@ Returns the measured values of the qbits in the qbit_list, each 0 or 1, as a lis
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
 
-Parameter 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qbits is done in that basis, the system's state after teh measurement continues to be represented in the 'standard' basis.
+Argument 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qbits is done in that basis, the system's state after teh measurement continues to be represented in the 'standard' basis.
 
 Cleary, the computations can continue after the measurement operations. Just that the measurement will appropriately collapse the state of the measured qbits.
 
@@ -120,8 +122,8 @@ If qtrace is True, the resulting state is printed out.
 
 2.4	qreport(state=None, header="State")
 --------
-Prints the current state of the system. if state parameter is provided with a column numpy.matrix, it prints that state instead.
-The parameter header provides the text to be printed above the state information.
+Prints the current state of the system. if state argument is provided with a column numpy.matrix, it prints that state instead.
+The argument header provides the text to be printed above the state information.
 
 2.5	st = qstate()
 --------
@@ -145,7 +147,7 @@ Turns ON or OFF of zero amplitude states in trace outputs and qreport() outputs.
 
 3.1	comb_op = qcombine_seq(name, op_list)
 --------
-Combines a sequential application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
+Combines a sequential application of gates into one equivalent gate. The argument name is the name of the resulting gate. Argument op_list is a list of gates each of the structure [name,matrix].
 
 	--[A]--[B]--[C]--[D]--    ==>   --[G]--
  
@@ -159,7 +161,7 @@ and to use it, for instance to apply it on qbit 2
 
 3.2	comb_op = qcombine_par(name, op_list)
 --------
-Combines a parallel application of gates into one equivalent gate. The parameter name is the name of the resulting gate. Parameter op_list is a list of gates each of the structure [name,matrix].
+Combines a parallel application of gates into one equivalent gate. The argument name is the name of the resulting gate. Argument op_list is a list of gates each of the structure [name,matrix].
 	                         +-+
 	3 --[A]----          3 --| |--
 	2 --[B]----     ==>  2 --| |--
@@ -265,7 +267,7 @@ So, in general, if the gate operates on n qbits, then it should be written as if
 
 The system looks at the size of the matrix specifying the gate to determine the number of qbits required for that gate. If the number is incorrect, it throws an exception.
 
-Since the gate is defined in form of a function, it can take parameters. For instance, for a rotation gate, the rotation angle can be passed as a parameter --
+Since the gate is defined in form of a function, it can take arguments. For instance, for a rotation gate, the rotation angle can be passed as an argument --
 
 	def myR(theta):
 		c = numpy.cos(theta)
@@ -292,7 +294,7 @@ Note, the row number (top row is row 0) is the value that will be measured for t
 
 8. ERROR HANDLING, EXCEPTIONS
 --------------------------------------------------------------------------------
-Various function calls raise exceptions, mostly in cases where user passed parameters are incorrect. The exceptions are raised using class qclib.QClibError, having an argument of a text string describing the error encountered.
+Various function calls raise exceptions, mostly in cases where user passed arguments are incorrect. The exceptions are raised using class qclib.QClibError, having an argument of a text string describing the error encountered.
 
 Following is an example shows how these exceptions are handled --
 
@@ -305,22 +307,7 @@ Following is an example shows how these exceptions are handled --
 
 Following is the list of error messages with the name of the function, thrown in an exception --
 
-qclib.qcsim()
-	"User Error. Wrong type. Prepared qbits must be a numpy.matrix."
-	"User Error. wrong dimensions. Prepared qbits shape must be (n,2)."
-	"User Error. Parameter 'prepare' has too many qbits."
-	"User Error. Parameter 'prepare' qbit not normalized."
-
-qgate()
-	"Error. Operator is not a square matrix. operator's dimension = (r,c)."
-	"User Error. Wrong number of qbit args for operator <name>. Provided arguments = [list of arguments]."
-
-qcombine_seq()
-	"Opearion is not a square matrix."
-	"Opearion matrices not the same size."
-
-def qmeasure()
-	"Internal error, total probability != 1  (total prob = <number>).
+	(TBD with the latest list)
 
 9. PERFORMANCE
 --------------------------------------------------------------------------------
