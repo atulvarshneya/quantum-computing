@@ -90,11 +90,13 @@ and, here is its output --
 --------
 First argument specifies the number of qbits in the system. if neither initstate ot prepqbits is provided, prepares all qbits to |0>.
 
-Argument 'initstate' can be used to pass an initial state as a numpy.matrix of shape (2**nqbits,1). Also, the initstate should have the amplitudes normalized. See accompanying initialize-state.py for an example. If initstate is provided, it ignores any provided prepqbits.
-
 Argument 'prepqbits' can be provided to initialize the initial state by providing the states of all individual qbits in the system. The structure to use is a list, example [[a,b],[c,d], ... [x,y]]. Note that [a,b] is the MSB.
 
-If qtrace=True, it causes each operation (gate, measurement) to emit the resulting state.
+Argument 'initstate' can be used to pass an initial state as a numpy.matrix of shape (2**nqbits,1). Also, the initstate should have the amplitudes normalized. See accompanying initialize-state.py for an example. creating an initstate vector requires more involed coding, but can come in handy when the initial state is required to have very custom distribution of amplitudes - e.g., in case of trying to setup the initial state for testing QFT.
+
+If 'initstate' is provided, any provided 'prepqbits' is ignored. 
+
+If qtrace=True, it causes each gate application ab=nd measurement operation to emit the resulting state.
 
 If qzeros=True, prints even those whose amplitude is 0.
 
