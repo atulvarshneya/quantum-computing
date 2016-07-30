@@ -280,7 +280,7 @@ class qcsim:
 		print
 		print header
 		for i in range(len(state)):
-			if self.disp_zeros or np.absolute(state[i]) != 0:
+			if self.disp_zeros or np.absolute(state[i]) > self.maxerr:
 				print format(i,'0'+str(self.nqbits)+'b')+"    "+"{:.8f}".format(np.around(state[i].item(0),8))
 
 	def qstate(self):

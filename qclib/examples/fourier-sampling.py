@@ -17,7 +17,7 @@ def rootsofunity(n,step):
 	return rootlist
 
 # ... and using that, create the QFT operator for the given number of qbits
-def qftop(n):
+def qft(n):
 	opmat = [None]*(2**n)
 	for i in range(2**n):
 		opmat[i] = rootsofunity(2**n,i)
@@ -29,7 +29,7 @@ try:
 	qc = qclib.qcsim(4,qtrace=True)
 	for i in range(nqbits):
 		qc.qgate(qc.H(),[i])
-	qc.qgate(qftop(nqbits), range(nqbits))
-	# print qftop(nqbits)
+	qc.qgate(qft(nqbits), range(nqbits))
+	# print qft(nqbits)
 except qclib.QClibError,ex:
 	print ex.args

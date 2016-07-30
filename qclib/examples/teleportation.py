@@ -5,9 +5,15 @@ import random as rnd
 theta = rnd.random() * 2 * np.pi
 c = np.cos(theta)
 s = np.sin(theta)
-prep = np.matrix([[c,s]],dtype=complex)
+# prepare the initial state with qbit-3 with the above computed random amplitude
+msb = np.transpose(np.matrix([[c,s]],dtype=complex))
+init = msb
+for i in range(3-1):
+	init = np.kron(init,np.transpose(np.matrix([[1,0]],dtype=complex)))
 
-q = qclib.qcsim(3,prepare=prep)
+
+# now get started ...
+q = qclib.qcsim(3,initstate=init)
 q.qreport()
 
 # first put qbits 0 and 1 in bell state
