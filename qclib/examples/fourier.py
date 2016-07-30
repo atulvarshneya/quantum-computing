@@ -1,7 +1,7 @@
 import qclib
 import numpy as np
 
-nqbits = 4
+nqbits = 8
 
 # create a list of nth roots of unity
 def rootsofunity(n,step):
@@ -26,10 +26,21 @@ def qft(n):
 	return oper
 
 try:
-	qc = qclib.qcsim(4,qtrace=True)
-	for i in range(nqbits):
-		qc.qgate(qc.H(),[i])
-	qc.qgate(qft(nqbits), range(nqbits))
+	# setup an initial state to try out QFT
+	initstate = [None]*(2**nqbits)
+	p = 0
+	stsz = 2**nqbits
+	for i in range(stsz):
+		initstate[i] = i%8
+		p += np.absolute(initstate[i])**2
+	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
+
+	q = qclib.qcsim(nqbits,initstate=initstate, qtrace=True, qzeros=True)
+	# for i in range(nqbits):
+	# 	qc.qgate(qc.H(),[i])
+	lst = range(nqbits)
+	lst.reverse()
+	q.qgate(qft(nqbits), lst)
 	# print qft(nqbits)
 except qclib.QClibError,ex:
 	print ex.args
