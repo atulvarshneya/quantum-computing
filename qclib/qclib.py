@@ -21,9 +21,9 @@ class qcsim:
 		self.maxproberr = 0.000001
 
 		# Initial State
-		# Check the validity of the 'prepared' state passed
-		preplen = 0
+		offst = self.nqbits
 		if not prepare is None:
+			preplen = 0
 			# if prepare id provided, check its sanity first
 			if not type(prepare) is np.matrixlib.defmatrix.matrix:
 				errmsg = "User Error. Wrong type. Prepared qbits must be a numpy.matrix."
@@ -41,7 +41,7 @@ class qcsim:
 				if np.absolute(qbmag - 1) > self.maxerr:
 					errmsg = "User Error. Parameter 'prepare' qbit not normalized."
 					raise QClibError(errmsg)
-		offst = self.nqbits - preplen
+			offst = self.nqbits - preplen
 		# initialize the qbits
 		qbit = [None]*self.nqbits
 		for i in range(self.nqbits):
@@ -188,7 +188,7 @@ class qcsim:
 			(r,c) = basis.shape
 			if r != c:
 				errmsg = "User Error. Provided basis is not a square matrix."
-				raise self.QClibError(errmsg)
+				raise QClibError(errmsg)
 			isok = True
 			if not basis is None:
 				isok = True
@@ -204,7 +204,7 @@ class qcsim:
 								isok = False
 				if not isok:
 					errmsg = "User Error. Provided basis does not have orthonormal vectors."
-					raise self.QClibError(errmsg)
+					raise QClibError(errmsg)
 
 		# align the qbits to measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
