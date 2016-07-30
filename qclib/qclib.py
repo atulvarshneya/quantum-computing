@@ -7,7 +7,7 @@ import types
 
 class qcsim:
 
-	def __init__(self, nq, prepare=None, qtrace=False, qzeros=False):
+	def __init__(self, nq, initstate=None, qtrace=False, qzeros=False):
 		# System Variables
 		self.nqbits = nq
 
@@ -21,40 +21,35 @@ class qcsim:
 		self.maxproberr = 0.000001
 
 		# Initial State
-		offst = self.nqbits
-		if not prepare is None:
-			preplen = 0
-			# if prepare id provided, check its sanity first
-			if not type(prepare) is np.matrixlib.defmatrix.matrix:
-				errmsg = "User Error. Wrong type. Prepared qbits must be a numpy.matrix."
+		if not initstate is None:
+			# check if the state is np.matrix type
+			if not type(initstate) is np.matrixlib.defmatrix.matrix:
+				errmsg = "User Error. Wrong type. Initstate must be a numpy.matrix."
 				raise QClibError(errmsg)
-			(preplen,w) = prepare.shape
-			if w != 2:
-				errmsg = "User Error. wrong dimensions. Prepared qbits shape must be (n,2)."
+			# check if the size of the passed state is 2**nqbits
+			(rows,cols) = initstate.shape
+			if rows != 2**self.nqbits or cols != 1:
+				errmsg = "User Error. wrong dimensions. Initstate shape must be (2^nqbits,1)."
 				raise QClibError(errmsg)
-			if preplen > self.nqbits:
-				errmsg = "User Error. Parameter 'prepare' has too many qbits."
+			# check if normalized
+			p = 0
+			for i in range(2**self.nqbits):
+				p += np.absolute(initstate[i].item(0))**2
+			if np.absolute(p-1.0) > self.maxerr:
+				errmsg = "User Error. Initial state not normalized."
 				raise QClibError(errmsg)
-			prepqb = np.asarray(prepare)
-			for qb in prepqb:
-				qbmag = np.sqrt(np.absolute(qb[0])**2 + np.absolute(qb[1])**2)
-				if np.absolute(qbmag - 1) > self.maxerr:
-					errmsg = "User Error. Parameter 'prepare' qbit not normalized."
-					raise QClibError(errmsg)
-			offst = self.nqbits - preplen
-		# initialize the qbits
-		qbit = [None]*self.nqbits
-		for i in range(self.nqbits):
-			if i >= offst:
-				qbit[i] = np.transpose(np.matrix(prepqb[self.nqbits-i-1],dtype=complex))
-			else:
+			self.sys_state = deepcopy(initstate)
+		else:
+			# initialize the qbits to |0>
+			qbit = [None]*self.nqbits
+			for i in range(self.nqbits):
 				qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
-		# Now create the state as a tensor product of the qbits (MSB to the left)
-		self.sys_state = qbit[self.nqbits-1]
-		l = range(self.nqbits-1)
-		l.reverse()
-		for i in l:
-			self.sys_state = np.kron(self.sys_state,qbit[i])
+			# Now create the state as a tensor product of the qbits (MSB to the left)
+			self.sys_state = qbit[self.nqbits-1]
+			l = range(self.nqbits-1)
+			l.reverse()
+			for i in l:
+				self.sys_state = np.kron(self.sys_state,qbit[i])
 		if self.trace:
 			self.qreport(header="Initial State")
 
@@ -119,10 +114,10 @@ class qcsim:
 	def qstretch(self,oper,qbit_list):
 		return ["{:d}Q-{:s}{:s}".format(self.nqbits,oper[0],qbit_list),self.__stretched_mat(oper,qbit_list)]
 
-	def qgate(self, oper, qbit_list, display=False):
+	def qgate(self, oper, qbit_list, qtrace=False):
 		a_op = self.__stretched_mat(oper,qbit_list)
 		self.sys_state = a_op * self.sys_state
-		if display or self.trace:
+		if qtrace or self.trace:
 			opname = oper[0]
 			opargs = str(qbit_list)
 			hdr = opname + " Qbit" + opargs
@@ -180,7 +175,7 @@ class qcsim:
 						return False
 		return True
 
-	def qmeasure(self, qbit_list, basis=None, display=False):
+	def qmeasure(self, qbit_list, basis=None, qtrace=False):
 		##
 		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		##
@@ -273,7 +268,7 @@ class qcsim:
 		# align the qbits back to original
 		self.sys_state = rrmat * self.sys_state
 
-		if display or self.trace:
+		if qtrace or self.trace:
 			hdr = "MEASURED Qbit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
 			self.qreport(header=hdr)
 		return meas_val

@@ -2,9 +2,6 @@ git add -A
 git status
 git commit -m "comment message"
 git push origin master
-Username: atulvarshneya
-Password: atul123
-
 
 # create a file ~/.netrc with the following line
 machine github.com login atulvarshneya password atul123
