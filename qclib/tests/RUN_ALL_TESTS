@@ -1,4 +1,24 @@
 #!/bin/bash
+BRIEF=0
+QUIET=0
+while [[ $# -gt 0 ]]
+do
+	key="$1"
+
+	case $key in
+		-b|--brief)
+		BRIEF=1
+		;;
+		-q|--quiet)
+		QUIET=1
+		;;
+		*)
+		echo "Usage: $0 [-b|--brief] [-q|--quiet]"
+		exit 1
+		;;
+	esac
+	shift # past argument or value
+done
 
 list=`ls *.py`
 
@@ -6,19 +26,31 @@ overall_ret=0
 for f in $list; do
 	logfile=runlogs/${f}.log
 	python $f > ${logfile}
-	explist=`ls expected/${f}.log*`
+	explist=""
+	explist=$(ls expected/${f}.log*)
 	succ=1
-	for e in $explist; do
-		cmp -s $logfile $e
-		if [ $? = 0 ]; then 
-			succ=0
-		fi
-	done
+	if [[ $explist != "" ]]; then
+		for e in $explist; do
+			cmp -s $logfile $e
+			if [ $? = 0 ]; then 
+				succ=0
+			fi
+		done
+	fi
 	if [ $succ = 0 ]; then
-		echo "SUCCESS - $f"
+		if [[ $BRIEF = 0 && $QUIET = 0 ]]; then
+			echo "SUCCESS - $f"
+		fi
 	else
-		echo ">>>>>>> FAILED - $f"
+		if [[ $QUIET = 0 ]]; then
+			echo ">>>>>>> FAILED - $f"
+		fi
 		overall_ret=1
 	fi
 done
+if [[ $BRIEF = 1 && $QUIET = 0 ]]; then
+	if [[ $overall_ret = 0 ]]; then
+		echo "SUCCESS"
+	fi
+fi
 exit $overall_ret
