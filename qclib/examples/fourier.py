@@ -1,7 +1,7 @@
 import qclib
 import numpy as np
 
-nqbits = 8
+nqbits = 10
 
 # create a list of nth roots of unity
 def rootsofunity(n,step):
@@ -35,11 +35,17 @@ try:
 		p += np.absolute(initstate[i])**2
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 
+	# Start the Quantum Computer Simulator
 	q = qclib.qcsim(nqbits,initstate=initstate, qtrace=True, qzeros=True)
+	q.qzerosON(False)
+
+	qftgate = qft(nqbits)
+	if not q.qisunitary(qftgate):
+		print ">>>>>> NOT UNITARY!!!",qfgate[0]
+	else:
+		print "Is Unitary.",qftgate[0]
 	lst = range(nqbits)
 	lst.reverse()
-	q.qzerosON(False)
-	q.qgate(qft(nqbits), lst)
-	# print qft(nqbits)
+	q.qgate(qftgate, lst)
 except qclib.QClibError,ex:
 	print ex.args
