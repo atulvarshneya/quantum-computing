@@ -9,6 +9,7 @@ class qcsim:
 
 	def __init__(self, nq, initstate=None, prepqbits=None, qtrace=False, qzeros=False):
 		# System Variables
+		self.stepcount = 0
 		self.nqbits = nq
 
 		# Runtime Options
@@ -123,6 +124,7 @@ class qcsim:
 		return ["{:d}Q-{:s}{:s}".format(self.nqbits,oper[0],qbit_list),self.__stretched_mat(oper,qbit_list)]
 
 	def qgate(self, oper, qbit_list, qtrace=False):
+		self.stepcount += 1
 		a_op = self.__stretched_mat(oper,qbit_list)
 		self.sys_state = a_op * self.sys_state
 		if qtrace or self.trace:
@@ -184,6 +186,7 @@ class qcsim:
 		return True
 
 	def qmeasure(self, qbit_list, basis=None, qtrace=False):
+		self.stepcount += 1
 		##
 		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		##
@@ -287,6 +290,7 @@ class qcsim:
 		if state == None:
 			state = self.sys_state
 		print
+		# print "[{:04d}] ".format(self.stepcount)+header
 		print header
 		for i in range(len(state)):
 			if self.disp_zeros or np.absolute(state[i]) > self.maxerr:
@@ -347,6 +351,21 @@ class qcsim:
 		Controlled NOT gate.
 		"""
 		return ["C-NOT", np.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
+
+	def T(self):
+		"""
+		TOFFOLI gate.
+		"""
+		return ["TOFFOLI", np.matrix([
+			[1,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0],
+			[0,0,1,0,0,0,0,0],
+			[0,0,0,1,0,0,0,0],
+			[0,0,0,0,1,0,0,0],
+			[0,0,0,0,0,1,0,0],
+			[0,0,0,0,0,0,0,1],
+			[0,0,0,0,0,0,1,0]
+			],dtype=complex)]
 
 	# Basis Matrices
 	def BELL_BASIS(self):

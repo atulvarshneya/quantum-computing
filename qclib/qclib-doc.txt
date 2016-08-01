@@ -240,6 +240,7 @@ A number of gates are pre-defined in the qclib class. The following is the list 
 	R(phi)	Phase rotation by phi
 	C()	CNOT gate
 	SWAP()	SWAP gate
+	T()	TOFFOLI gate
 
 5. CREATING USER DEFINED GATES
 --------------------------------------------------------------------------------
