@@ -22,6 +22,9 @@ done
 
 list=`ls *.py`
 
+if [ ! -d runlogs ]; then
+	mkdir runlogs
+fi
 overall_ret=0
 for f in $list; do
 	logfile=runlogs/${f}.log
