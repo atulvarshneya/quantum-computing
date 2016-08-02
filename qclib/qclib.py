@@ -64,65 +64,6 @@ class qcsim:
 		if self.trace:
 			self.qreport(header="Initial State")
 
-	def __shuffled_count(self, bitorder):
-		sz = self.nqbits
-		shuffled = []
-		for i in range(2**sz):
-			shfval = 0
-			for b in range(sz):
-				dstbit = bitorder[sz-b-1]
-				shfval += (((i >> b) & 0x1) << dstbit)
-			shuffled.append(shfval)
-		return shuffled
-
-	def __rmat_rrmat(self, qbit_reorder):
-		# this is the counting with the given bit ordering
-		rr = self.__shuffled_count(qbit_reorder)
-		## create the rmat and rrmat
-		imat = np.matrix(np.eye(2**self.nqbits))
-		rmat = np.matrix(np.eye(2**self.nqbits))
-		rrmat = np.matrix(np.eye(2**self.nqbits))
-		for i in range(2**self.nqbits):
-			s = rr[i]
-			rmat[i] = imat[s]
-			rrmat[s] = imat[i]
-		return (rmat, rrmat)
-
-	def __qbit_realign_list(self, qbit_list):
-		reord_list = deepcopy(qbit_list)
-		for i in reversed(range(self.nqbits)): # reversed to maintain significance order of the other qbits; poetic correctness :-)
-			if i not in reord_list:
-				reord_list.append(i)
-		return reord_list
-
-	def __aligned_op(self, op, qbit_list):
-		"""
-		qbit_reorder is 'visually correct'. So [a,b,c,d] implies bring to MSB 
-		the bit in position 'a' in the original, brint to the next lower MSB 
-		the bit in potion 'b' in the original, and so on ...
-		"""
-		qbit_reorder = self.__qbit_realign_list(qbit_list)
-		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
-		a_op = rrmat * op * rmat
-		return a_op
-
-	def __stretched_mat(self,oper,qbit_list):
-		orignm = oper[0]
-		op = oper[1]
-		opargs = str(qbit_list)
-		if (op.shape)[1] != (op.shape)[0]:
-			errmsg = "Error. Operator is not a square matrix. "+orignm+"'s dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
-			raise QClibError(errmsg)
-		if (2**len(qbit_list)) != (op.shape)[0]:
-			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
-			raise QClibError(errmsg)
-		c_op = np.kron(op,np.eye(2**(self.nqbits-len(qbit_list))))
-		a_op = self.__aligned_op(c_op,qbit_list)
-		return a_op
-
-	def qstretch(self,oper,qbit_list):
-		return ["{:d}Q-{:s}{:s}".format(self.nqbits,oper[0],qbit_list),self.__stretched_mat(oper,qbit_list)]
-
 	def qgate(self, oper, qbit_list, qtrace=False):
 		self.stepcount += 1
 		a_op = self.__stretched_mat(oper,qbit_list)
@@ -132,58 +73,6 @@ class qcsim:
 			opargs = str(qbit_list)
 			hdr = opname + " Qbit" + opargs
 			self.qreport(header=hdr)
-
-	def qcombine_seq(self,name,op_list):
-		d = ((op_list[0])[1]).shape[0]
-		res = np.matrix(np.eye(d),dtype=complex)
-		for opdef in op_list:
-			op = opdef[1]
-			r = op.shape[0]
-			c = op.shape[1]
-			if r != c:
-				errmsg = "Opearion is not a square matrix."
-				raise QClibError(errmsg)
-			if r != d:
-				errmsg = "Opearion matrices not the same size."
-				raise QClibError(errmsg)
-			res = op*res # remember order of multiplication is opposite of the visual order
-		return [name,res]
-
-	def qcombine_par(self,name,op_list):
-		res = None
-		first = True
-		for op in op_list:
-			mat = op[1]
-			if first:
-				res = mat
-				first = False
-			else:
-				res = np.kron(res,mat)
-		return [name,res]
-
-	def qinverse(self,op,name=None):
-		if name == None:
-			name = "INV-"+op[0]
-		mat = deepcopy(op[1])
-		invmat = np.conjugate(np.transpose(mat))
-		return [name,invmat]
-
-	def qisunitary(self,op):
-		mat = op[1]
-		(r,c) = mat.shape
-		if r != c:
-			return False
-		invmat = np.conjugate(np.transpose(mat))
-		pmat = np.asarray(mat * invmat)
-		for i in range(r):
-			for j in range(c):
-				if i != j:
-					if np.absolute(pmat[i][j]) > self.maxerr:
-						return False
-				else:
-					if np.absolute(pmat[i][j]-1.0) > self.maxerr:
-						return False
-		return True
 
 	def qmeasure(self, qbit_list, basis=None, qtrace=False):
 		self.stepcount += 1
@@ -370,6 +259,123 @@ class qcsim:
 	# Basis Matrices
 	def BELL_BASIS(self):
 		return ["BELL_BASIS",np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)/np.sqrt(2)]
+
+
+
+	####################################################################################################
+	## Utility functions ###############################################################################
+	####################################################################################################
+
+	def __shuffled_count(self, bitorder):
+		sz = self.nqbits
+		shuffled = []
+		for i in range(2**sz):
+			shfval = 0
+			for b in range(sz):
+				dstbit = bitorder[sz-b-1]
+				shfval += (((i >> b) & 0x1) << dstbit)
+			shuffled.append(shfval)
+		return shuffled
+
+	def __rmat_rrmat(self, qbit_reorder):
+		# this is the counting with the given bit ordering
+		rr = self.__shuffled_count(qbit_reorder)
+		## create the rmat and rrmat
+		imat = np.matrix(np.eye(2**self.nqbits))
+		rmat = np.matrix(np.eye(2**self.nqbits))
+		rrmat = np.matrix(np.eye(2**self.nqbits))
+		for i in range(2**self.nqbits):
+			s = rr[i]
+			rmat[i] = imat[s]
+			rrmat[s] = imat[i]
+		return (rmat, rrmat)
+
+	def __qbit_realign_list(self, qbit_list):
+		reord_list = deepcopy(qbit_list)
+		for i in reversed(range(self.nqbits)): # reversed to maintain significance order of the other qbits; poetic correctness :-)
+			if i not in reord_list:
+				reord_list.append(i)
+		return reord_list
+
+	def __aligned_op(self, op, qbit_list):
+		"""
+		qbit_reorder is 'visually correct'. So [a,b,c,d] implies bring to MSB 
+		the bit in position 'a' in the original, brint to the next lower MSB 
+		the bit in potion 'b' in the original, and so on ...
+		"""
+		qbit_reorder = self.__qbit_realign_list(qbit_list)
+		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
+		a_op = rrmat * op * rmat
+		return a_op
+
+	def __stretched_mat(self,oper,qbit_list):
+		orignm = oper[0]
+		op = oper[1]
+		opargs = str(qbit_list)
+		if (op.shape)[1] != (op.shape)[0]:
+			errmsg = "Error. Operator is not a square matrix. "+orignm+"'s dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
+			raise QClibError(errmsg)
+		if (2**len(qbit_list)) != (op.shape)[0]:
+			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
+			raise QClibError(errmsg)
+		c_op = np.kron(op,np.eye(2**(self.nqbits-len(qbit_list))))
+		a_op = self.__aligned_op(c_op,qbit_list)
+		return a_op
+
+	def qstretch(self,oper,qbit_list):
+		return ["{:d}Q-{:s}{:s}".format(self.nqbits,oper[0],qbit_list),self.__stretched_mat(oper,qbit_list)]
+
+	def qcombine_seq(self,name,op_list):
+		d = ((op_list[0])[1]).shape[0]
+		res = np.matrix(np.eye(d),dtype=complex)
+		for opdef in op_list:
+			op = opdef[1]
+			r = op.shape[0]
+			c = op.shape[1]
+			if r != c:
+				errmsg = "Opearion is not a square matrix."
+				raise QClibError(errmsg)
+			if r != d:
+				errmsg = "Opearion matrices not the same size."
+				raise QClibError(errmsg)
+			res = op*res # remember order of multiplication is opposite of the visual order
+		return [name,res]
+
+	def qcombine_par(self,name,op_list):
+		res = None
+		first = True
+		for op in op_list:
+			mat = op[1]
+			if first:
+				res = mat
+				first = False
+			else:
+				res = np.kron(res,mat)
+		return [name,res]
+
+	def qinverse(self,op,name=None):
+		if name == None:
+			name = "INV-"+op[0]
+		mat = deepcopy(op[1])
+		invmat = np.conjugate(np.transpose(mat))
+		return [name,invmat]
+
+	def qisunitary(self,op):
+		mat = op[1]
+		(r,c) = mat.shape
+		if r != c:
+			return False
+		invmat = np.conjugate(np.transpose(mat))
+		pmat = np.asarray(mat * invmat)
+		for i in range(r):
+			for j in range(c):
+				if i != j:
+					if np.absolute(pmat[i][j]) > self.maxerr:
+						return False
+				else:
+					if np.absolute(pmat[i][j]-1.0) > self.maxerr:
+						return False
+		return True
 
 
 class QClibError:

@@ -144,7 +144,7 @@ Turns ON or OFF outputting of state after each qgate() and qmeasure() function c
 Turns ON or OFF of zero amplitude states in trace outputs and qreport() outputs.
 
 
-3. OPERATOR FUNCTIONS
+3. OPERATOR UTILITY FUNCTIONS
 --------------------------------------------------------------------------------
 
 3.1	comb_op = qcombine_seq(name, op_list)
