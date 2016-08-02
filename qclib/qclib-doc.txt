@@ -1,5 +1,8 @@
 1. QUICK START
 --------------------------------------------------------------------------------
+
+1.2	TUTORIAL INTRODUCTION
+--------
 (see accompanying helloworld.py)
 Lets start with a simple example of using qclib, something like a 'hello world' --
 
@@ -82,6 +85,21 @@ and, here is its output --
 	MEASURED in basis STANDARD, Qbit[0] = [0] with probality = 0.5
 	00000000    1.00000000+0.00000000j
 
+1.2	PROGRAMMING MODEL
+--------
+The qclib assumes a programming model as shown below.
+
+Users write the algorithms on a front-end classical computer using standard programming language (Python), and qclib provides an API to access and perform operations on a Quantum Computer as a back-end resource.
+
+	                     +--------------------+          +----------------+
+	                     |                    |          |                |
+	    +-------+        |                    |          |                |
+	    |       |        |                    |          |    Quantum     |
+	    |       |--------| Classical Computer |----------|    Computer    |
+	    +-------+        |    (Front-end)     |          |   (Back-end)   |
+	   /       /         |                    |          |                |
+	  ---------          |                    |          |                |
+	                     +--------------------+          +----------------+
 
 2. CORE FUNCTIONS
 --------------------------------------------------------------------------------
