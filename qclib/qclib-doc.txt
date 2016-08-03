@@ -301,6 +301,7 @@ Since the gate is defined in form of a function, it can take arguments. For inst
 6. PRE-DEFINED BASIS
 --------------------------------------------------------------------------------
 	BELL_BASIS()	Bell Basis (for two qbits)
+	HDM_BASIS()	Hadamard Basis (for one qbits), |+> and |->
 
 7. CREATING USER DEFINED BASIS
 --------------------------------------------------------------------------------

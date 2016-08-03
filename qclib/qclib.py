@@ -81,6 +81,7 @@ class qcsim:
 		##
 		bname = "STANDARD"
 		if not basis is None:
+			# first checck if basis provided is valid
 			bname = basis[0]
 			bmat = basis[1]
 			(r,c) = bmat.shape
@@ -110,7 +111,6 @@ class qcsim:
 		# align with basis
 		if not basis is None:
 			# Convert the mentioned qbits in the state to the given basis
-			# TODO -- check sanity of the basis
 			full_sz_basis_mat = np.kron(bmat, np.eye(2**(self.nqbits-len(qbit_list))))
 			self.sys_state = full_sz_basis_mat * self.sys_state
 
@@ -259,6 +259,10 @@ class qcsim:
 	# Basis Matrices
 	def BELL_BASIS(self):
 		return ["BELL_BASIS",np.matrix([[1,0,0,1],[1,0,0,-1],[0,1,1,0],[0,1,-1,0]], dtype=complex)/np.sqrt(2)]
+
+	def HDM_BASIS(self):
+		sq2 = np.sqrt(2)
+		return ["HDM_BASIS",np.matrix([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)]
 
 
 
