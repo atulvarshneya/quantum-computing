@@ -173,7 +173,7 @@ Combines a sequential application of gates into one equivalent gate. The argumen
  
 To combine the above 
 
-	G = qc.qcombine_seq(SEQ,[A,B,C,D])
+	G = qc.qcombine_seq("SEQ",[A,B,C,D])
  
 and to use it, for instance to apply it on qbit 2 
  
@@ -191,7 +191,7 @@ Combines a parallel application of gates into one equivalent gate. The argument 
 
 To combine the above into one operation with 4 qbits as inputs 
 
-	G = qc.qcombine_par(PAR,[A,B,C,D])
+	G = qc.qcombine_par("PAR",[A,B,C,D])
  
 and to use it, for example to apply it on qbits 7,5,3,1 
 
@@ -203,7 +203,7 @@ An interesting illustrative example is
 	                         |H2|
 	0 --[H]----          0 --|  |--
 	                         +--+
-	H2 = qc.qcombine_par(H2,[qc.H(),qc.H()])
+	H2 = qc.qcombine_par("H2",[qc.H(),qc.H()])
  
 	                         +--+
 	3 ---.-----          3 --|  |--
@@ -214,7 +214,7 @@ An interesting illustrative example is
 	     |                   |  |
 	0 ---O-----          0 --|  |--
 	                         +--+
-	C2 = qc.qcombine_par(C2,[qc.C(),qc.C()])
+	C2 = qc.qcombine_par("C2",[qc.C(),qc.C()])
  
 Create 2 bell states between quits 7,6 and 5,4 using these --
 
@@ -257,6 +257,7 @@ A number of gates are pre-defined in the qclib class. The following is the list 
 	Z()	Pauli_z gate
 	R(phi)	Phase rotation by phi
 	C()	CNOT gate
+	CRk(k)	Controlled Rotate. Rotates by 2*pi/(2**k)
 	SWAP()	SWAP gate
 	T()	TOFFOLI gate
 

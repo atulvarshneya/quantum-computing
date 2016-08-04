@@ -230,6 +230,17 @@ class qcsim:
 		cphi = np.cos(phi)
 		sphi = np.sin(phi)
 		return ["PHASE-ROT({:0.4f})".format(phi), np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)]
+	def CRk(self,k):
+		"""
+		Controlled Phase rotation gate. Takes the k as an argument to divide 2*pi by 2**k.
+		"""
+		ck = np.cos(2*self.pi/(2**k))
+		sk = np.sin(2*self.pi/(2**k))
+		return ["C-PHASE-ROT({:d})".format(k), np.matrix([
+			[1,0,0,0],
+			[0,1,0,0],
+			[0,0,1,0],
+			[0,0,0,complex(ck,sk)]],dtype=complex)]
 	def SWAP(self):
 		"""
 		Swap gate.
