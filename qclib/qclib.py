@@ -206,66 +206,71 @@ class qcsim:
 		"""
 		Pauli_X gate.
 		"""
-		return ["PAULI_X", np.matrix([[0,1],[1,0]],dtype=complex)]
+		return ["X", np.matrix([[0,1],[1,0]],dtype=complex)]
 	def Y(self):
 		"""
 		Pauli_Y gate.
 		"""
-		return ["PAULI_Y", np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
+		return ["Y", np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
 	def Z(self):
 		"""
 		Pauli_Z gate.
 		"""
-		return ["PAULI_Z", np.matrix([[1,0],[0,-1]],dtype=complex)]
+		return ["Z", np.matrix([[1,0],[0,-1]],dtype=complex)]
 	def H(self):
 		"""
 		Hadamard gate.
 		"""
 		sqr2 = np.sqrt(2)
 		return ["HADAMARD", np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)]
-	def R(self,phi):
+	def Rphi(self,phi):
 		"""
 		Phase rotation gate. Takes the Phi as an argument.
 		"""
 		cphi = np.cos(phi)
 		sphi = np.sin(phi)
-		return ["PHASE-ROT({:0.4f})".format(phi), np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)]
-	def CRk(self,k):
+		return ["ROTphi({:0.4f})".format(phi), np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)]
+	def Rk(self,k):
 		"""
 		Controlled Phase rotation gate. Takes the k as an argument to divide 2*pi by 2**k.
 		"""
 		ck = np.cos(2*self.pi/(2**k))
 		sk = np.sin(2*self.pi/(2**k))
-		return ["C-PHASE-ROT({:d})".format(k), np.matrix([
-			[1,0,0,0],
-			[0,1,0,0],
-			[0,0,1,0],
-			[0,0,0,complex(ck,sk)]],dtype=complex)]
+		return ["ROTk({:d})".format(k), np.matrix([
+			[1,0],
+			[0,complex(ck,sk)]],dtype=complex)]
 	def SWAP(self):
 		"""
 		Swap gate.
 		"""
 		return ["SWAP", np.matrix([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]],dtype=complex)]
+	def CTL(self,op,name=None):
+		"""
+		Add Control to any gate
+		"""
+		opname = op[0]
+		opmat = op[1]
+		(r,c) = opmat.shape
+		oparr = np.array(opmat)
+		coparr = np.eye(r*2,dtype=complex)
+		for i in range(r,r*2):
+			for j in range(r,r*2):
+				coparr[i][j] = oparr[i-r][j-r]
+		if name is None:
+			name = "C"+opname
+		return [name, np.matrix(coparr,dtype=complex)]
+
 	def C(self):
 		"""
-		Controlled NOT gate.
+		CNOT gate
 		"""
-		return ["C-NOT", np.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
+		return self.CTL(self.X(),name="CNOT")
 
 	def T(self):
 		"""
 		TOFFOLI gate.
 		"""
-		return ["TOFFOLI", np.matrix([
-			[1,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0],
-			[0,0,1,0,0,0,0,0],
-			[0,0,0,1,0,0,0,0],
-			[0,0,0,0,1,0,0,0],
-			[0,0,0,0,0,1,0,0],
-			[0,0,0,0,0,0,0,1],
-			[0,0,0,0,0,0,1,0]
-			],dtype=complex)]
+		return self.CTL(self.CTL(self.X(),name="TOFFOLI"))
 
 	# Basis Matrices
 	def BELL_BASIS(self):
@@ -400,16 +405,22 @@ class QClibError:
 if __name__ == "__main__":
 
 	try:
+		q = qcsim(2,qtrace=True)
+		q.qgate(q.H(),[1])
+		q.qgate(q.C(), [1,0])
+
+		quit()
+
 		q = qcsim(8,qtrace=True)
 
 		print "Entangling 4 bits -------------------------"
 		q.qgate(q.H(),[3])
 		for i in range(3):
-			q.qgate(q.C(),[3,i])
+			q.qgate(q.CTL(),[3,i])
 		print "-------------------------------------------"
 		for i in range(4):
 			q.qgate(q.X(),[i+4])
-		q.qgate(q.R(q.pi/2),[7])
+		q.qgate(q.Rphi(q.pi/2),[7])
 		print "-------------------------------------------"
 		v = q.qmeasure([2])
 		print "Qbit 2 value measured = ",v

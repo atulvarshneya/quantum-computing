@@ -78,7 +78,7 @@ and, here is its output --
 	00000000    0.70710678+0.00000000j
 	00000001    0.70710678+0.00000000j
 
-	C-NOT Qbit[0, 3]
+	CNOT Qbit[0, 3]
 	00000000    0.70710678+0.00000000j
 	00001001    0.70710678+0.00000000j
 
@@ -250,16 +250,28 @@ Checks if the provided operator is unitary opperator or not. Returns boolean val
 
 4. PRE DEFINED GATES
 --------------------------------------------------------------------------------
+
+4.1	PRE-DEFINED GATES
+--------
 A number of gates are pre-defined in the qclib class. The following is the list --
-	H()	Hadamard gate
-	X()	Pauli_x gate
-	Y()	Pauli_y gate
-	Z()	Pauli_z gate
-	R(phi)	Phase rotation by phi
-	C()	CNOT gate
-	CRk(k)	Controlled Rotate. Rotates by 2*pi/(2**k)
-	SWAP()	SWAP gate
-	T()	TOFFOLI gate
+
+H()	Hadamard gate
+X()	Pauli_x gate
+Y()	Pauli_y gate
+Z()	Pauli_z gate
+R(phi)	Phase rotation by phi
+Rk(k)	Phase rotation by 2*pi/(2**k), useful in QFT algorithm
+C()	CNOT gate
+SWAP()	SWAP gate
+T()	TOFFOLI gate
+
+4.2	CONTROLLED GATES
+--------
+CTL(op,name)	Converts any gate to controlled gate, MSB as control bit. Can apply CTL() multiple times CTL(CTL(op)).
+
+Examples:
+C() is the same as CTL(X(),name="CNOT")
+T() is the same as CTL(CTL(X()),name="TOFFOLI")
 
 5. CREATING USER DEFINED GATES
 --------------------------------------------------------------------------------

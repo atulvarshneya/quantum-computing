@@ -27,7 +27,7 @@ mvals = q.qmeasure([2,1],basis=q.BELL_BASIS())
 b0 = mvals[1]
 b1 = mvals[0]
 
-# now we send these classicla bits b0 and b1 to 'far away' and apply appropriate gates to recover the input bit's state in qbit 1
+# now we send these classical bits b0 and b1 to 'far away' and apply appropriate gates to recover the input bit's state in qbit 1
 if b1 == 0 and b0 == 0:
 	q.qgate(q.C(),[2,1])
 	q.qgate(q.H(),[2])
