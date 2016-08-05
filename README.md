@@ -7,5 +7,4 @@ Allows user-defined quantum gates, user-defined basis for measurements.
 Easy to follow documentation with tutorial introduction. See qclib/qclib-doc.txt.
 Example implementations of popular quantum algorithms.
 
-Regression tests, automated,
-Code for tests also serves as examples to quickly learn qclib.
+Code for [automated] regression tests also serves as examples to quickly learn qclib.
