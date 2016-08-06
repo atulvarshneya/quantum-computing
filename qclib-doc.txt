@@ -114,7 +114,7 @@ Argument 'initstate' can be used to pass an initial state as a numpy.matrix of s
 
 If 'initstate' is provided, any provided 'prepqubits' is ignored. 
 
-If qtrace=True, it causes each gate application ab=nd measurement operation to emit the resulting state.
+If qtrace=True, it causes each gate and measurement operation to emit the resulting state.
 
 If qzeros=True, prints even those whose amplitude is 0.
 
@@ -126,7 +126,7 @@ Brings the simulator to the same state as after qcsim() call - initial state, qt
 --------
 qgate() is used to perform quantum gate operations on a set of qubits.
 
-There are a number of gates pre-created within the qclib class, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, or SWAP gate, etc.) then the list in the second argument (list_of_qubits) would contain that many qubits.
+There are a number of gates pre-created within the qclib class, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, SWAP gate, etc.) then the list in the second argument (list_of_qubits) must contain that many qubits.
 
 The function qgate() validates the number of bits passed in list_of_qubits against the number of qubits required for the gate, if not correct, throws an exception.
 
@@ -138,9 +138,9 @@ Returns the measured values of the qubits in the qubit_list, each 0 or 1, as a l
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
 
-Argument 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qubits is done in that basis, the system's state after teh measurement continues to be represented in the 'standard' basis.
+Argument 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qubits is done in that basis, the system's state after the measurement continues to be represented in the 'standard' basis.
 
-Cleary, the computations can continue after the measurement operations. Just that the measurement will appropriately collapse the state of the measured qubits.
+Cleary, the computations can continue after the measurement operations. Just that the overall state will have the appropriately collapsed state of the measured qubits.
 
 If qtrace is True, the resulting state is printed out.
 
@@ -201,7 +201,7 @@ and to use it, for example to apply it on qubits 7,5,3,1
 
 	qc.qgate(G,[7,5,3,1])
  
-An interesting illustrative example is 
+An illustrative example is 
 	                         +--+
 	1 --[H]----          1 --|  |--
 	                         |H2|
@@ -227,9 +227,9 @@ Create 2 bell states between quits 7,6 and 5,4 using these --
 
 3.3	newgate = qstretch(gate_function, list_of_qubits)
 --------
-qstretch takes a gate and a specifc ordered list of qubits on which it would operate and stretches it to handle *all* qubits in the system. Basically, the resulting newgate takes as input all the qubits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qubits, and passes through all the other qubits unaffected.
+qstretch takes a gate and a specifc ordered list of qubits on which it would operate and "stretches" it to handle *all* qubits in the system. Basically, the resulting newgate takes as input all the qubits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qubits, and passes through all the other qubits unaffected.
 
-For instance, lets assume we created a 4 qubit system (qclib.qcsim(4)), and in that we use C gate on qubits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. Stretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
+For instance, lets assume we created a 4 qubit system (qclib.qcsim(4)), and in that we use C gate on qubits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. qstretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
 	                         +---+
 	3 ---.-----          3 --| . |--
              |                   | | |
@@ -285,12 +285,12 @@ T() is the same as CTL(CTL(X()),name="TOFFOLI")
 
 Qcsim allows using user defined gates. A user defined gate would be written as a function that returns a Python array with two elements [name_string, unitary_matrix]. The element unitary_matrix is the matrix that specifies the gate. It should be created using numpy.matrix([...],dtype=complex), or equivalent. The element name_string is a string that is a user-friendly name of that gate that is used in logs and debug traces.
 
-Qcsim does NOT verify if unitary_matrix in the user-defined gate is indeed a unitary matrix. It is left as the responsibility of the user. <Perhaps an enhancement for later on.>
+Qcsim does not verify if unitary_matrix in the user-defined gate is indeed a unitary matrix. It is left as the responsibility of the user. <this is a mandatory fix, coming soon.>
 
 Here is an example of a simple way for a user to define a CNOT gate --
 	def myCNOT():
 		return ["MY-CNOT", numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
- 
+
 As shown in the code above, while writing the unitary_matrix for myCNOT we assumed as if the entire system has only 2 qubits.
 
 Now, since in this definition of CNOT the higher order qubit (MSB) is the controlling qubit, hence when applying this gate to any two qubits, say, 4 and 7, where say, bit 4 is the controlling qubit, the qgate() function would be invoked as --
