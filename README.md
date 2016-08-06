@@ -36,7 +36,7 @@ Allows addition of any user-defined gates.
 
 BASIS
 -------------------
-Normal basis for measurement are included - Bell-Basis, |+>/|->.
+Common basis for measurement are included - Bell-Basis, |+>/|->.
 
 Allows addition of any user-defined bases.
 
