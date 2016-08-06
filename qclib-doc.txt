@@ -272,7 +272,8 @@ QFT(n)	QFT gate for n qubits
 
 4.2	CONTROLLED GATES
 --------
-CTL(op,name)	Converts any gate to controlled gate, MSB as control bit. Can apply CTL() multiple times e.g., CTL(CTL(op)).
+CTL(op,name=None)
+	Build a controlled gate from any gate, MSB position as control bit. Can apply CTL() multiple times e.g., CTL(CTL(op)), to add multiple control qubits.
 
 Examples:
 C() is the same as CTL(X(),name="CNOT")
