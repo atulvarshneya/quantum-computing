@@ -1,6 +1,6 @@
 # quantum-computing
 
-Quite complete Quantum Computing simulator in Python. Have tried upto 11 qubits on an ordinary laptop. More compute+memory, more qubits.
+Very complete Quantum Computing simulator in Python. Have tried upto 11 qubits on an ordinary laptop. More compute+memory, more qubits.
 
 All expected features implemented, simple to use, flexible, can implement any quantum computing algorithm; several examples included (Teleportation, Bernstien-Vazirani, Quantum Fourier Tramsform, Period-finding ... more added on daily basis - Shores and Grover's algos coming soon).
 
