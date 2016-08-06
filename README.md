@@ -1,7 +1,6 @@
 # quantum-computing
 
 A very complete Quantum Computer simulator in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM). More compute+memory, more qubits.
-Not just a toy.
 
 
 FEATURES
@@ -45,6 +44,6 @@ UTILITIES
 -------------------
 A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates into a single gate, check for unitarity, inverse.
 
-Easy to follow documentation with tutorial introduction. See qclib/qclib-doc.txt.
+Easy to follow documentation with tutorial introduction. See qclib-doc.txt (https://github.com/atulvarshneya/quantum-computing/blob/master/qclib-doc.txt).
 
 Code for [automated] regression tests also serves as examples to quickly learn qclib.
