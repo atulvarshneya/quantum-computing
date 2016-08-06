@@ -28,7 +28,7 @@ All commonly used gates included
 * Pauli_y
 * Pauli_z
 * Phase rotation by phi
-* Phase rotation by 2*pi/(2**k)
+* Phase rotation by 2*pi/(2^k)
 
 Create a CONTROLLED GATE for any given gate; add any number of control qubits.
 
