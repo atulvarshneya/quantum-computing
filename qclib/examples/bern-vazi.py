@@ -2,6 +2,9 @@
 
 import qclib
 
+###########################################################################
+## This is the function with the secret code
+###########################################################################
 def get_fx(qc):
 	input_sz = qc.qsize() - 1
 	secret_code = 0b11101
@@ -30,7 +33,7 @@ class bernvazi:
 		## Start of the Bernstien-Vazirani algorithm
 		###########################################################################
 		print
-		print "Starting the VB algorithm..."
+		print "Starting the BV algorithm..."
 
 		###########################################################################
 		# Step 0: Prepare the result bit |b> to |->

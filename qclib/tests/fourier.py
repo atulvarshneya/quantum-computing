@@ -20,17 +20,10 @@ try:
 
 	# Start the Quantum Computer Simulator
 	q = qclib.qcsim(nqbits,initstate=initstate, qtrace=True)
-	q.qtraceON(True)
-	q.qzerosON(False)
 
+	# Perform QFT
 	qftgate = q.QFT(nqbits)
-	if not q.qisunitary(qftgate):
-		print ">>>>>> NOT UNITARY!!!",qfgate[0]
-	else:
-		print "Is Unitary.",qftgate[0]
-	lst = range(nqbits)
-	lst.reverse()
-	q.qgate(qftgate, lst)
+	q.qgate(qftgate, list(reversed(range(nqbits))))
 
 except qclib.QClibError,ex:
 	print ex.args
