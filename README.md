@@ -14,7 +14,7 @@ Several algorithm implementations included as examples
 * Quantum Fourier Tramsform
 * Period-finding
 * ... more added on daily basis
-* Shores and Grover's algos coming soon
+* Shore's and Grover's algos coming soon
 
 
 GATES
