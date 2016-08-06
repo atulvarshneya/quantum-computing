@@ -92,13 +92,13 @@ The qclib assumes a programming model as shown below.
 Users write the algorithms on a front-end classical computer using standard programming language (Python), and qclib provides an API to access and perform operations on a Quantum Computer as a back-end resource.
 
 	                     +--------------------+          +----------------+
-	                     |                    |          |                |
-	    +-------+        |                    |          |                |
-	    |       |        |                    |          |    Quantum     |
-	    |       |--------| Classical Computer |----------|    Computer    |
-	    +-------+        |    (Front-end)     |          |   (Back-end)   |
-	   /       /         |                    |          |                |
-	  ---------          |                    |          |                |
+	                     |                +---|          |                |
+	    +-------+        |                | q |          |                |
+	    |       |        |  Classical     | c |          |    Quantum     |
+	    |       |--------|  Computer      | l |----------|    Computer    |
+	    +-------+        |  (Front-end)   | i |          |   (Back-end)   |
+	   /       /         |                | b |          |                |
+	  ---------          |                +---|          |                |
 	                     +--------------------+          +----------------+
 
 2. CORE FUNCTIONS
@@ -118,7 +118,11 @@ If qtrace=True, it causes each gate application ab=nd measurement operation to e
 
 If qzeros=True, prints even those whose amplitude is 0.
 
-2.2	qgate(gate_function, list_of_qbits, qtrace=False)
+2.2	qreset()
+--------
+Brings the simulator to the same state as after qcsim() call - initial state, qtrace, qzeros, ... everything.
+
+2.3	qgate(gate_function, list_of_qbits, qtrace=False)
 --------
 qgate() is used to perform quantum gate operations on a set of qbits.
 
@@ -128,7 +132,7 @@ The function qgate() validates the number of bits passed in list_of_qbits agains
 
 If qtrace is True, the resulting state is printed out.
 
-2.3	v = qmeasure(qbit_list, basis=None, qtrace=False)
+2.4	v = qmeasure(qbit_list, basis=None, qtrace=False)
 --------
 Returns the measured values of the qbits in the qbit_list, each 0 or 1, as a list, in the same order as the qbits in the qbit_list.
 
@@ -140,24 +144,24 @@ Cleary, the computations can continue after the measurement operations. Just tha
 
 If qtrace is True, the resulting state is printed out.
 
-2.4	qreport(state=None, header="State")
+2.5	qreport(state=None, header="State")
 --------
 Prints the current state of the system. if state argument is provided with a column numpy.matrix, it prints that state instead.
 The argument header provides the text to be printed above the state information.
 
-2.5	st = qstate()
+2.6	st = qstate()
 --------
 Returns a Python array of the complex amplitudes of all possible superpositions of the qbits in the system.
 
-2.6	n = qsize()
+2.7	n = qsize()
 --------
 Returns the number of qbits in the system.
 
-2.7	qtraceON(boolean)
+2.8	qtraceON(boolean)
 --------
 Turns ON or OFF outputting of state after each qgate() and qmeasure() function call.
 
-2.8	qzerosON(boolean)
+2.9	qzerosON(boolean)
 --------
 Turns ON or OFF of zero amplitude states in trace outputs and qreport() outputs.
 
@@ -264,10 +268,11 @@ Rk(k)	Phase rotation by 2*pi/(2**k), useful in QFT algorithm
 C()	CNOT gate
 SWAP()	SWAP gate
 T()	TOFFOLI gate
+QFT(n)	QFT gate for n qubits
 
 4.2	CONTROLLED GATES
 --------
-CTL(op,name)	Converts any gate to controlled gate, MSB as control bit. Can apply CTL() multiple times CTL(CTL(op)).
+CTL(op,name)	Converts any gate to controlled gate, MSB as control bit. Can apply CTL() multiple times e.g., CTL(CTL(op)).
 
 Examples:
 C() is the same as CTL(X(),name="CNOT")
