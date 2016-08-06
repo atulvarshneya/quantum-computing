@@ -7,13 +7,14 @@ import types
 
 class qcsim:
 
-	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False):
+	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False):
 		# record input variables for reset
 		self.nqbits = nq
 		self.initstate = initstate
 		self.prepqubits = prepqubits
 		self.traceINP = qtrace
 		self.disp_zerosINP = qzeros
+		self.validation = validation
 
 		# Useful constants
 		self.pi = np.pi
@@ -23,7 +24,7 @@ class qcsim:
 		self.qreset()
 
 	def qreset(self):
-		# Runtime Variables
+		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
 
@@ -71,6 +72,10 @@ class qcsim:
 			self.qreport(header="Initial State")
 
 	def qgate(self, oper, qbit_list, qtrace=False):
+		if self.validation:
+			if not self.qisunitary(oper):
+				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+				raise QClibError(errmsg)
 		a_op = self.__stretched_mat(oper,qbit_list)
 		self.sys_state = a_op * self.sys_state
 		if qtrace or self.trace:
@@ -83,6 +88,10 @@ class qcsim:
 		##
 		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		##
+		if (not basis is None) and self.validation:
+			if not self.qisunitary(basis):
+				errmsg = "Error: Operator {:s} is not Unitary".format(basis[0])
+				raise QClibError(errmsg)
 		bname = "STANDARD"
 		if not basis is None:
 			# first checck if basis provided is valid

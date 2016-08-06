@@ -104,7 +104,7 @@ Users write the algorithms on a front-end classical computer using standard prog
 2. CORE FUNCTIONS
 --------------------------------------------------------------------------------
 
-2.1	qclib.qcsim(nqubits, initstate=None, prepqubits=None, qtrace=False, qzeros=False)
+2.1	qclib.qcsim(nqubits, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False)
 --------
 First argument specifies the number of qubits in the system. if neither initstate ot prepqubits is provided, prepares all qubits to |0>.
 
@@ -117,6 +117,8 @@ If 'initstate' is provided, any provided 'prepqubits' is ignored.
 If qtrace=True, it causes each gate and measurement operation to emit the resulting state.
 
 If qzeros=True, prints even those whose amplitude is 0.
+
+If validation=True, every qgate() call validates the gate to be unitary, and every qmeasure() call validates the basis to be orthonormal (same as unitary?)
 
 2.2	qreset()
 --------
@@ -284,8 +286,6 @@ T() is the same as CTL(CTL(X()),name="TOFFOLI")
 (see accompanying user_def_gates.py)
 
 Qcsim allows using user defined gates. A user defined gate would be written as a function that returns a Python array with two elements [name_string, unitary_matrix]. The element unitary_matrix is the matrix that specifies the gate. It should be created using numpy.matrix([...],dtype=complex), or equivalent. The element name_string is a string that is a user-friendly name of that gate that is used in logs and debug traces.
-
-Qcsim does not verify if unitary_matrix in the user-defined gate is indeed a unitary matrix. It is left as the responsibility of the user. <this is a mandatory fix, coming soon.>
 
 Here is an example of a simple way for a user to define a CNOT gate --
 	def myCNOT():
