@@ -13,12 +13,12 @@ qc.qgate(qc.C(),[7,6])
 qc.qgate(qc.C(),[5,4])
 qc.qgate(qc.C(),[3,2])
 qc.qgate(qc.C(),[1,0])
-qc.qreport("AFTER 4 individual C's")
+qc.qreport(header="AFTER 4 individual C's")
 qc.qgate(qc.H(),[7])
 qc.qgate(qc.H(),[5])
 qc.qgate(qc.H(),[3])
 qc.qgate(qc.H(),[1])
-qc.qreport("AFTER 4 individual H's")
+qc.qreport(header="AFTER 4 individual H's")
 
 print
 print "Sequence HXYZ------------------------------------------"

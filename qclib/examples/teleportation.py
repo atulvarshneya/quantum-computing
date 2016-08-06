@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import qclib
 import numpy as np
 import random as rnd
@@ -14,12 +16,12 @@ for i in range(3-1):
 
 # now get started ...
 q = qclib.qcsim(3,initstate=init)
-q.qreport()
+q.qreport(header="Initial State")
 
 # first put qbits 0 and 1 in bell state
 q.qgate(q.H(),[0])
 q.qgate(q.C(),[0,1])
-# q.qreport("0 and 1 in bell state")
+# q.qreport(header="0 and 1 in bell state")
 # qbit 1 is kept 'here' and qbit 0 is sent 'far away'; and we have the input qbit to be teleported, qbit 2, also 'here'.
 
 # at 'here' we measure the qbit to be teleported and qbit 1 in bell basis.
@@ -55,4 +57,4 @@ else:
 	q.qgate(q.X(),[2])
 	q.qgate(q.X(),[1])
 
-q.qreport("Final state")
+q.qreport(header="Final state")

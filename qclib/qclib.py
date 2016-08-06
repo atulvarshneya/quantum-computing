@@ -7,11 +7,11 @@ import types
 
 class qcsim:
 
-	def __init__(self, nq, initstate=None, prepqbits=None, qtrace=False, qzeros=False):
+	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False):
 		# record input variables for reset
 		self.nqbits = nq
 		self.initstate = initstate
-		self.prepqbits = prepqbits
+		self.prepqubits = prepqubits
 		self.traceINP = qtrace
 		self.disp_zerosINP = qzeros
 
@@ -46,13 +46,13 @@ class qcsim:
 				errmsg = "User Error. Initial state not normalized."
 				raise QClibError(errmsg)
 			self.sys_state = deepcopy(self.initstate)
-		elif not self.prepqbits is None:
-			if len(self.prepqbits) != self.nqbits:
-				errmsg = "User Error. wrong dimensions. prepqbits has incorrect number of qbits."
+		elif not self.prepqubits is None:
+			if len(self.prepqubits) != self.nqbits:
+				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QClibError(errmsg)
-			prepstate = self.prepqbits[self.nqbits-1]
+			prepstate = self.prepqubits[self.nqbits-1]
 			for i in reversed(range(self.nqbits-1)):
-				prepstate = np.kron(prepstate,self.prepqbits[i])
+				prepstate = np.kron(prepstate,self.prepqubits[i])
 			p = 0
 			for i in range(len(prepstate)):
 				p += np.absolute(prepstate[i].item(0))**2

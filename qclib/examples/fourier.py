@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import qclib
 import numpy as np
 

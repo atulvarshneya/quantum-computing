@@ -8,7 +8,7 @@ try:
 	q = qclib.qcsim(nqbits,qtrace=True)
 
 	# initialise with initial states of qbits
-	q = qclib.qcsim(nqbits,prepqbits=[[1,0],[0,1],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
+	q = qclib.qcsim(nqbits,prepqubits=[[1,0],[0,1],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
 
 	# or build the full state yourself (good if you need a very custom state, e.g., for testing QFT)
 	initstate = [None]*(2**nqbits)
