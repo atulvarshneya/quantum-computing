@@ -7,7 +7,7 @@ import types
 
 class qcsim:
 
-	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False):
+	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False):
 		# record input variables for reset
 		self.nqbits = nq
 		self.initstate = initstate
@@ -15,6 +15,7 @@ class qcsim:
 		self.traceINP = qtrace
 		self.disp_zerosINP = qzeros
 		self.validation = validation
+		self.visualize = visualize
 
 		# Useful constants
 		self.pi = np.pi
@@ -189,7 +190,7 @@ class qcsim:
 			self.qreport(header=hdr)
 		return meas_val
 
-	def qreport(self, header="State", state=None):
+	def qreport(self, header="State", state=None, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		if state == None:
 			state = self.sys_state
@@ -197,7 +198,22 @@ class qcsim:
 		print header
 		for i in range(len(state)):
 			if self.disp_zeros or np.absolute(state[i]) > self.maxerr:
-				print format(i,'0'+str(self.nqbits)+'b')+"    "+"{:.8f}".format(np.around(state[i].item(0),8))
+				barlen = 20
+				barstr = ""
+				if self.visualize or visualize:
+					barstr = "x"
+					amp = np.absolute(state[i].item(0))*barlen
+					intamp = int(amp)
+					if amp > self.maxerr:
+						barstr = "|"
+						for b in range(barlen):
+							if b <= intamp:
+								barstr = barstr+"*"
+							else:
+								barstr = barstr + "."
+				ststr = ("{:0"+str(self.nqbits)+"b}    ").format(i)
+				ampstr = "{:.8f}    ".format(np.around(state[i].item(0),8))
+				print ststr + ampstr + barstr
 
 	def qstate(self):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
@@ -444,7 +460,7 @@ class QClibError:
 if __name__ == "__main__":
 
 	try:
-		q = qcsim(2,qtrace=True)
+		q = qcsim(2,qtrace=True, visualize=True)
 		q.qgate(q.H(),[1])
 		q.qgate(q.C(), [1,0])
 
