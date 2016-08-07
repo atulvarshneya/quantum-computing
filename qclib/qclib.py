@@ -51,9 +51,11 @@ class qcsim:
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QClibError(errmsg)
-			prepstate = self.prepqubits[self.nqbits-1]
+			pqbit = np.transpose(np.matrix(self.prepqubits[self.nqbits-1],dtype=complex))
+			prepstate = pqbit
 			for i in reversed(range(self.nqbits-1)):
-				prepstate = np.kron(prepstate,self.prepqubits[i])
+				pqbit = np.transpose(np.matrix(self.prepqubits[i],dtype=complex))
+				prepstate = np.kron(pqbit,prepstate)
 			p = 0
 			for i in range(len(prepstate)):
 				p += np.absolute(prepstate[i].item(0))**2
