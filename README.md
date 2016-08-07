@@ -5,7 +5,7 @@ A very complete Quantum Computer simulator in Python. Have tried upto 11 qubits 
 
 FEATURES
 -------------------
-All expected features and more, simple to use, flexible to allow all aspects of quantum computing.
+All expected features and more, simple to use, extensible and flexible to allow all aspects of quantum computing.
 
 Can implement any quantum computing algorithms.
 Several algorithm implementations included as examples
@@ -13,7 +13,7 @@ Several algorithm implementations included as examples
 * Bernstien-Vazirani
 * Quantum Fourier Tramsform
 * Period-finding
-* ... more added on daily basis
+* ... more added every few days
 * Shore's and Grover's algos coming soon
 
 
