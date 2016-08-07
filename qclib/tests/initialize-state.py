@@ -6,10 +6,13 @@ try:
 
 	# initialise with the default state of all qbits = |0>
 	q = qclib.qcsim(nqbits,qtrace=True)
+	q.qgate(q.H(),[1])
+	q.qgate(q.C(),[1,0])
 
 	# initialise with initial states of qbits
 	q = qclib.qcsim(nqbits,prepqubits=[[1,0],[1,0],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
-	q.qgate(q.X(),[0])
+	q.qgate(q.H(),[1])
+	q.qgate(q.C(),[1,0])
 
 	# or build the full state yourself (good if you need a very custom state, e.g., for testing QFT)
 	initstate = [None]*(2**nqbits)
@@ -22,6 +25,8 @@ try:
 		p += np.absolute(initstate[i])**2
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 	q = qclib.qcsim(nqbits,initstate=initstate, qtrace=True)
+	q.qgate(q.H(),[1])
+	q.qgate(q.C(),[1,0])
 
 except qclib.QClibError, ex:
 	print ex.args
