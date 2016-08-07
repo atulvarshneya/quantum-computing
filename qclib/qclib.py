@@ -75,6 +75,11 @@ class qcsim:
 			self.qreport(header="Initial State")
 
 	def qgate(self, oper, qbit_list, qtrace=False):
+		##
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+		if not self.__valid_qbit_list(qbit_list):
+			errmsg = "Error: the list of qubits is not valid."
+			raise QClibError(errmsg)
 		if self.validation:
 			if not self.qisunitary(oper):
 				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
@@ -89,8 +94,10 @@ class qcsim:
 
 	def qmeasure(self, qbit_list, basis=None, qtrace=False):
 		##
-		# TBD check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		##
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+		if not self.__valid_qbit_list(qbit_list):
+			errmsg = "Error: teh list of qubits is not valid."
+			raise QClibError(errmsg)
 		if (not basis is None) and self.validation:
 			if not self.qisunitary(basis):
 				errmsg = "Error: Operator {:s} is not Unitary".format(basis[0])
@@ -177,7 +184,6 @@ class qcsim:
 		# align back with standard basis
 		if not basis is None:
 			# Convert the mentioned qbits in the state to the given basis
-			# TODO -- check sanity of the basis
 			invbasis = np.conjugate(np.transpose(bmat))
 			full_sz_invbasis_mat = np.kron(invbasis, np.eye(2**(self.nqbits-len(qbit_list))))
 			self.sys_state = full_sz_invbasis_mat * self.sys_state
@@ -340,6 +346,16 @@ class qcsim:
 	####################################################################################################
 	## Utility functions ###############################################################################
 	####################################################################################################
+
+	def __valid_qbit_list(self,qbit_list):
+		if len(qbit_list) > self.nqbits:
+			return False
+		for i in qbit_list:
+			if i >= self.nqbits:
+				return False
+			if qbit_list.count(i) != 1:
+				return False
+		return True
 
 	def __shuffled_count(self, bitorder):
 		sz = self.nqbits
