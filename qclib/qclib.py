@@ -207,11 +207,11 @@ class qcsim:
 				barlen = 20
 				barstr = ""
 				if self.visualize or visualize:
-					barstr = "    x"
+					barstr = "	x"
 					amp = np.absolute(state[i].item(0))*barlen
 					intamp = int(amp)
 					if amp > self.maxerr:
-						barstr = "    |"
+						barstr = "	|"
 						for b in range(barlen):
 							if b <= intamp:
 								barstr = barstr+"*"
