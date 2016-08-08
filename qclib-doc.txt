@@ -104,13 +104,13 @@ Users write the algorithms on a front-end classical computer using standard prog
 2. CORE FUNCTIONS
 --------------------------------------------------------------------------------
 
-2.1	qclib.qcsim(nqubits, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False)
+2.1	qclib.qcsim(nqubits, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False)
 --------
 First argument specifies the number of qubits in the system. if neither initstate ot prepqubits is provided, prepares all qubits to |0>.
 
 Argument 'prepqubits' can be provided to initialize the initial state by providing the states of all individual qubits in the system. The structure to use is a list, example [[a,b],[c,d], ... [x,y]]. Note that [a,b] is the MSB.
 
-Argument 'initstate' can be used to pass an initial state as a numpy.matrix of shape (2**nqubits,1). Also, the initstate should have the amplitudes normalized. See accompanying initialize-state.py for an example. creating an initstate vector requires more involed coding, but can come in handy when the initial state is required to have very custom distribution of amplitudes - e.g., in case of trying to setup the initial state for testing QFT.
+Argument 'initstate' can be used to pass an initial state as a numpy.matrix of shape (2**nqubits,1). Also, the initstate should have the amplitudes normalized. See accompanying initialize-state.py for an example. Creating an initstate vector requires more involed coding, but can come in handy when the initial state is required to have very custom distribution of amplitudes - e.g., in case of trying to setup the initial state for testing QFT.
 
 If 'initstate' is provided, any provided 'prepqubits' is ignored. 
 
@@ -119,6 +119,8 @@ If qtrace=True, it causes each gate and measurement operation to emit the result
 If qzeros=True, prints even those whose amplitude is 0.
 
 If validation=True, every qgate() call validates the gate to be unitary, and every qmeasure() call validates the basis to be orthonormal (same as unitary?)
+
+If visualize=True, the qreport() displays an additional bar graph showing the magnitude of the amplitudes of each state.
 
 2.2	qreset()
 --------
@@ -153,7 +155,7 @@ The argument header provides the text to be printed above the state information.
 
 2.6	st = qstate()
 --------
-Returns a Python array of the complex amplitudes of all possible superpositions of the qubits in the system.
+Returns a Python array of complex amplitudes of superposition states of the qubits in the system.
 
 2.7	n = qsize()
 --------
@@ -161,11 +163,11 @@ Returns the number of qubits in the system.
 
 2.8	qtraceON(boolean)
 --------
-Turns ON or OFF outputting of state after each qgate() and qmeasure() function call.
+Turns ON or OFF printing of state after each qgate() and qmeasure() function call.
 
 2.9	qzerosON(boolean)
 --------
-Turns ON or OFF of zero amplitude states in trace outputs and qreport() outputs.
+Turns ON or OFF printing of zero amplitude states in trace outputs and qreport() outputs.
 
 
 3. OPERATOR UTILITY FUNCTIONS
@@ -187,7 +189,7 @@ and to use it, for instance to apply it on qubit 2
 
 3.2	comb_op = qcombine_par(name, op_list)
 --------
-Combines a parallel application of gates into one equivalent gate. The argument name is the name of the resulting gate. Argument op_list is a list of gates each of the structure [name,matrix].
+Combines a parallel application of gates into one equivalent gate. The argument name is the name of the resulting gate. Argument op_list is a list of gates.
 	                         +-+
 	3 --[A]----          3 --| |--
 	2 --[B]----     ==>  2 --| |--
@@ -229,7 +231,7 @@ Create 2 bell states between quits 7,6 and 5,4 using these --
 
 3.3	newgate = qstretch(gate_function, list_of_qubits)
 --------
-qstretch takes a gate and a specifc ordered list of qubits on which it would operate and "stretches" it to handle *all* qubits in the system. Basically, the resulting newgate takes as input all the qubits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qubits, and passes through all the other qubits unaffected.
+qstretch takes a gate and an ordered list of qubits on which it would operate and "stretches" it to handle *all* qubits in the system. Basically, the resulting newgate takes as input all the qubits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qubits, and passes through all the other qubits unaffected.
 
 For instance, lets assume we created a 4 qubit system (qclib.qcsim(4)), and in that we use C gate on qubits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. qstretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
 	                         +---+
