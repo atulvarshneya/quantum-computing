@@ -331,7 +331,7 @@ class qcsim:
 		"""
 		TOFFOLI gate.
 		"""
-		return self.CTL(self.CTL(self.X(),name="TOFFOLI"))
+		return self.CTL(self.CTL(self.X()),name="TOFFOLI")
 
 	# Basis Matrices
 	def BELL_BASIS(self):
