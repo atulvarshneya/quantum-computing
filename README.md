@@ -1,15 +1,16 @@
 # quantum-computing
 
-A very complete Quantum Computer simulator in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM). More compute+memory, more qubits.
+A very complete simulator for Universal Quantum Computer in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM). More compute+memory, more qubits.
 
 
 FEATURES
 -------------------
-All expected features and more, simple to use, extensible and flexible to allow all aspects of quantum computing.
+All expected features and more, simple to use, extensible and flexible to allow all aspects of quantum computing. Flexible, because you write the algorithms in a regular programming language, Python, so no limitations on the program logic, the simulator API abstracts a Universal Quantum Computer as a backend resource.
 
-Can implement any quantum computing algorithms.
-Several algorithm implementations included as examples
+Can implement any quantum computing algorithms. Several algorithm implementations included as examples:
 * Teleportation
+* Simple Search
+* Deutsch-Jozsa
 * Bernstien-Vazirani
 * Quantum Fourier Tramsform
 * Period-finding
