@@ -142,7 +142,7 @@ Returns the measured values of the qubits in the qubit_list, each 0 or 1, as a l
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
 
-Argument 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qubits is done in that basis, the system's state after the measurement continues to be represented in the 'standard' basis.
+Argument 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qubits is done in that basis, the system's state after the measurement continues to be represented in the 'standard' basis. This is, essentially, just a convinience. You could very well apply a corresponding gate, measure, and then apply the inverse of that gate, to achive the same result. the 'basis' option just makes it easier to do that. Note that you can just pass that gate, as is, in place of the basis! Gate and Basis both have exactly the same representation in the simulator.
 
 Cleary, the computations can continue after the measurement operations. Just that the overall state will have the appropriately collapsed state of the measured qubits.
 
