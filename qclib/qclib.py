@@ -98,35 +98,19 @@ class qcsim:
 		if not self.__valid_qbit_list(qbit_list):
 			errmsg = "Error: teh list of qubits is not valid."
 			raise QClibError(errmsg)
+		# check the validity of basis
 		if (not basis is None) and self.validation:
 			if not self.qisunitary(basis):
-				errmsg = "Error: Operator {:s} is not Unitary".format(basis[0])
-				raise QClibError(errmsg)
-		bname = "STANDARD"
-		if not basis is None:
-			# first checck if basis provided is valid
-			bname = basis[0]
-			bmat = basis[1]
-			(r,c) = bmat.shape
-			if r != c:
-				errmsg = "User Error. Provided basis is not a square matrix."
-				raise QClibError(errmsg)
-			isok = True
-			trpbasis = np.transpose(bmat)
-			pmat = np.asarray(np.dot(bmat,trpbasis))
-			for i in range(r):
-				for j in range(c):
-					if i != j:
-						if np.absolute(pmat[i][j]) > self.maxerr:
-							isok = False
-					else:
-						if np.absolute(pmat[i][j]-1.0) > self.maxerr:
-							isok = False
-			if not isok:
-				errmsg = "User Error. Provided basis does not have orthonormal vectors."
+				errmsg = "Error: basis {:s} is not Unitary".format(basis[0])
 				raise QClibError(errmsg)
 
-		# align the qbits to measure to the MSB
+		# pick out the name and, if available, the matrix of this basis
+		bname = "STANDARD"
+		if not basis is None:
+			bname = basis[0]
+			bmat = basis[1]
+
+		# align the qbits-to-measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
 		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
 		self.sys_state = rmat * self.sys_state
