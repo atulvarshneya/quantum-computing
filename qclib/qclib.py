@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+# This file is part of the QCLIB project covered under GPL v3 license.
+# See the full license in the file LICENSE
+# Author: Atul Varshneya
+
 import numpy as np
 import random as rnd
 from copy import deepcopy
