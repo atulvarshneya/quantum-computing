@@ -1,6 +1,6 @@
 # quantum-computing
 
-A very complete simulator for Universal Quantum Computer in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM). More compute+memory, more qubits.
+A functionally complete simulator for Universal Quantum Computer in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM). More compute+memory, more qubits.
 
 
 FEATURES
