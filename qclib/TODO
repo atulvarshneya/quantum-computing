@@ -1,0 +1,1 @@
+1. Bug fix in qmeasure - when validating basis, use qisunitary function already there. The current implementation in qmeasure is wrong as it assumes inv = transpose(basis).
