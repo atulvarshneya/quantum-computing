@@ -4,15 +4,17 @@ import random as rnd
 import numpy as np
 import qclib
 
-print "-------------------------------------------------------------------------------------------------------"
-print "Problem Statement:"
-print "  Given a function whose output is CONSTANT (does not change the result register)"
-print "  or BALANCED (result register is equally 0 and 1 across all possible input values"
-print "  Problem is to find which fx it is."
-print
-print "This program randomly selects one of the two fx's and the algorithm determines which one it is."
-print "-------------------------------------------------------------------------------------------------------"
-print
+print """
+-------------------------------------------------------------------------------------------------------
+Problem Statement:
+  Given a function whose output is CONSTANT (fixed output in the result
+  register) or BALANCED (result register is equally 0 and 1 across all
+  possible input values. Problem is to find which fx it is.
+
+This program randomly selects one of the two fx's and the algorithm
+determines which one it is.
+-------------------------------------------------------------------------------------------------------
+"""
 
 nqbits = 8
 

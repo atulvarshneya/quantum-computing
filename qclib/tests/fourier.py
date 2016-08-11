@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+print """
+-------------------------------------------------------------------------------------------------------
+Problem Statement:
+    Setup an initial prepared state and compute the fourier transform on it.
+-------------------------------------------------------------------------------------------------------
+"""
+
 import qclib
 import numpy as np
 
