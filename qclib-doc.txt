@@ -23,7 +23,7 @@ When run, the above code generates the following output (since measuring randoml
 	State
 	00001001    1.00000000+0.00000000j
  
-With respect to the functionality, the above code starts with an 8-qubit system, and then sets up qubits 3 and 0 in bell state. And then measures qubit 0. This is depicted in the diagram below --
+With respect to the functionality, the above code starts with an 8-qubit system, and then sets up qubits 3 and 0 in bell state |Phi+>. And then measures qubit 0. This is depicted in the diagram below --
 
 	7 -------------------------
 	6 -------------------------
@@ -36,7 +36,7 @@ With respect to the functionality, the above code starts with an 8-qubit system,
 
 (Using (/) to depict the measurement operation.)
 
-The output emitted by the above code is the dump of the state right after the setting up of the bell state, and then after measuring the qubit 0.
+The output emitted by the above code is the dump of the state right after the setting up of the |Phi+> state, and then after measuring the qubit 0.
 
 Lets go line by line to understand the code --
 
@@ -224,7 +224,7 @@ An illustrative example is
 	                         +--+
 	C2 = qc.qcombine_par("C2",[qc.C(),qc.C()])
  
-Create 2 bell states between quits 7,6 and 5,4 using these --
+Create 2 |Phi+> bell states, between quits 7,6 and 5,4 using these --
 
 	qc.qgate(H2,[7,5])
 	qc.qgate(C2,[7,6,5,4])
