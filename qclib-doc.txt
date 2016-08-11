@@ -14,7 +14,7 @@ Lets start with a simple example of using qclib, something like a 'hello world' 
 	qc.qmeasure([0])
 	qc.qreport()
  
-When run, the above code generates the following output (since measuring rndomly collapses to some state per its probability, sometimes you might see the final state as 00000000) --
+When run, the above code generates the following output (since measuring randomly collapses to some state per its probability, there is 50% chance you might see the final state as 00000000) --
 
 	State
 	00000000    0.70710678+0.00000000j
