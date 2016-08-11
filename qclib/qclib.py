@@ -93,7 +93,7 @@ class qcsim:
 		if qtrace or self.trace:
 			opname = oper[0]
 			opargs = str(qbit_list)
-			hdr = opname + " Qbit" + opargs
+			hdr = opname + " Qubit" + opargs
 			self.qreport(header=hdr)
 
 	def qmeasure(self, qbit_list, basis=None, qtrace=False):
@@ -180,7 +180,7 @@ class qcsim:
 		self.sys_state = rrmat * self.sys_state
 
 		if qtrace or self.trace:
-			hdr = "MEASURED in basis "+bname+", Qbit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
+			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
 			self.qreport(header=hdr)
 		return meas_val
 
@@ -482,9 +482,9 @@ if __name__ == "__main__":
 		q.qgate(q.Rphi(q.pi/2),[7])
 		print "-------------------------------------------"
 		v = q.qmeasure([2])
-		print "Qbit 2 value measured = ",v
+		print "Qubit 2 value measured = ",v
 		v = q.qmeasure([1])
-		print "Qbit 1 value measured = ",v
+		print "Qubit 1 value measured = ",v
 		q.qreport()
 	except QClibError, m:
 		print m.args
