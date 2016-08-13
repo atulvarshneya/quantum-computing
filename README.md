@@ -24,6 +24,8 @@ All commonly used gates included
 * Hadamard
 * CNOT
 * SWAP
+* CSWAP
+* SQSWAP (square root of SWAP)
 * Toffoli
 * Pauli_x
 * Pauli_y

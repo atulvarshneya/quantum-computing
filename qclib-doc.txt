@@ -263,16 +263,18 @@ Checks if the provided operator is unitary opperator or not. Returns boolean val
 --------
 A number of gates are pre-defined in the qclib class. The following is the list --
 
-H()	Hadamard gate
-X()	Pauli_x gate
-Y()	Pauli_y gate
-Z()	Pauli_z gate
-R(phi)	Phase rotation by phi
-Rk(k)	Phase rotation by 2*pi/(2**k), useful in QFT algorithm
-C()	CNOT gate
-SWAP()	SWAP gate
-T()	TOFFOLI gate
-QFT(n)	QFT gate for n qubits
+H()		Hadamard gate
+X()		Pauli_x gate
+Y()		Pauli_y gate
+Z()		Pauli_z gate
+R(phi)		Phase rotation by phi
+Rk(k)		Phase rotation by 2*pi/(2**k), useful in QFT algorithm
+C()		CNOT gate
+SWAP()		SWAP gate
+CSWAP()		Controlled-SWAP gate
+SQSWAP()	Square root of SWAP gate
+T()		TOFFOLI gate
+QFT(n)		QFT gate for n qubits
 
 4.2	CONTROLLED GATES
 --------

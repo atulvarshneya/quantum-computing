@@ -231,22 +231,26 @@ class qcsim:
 		Pauli_X gate.
 		"""
 		return ["X", np.matrix([[0,1],[1,0]],dtype=complex)]
+
 	def Y(self):
 		"""
 		Pauli_Y gate.
 		"""
 		return ["Y", np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
+
 	def Z(self):
 		"""
 		Pauli_Z gate.
 		"""
 		return ["Z", np.matrix([[1,0],[0,-1]],dtype=complex)]
+
 	def H(self):
 		"""
 		Hadamard gate.
 		"""
 		sqr2 = np.sqrt(2)
 		return ["HADAMARD", np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)]
+
 	def Rphi(self,phi):
 		"""
 		Phase rotation gate. Takes the Phi as an argument.
@@ -254,6 +258,7 @@ class qcsim:
 		cphi = np.cos(phi)
 		sphi = np.sin(phi)
 		return ["ROTphi({:0.4f})".format(phi), np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)]
+
 	def Rk(self,k):
 		"""
 		Controlled Phase rotation gate. Takes the k as an argument to divide 2*pi by 2**k.
@@ -263,6 +268,13 @@ class qcsim:
 		return ["ROTk({:d})".format(k), np.matrix([
 			[1,0],
 			[0,complex(ck,sk)]],dtype=complex)]
+
+	def SQSWAP(self):
+		"""
+		Swap gate.
+		"""
+		return ["SQSWAP", np.matrix([[1,0,0,0],[0,0.5+0.5j,0.5-0.5j,0],[0,0.5-0.5j,0.5+0.5j,0],[0,0,0,1]],dtype=complex)]
+
 	def SWAP(self):
 		"""
 		Swap gate.
