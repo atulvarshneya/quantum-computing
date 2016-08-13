@@ -305,6 +305,20 @@ class qcsim:
 		oper = ["QFT({:d})".format(nqbits),opmat]
 		return oper
 
+	def RND(self):
+		"""
+		Random apmplitude gate.
+		"""
+		phi = rnd.random() * self.pi * 2
+		camp = np.cos(phi)
+		samp = np.sin(phi)
+		phi = rnd.random() * self.pi * 2
+		re1 = camp*np.cos(phi)
+		im1 = camp*np.sin(phi)
+		re2 = samp*np.cos(phi)
+		im2 = samp*np.sin(phi)
+		return ["RND", np.matrix([[complex(-re1,-im1),complex(re2,im2)],[complex(re2,im2),complex(re1,im1)]],dtype=complex)]
+
 	def CTL(self,op,name=None):
 		"""
 		Add Control to any gate

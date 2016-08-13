@@ -275,6 +275,7 @@ CSWAP()		Controlled-SWAP gate
 SQSWAP()	Square root of SWAP gate
 T()		TOFFOLI gate
 QFT(n)		QFT gate for n qubits
+RND()		Randomizes the qubit - useful for testing some cases
 
 4.2	CONTROLLED GATES
 --------
