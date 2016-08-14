@@ -118,7 +118,7 @@ If qtrace=True, it causes each gate and measurement operation to emit the result
 
 If qzeros=True, prints even those whose amplitude is 0.
 
-If validation=True, every qgate() call validates the gate to be unitary, and every qmeasure() call validates the basis to be orthonormal (same as unitary?)
+If validation=True, every qgate() call validates the gate to be unitary, and every qmeasure() call validates the basis passed
 
 If visualize=True, the qreport() displays an additional bar graph showing the magnitude of the amplitudes of each state.
 
