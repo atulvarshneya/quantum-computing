@@ -62,7 +62,9 @@ for i in symtbl:
 		if k in qckeys:
 			print
 			print k,"--EXISTING INFORMATION-------------"
-			print qcbld[k]
+			print "Command: ",qcbld[k][0]
+			print "Description: ",qcbld[k][1]
+			print "Arguments: ",qcbld[k][2]
 		resp = getresp( "{:s} ".format(k),"n","y")
 		procit = False
 		if resp == "n":

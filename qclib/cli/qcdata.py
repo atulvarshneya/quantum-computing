@@ -32,22 +32,22 @@ qcbld = {
 	"qclib.qcsim.SWAP": ["sw","sw bit1 bit2","list:2"],
 	"qclib.qcsim.RND": ["rnd","rnd bit","list:1"],
 	"qclib.qcsim.Y": ["y","y bit","list:1"],
-	"qclib.qcsim.X": ["x","x bit","list:1"],
+	"qclib.qcsim.H": ["h","h bit","list:1"],
 	"qclib.qcsim.Z": ["z","z bit","list:1"],
 	"qclib.qcsim.T": ["t","t cbit1 cbit2 bit","list:3"],
 	"qclib.qcsim.SQSWAP": ["sqsw","sqsw bit1 bit2","list:2"],
 	"qclib.qcsim.C": ["c","c cbit bit","list:2"],
-	"qclib.qcsim.H": ["h","h bit","list:1"]
+	"qclib.qcsim.X": ["x","x bit","list:1"]
 	}
 qcdata = {
 	"csw": [qclib.qcsim.CSWAP,"csw cbit bit1 bit2","list:3"],
 	"sw": [qclib.qcsim.SWAP,"sw bit1 bit2","list:2"],
 	"rnd": [qclib.qcsim.RND,"rnd bit","list:1"],
 	"y": [qclib.qcsim.Y,"y bit","list:1"],
-	"x": [qclib.qcsim.X,"x bit","list:1"],
+	"h": [qclib.qcsim.H,"h bit","list:1"],
 	"z": [qclib.qcsim.Z,"z bit","list:1"],
 	"t": [qclib.qcsim.T,"t cbit1 cbit2 bit","list:3"],
 	"sqsw": [qclib.qcsim.SQSWAP,"sqsw bit1 bit2","list:2"],
 	"c": [qclib.qcsim.C,"c cbit bit","list:2"],
-	"h": [qclib.qcsim.H,"h bit","list:1"]
+	"x": [qclib.qcsim.X,"x bit","list:1"]
 	}
