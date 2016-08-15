@@ -61,7 +61,6 @@ while True:
 				for i in range(ac):
 					bit = int(cmdline[i+1])
 					l.append(bit)
-				print l
 				q.qgate(f(q),l)
 			else:
 				print "Usage:",desc
