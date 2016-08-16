@@ -28,26 +28,26 @@ igbld = [
 	"qclib.qcsim._qcsim__shuffled_count"
 	]
 qcbld = {
-	"qclib.qcsim.CSWAP": ["csw","csw cbit bit1 bit2","list:3"],
-	"qclib.qcsim.SWAP": ["sw","sw bit1 bit2","list:2"],
-	"qclib.qcsim.RND": ["rnd","rnd bit","list:1"],
-	"qclib.qcsim.Y": ["y","y bit","list:1"],
-	"qclib.qcsim.H": ["h","h bit","list:1"],
-	"qclib.qcsim.Z": ["z","z bit","list:1"],
-	"qclib.qcsim.T": ["t","t cbit1 cbit2 bit","list:3"],
-	"qclib.qcsim.SQSWAP": ["sqsw","sqsw bit1 bit2","list:2"],
-	"qclib.qcsim.C": ["c","c cbit bit","list:2"],
-	"qclib.qcsim.X": ["x","x bit","list:1"]
+	"qclib.qcsim.X": ["x","Gate: x bit","qgate:1"],
+	"qclib.qcsim.SWAP": ["sw","Gate: sw bit1 bit2","qgate:2"],
+	"qclib.qcsim.RND": ["rnd","Gate: rnd bit","qgate:1"],
+	"qclib.qcsim.Y": ["y","Gate: y bit","qgate:1"],
+	"qclib.qcsim.H": ["h","Gate: h bit","qgate:1"],
+	"qclib.qcsim.Z": ["z","Gate: z bit","qgate:1"],
+	"qclib.qcsim.T": ["t","Gate: t cbit1 cbit2 bit","qgate:3"],
+	"qclib.qcsim.SQSWAP": ["sqsw","Gate: sqsw bit1 bit2","qgate:2"],
+	"qclib.qcsim.C": ["c","Gate: c cbit bit","qgate:2"],
+	"qclib.qcsim.CSWAP": ["csw","Gate: csw cbit bit1 bit2","qgate:3"]
 	}
 qcdata = {
-	"csw": [qclib.qcsim.CSWAP,"csw cbit bit1 bit2","list:3"],
-	"sw": [qclib.qcsim.SWAP,"sw bit1 bit2","list:2"],
-	"rnd": [qclib.qcsim.RND,"rnd bit","list:1"],
-	"y": [qclib.qcsim.Y,"y bit","list:1"],
-	"h": [qclib.qcsim.H,"h bit","list:1"],
-	"z": [qclib.qcsim.Z,"z bit","list:1"],
-	"t": [qclib.qcsim.T,"t cbit1 cbit2 bit","list:3"],
-	"sqsw": [qclib.qcsim.SQSWAP,"sqsw bit1 bit2","list:2"],
-	"c": [qclib.qcsim.C,"c cbit bit","list:2"],
-	"x": [qclib.qcsim.X,"x bit","list:1"]
+	"x": [qclib.qcsim.X,"Gate: x bit","qgate:1"],
+	"sw": [qclib.qcsim.SWAP,"Gate: sw bit1 bit2","qgate:2"],
+	"rnd": [qclib.qcsim.RND,"Gate: rnd bit","qgate:1"],
+	"y": [qclib.qcsim.Y,"Gate: y bit","qgate:1"],
+	"h": [qclib.qcsim.H,"Gate: h bit","qgate:1"],
+	"z": [qclib.qcsim.Z,"Gate: z bit","qgate:1"],
+	"t": [qclib.qcsim.T,"Gate: t cbit1 cbit2 bit","qgate:3"],
+	"sqsw": [qclib.qcsim.SQSWAP,"Gate: sqsw bit1 bit2","qgate:2"],
+	"c": [qclib.qcsim.C,"Gate: c cbit bit","qgate:2"],
+	"csw": [qclib.qcsim.CSWAP,"Gate: csw cbit bit1 bit2","qgate:3"]
 	}

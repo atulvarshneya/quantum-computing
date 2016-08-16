@@ -5,22 +5,65 @@ import getopt
 import qclib
 from qcdata import qcdata
 
-cmds = {
-	"i": "init nqbits",
-	"r": "reset",
-	"q": "quit",
-	"m": "measure bit1 bit2 ...",
-	"?": "list of commands",
-	"help": "list of commands"
-	}
+q = None
+def initqc(n):
+	global q
+	q = qclib.qcsim(n,qtrace=True)
 
 def help():
-	print "Commands ------"
-	for k in sorted(cmds.keys()):
-		print k,"	",cmds[k]
-	print "Gates ------"
 	for k in sorted(qcdata.keys()):
 		print k,"	",qcdata[k][1]
+
+def parse_aspec(aspec):
+	isgate = False
+	isqlim = True
+	isnoq = False
+	isqlist = False
+	na = 0
+	nq = 0
+	if ',' in aspec:
+		aparts = aspec.split(",")
+	else:
+		aparts = [aspec]
+	for e in aparts:
+		al = e.split(":")
+		tag = al[0]
+		if tag == "qgate":
+			isgate = True
+			if al[1] == "*":
+				isqlim = False
+			else:
+				nq = int(al[1])
+		if tag == "args":
+			na = int(al[1])
+		if tag == "noqc":
+			isnoq = True
+		if tag == "qlist":
+			isqlist = True
+			if al[1] == "*":
+				isqlim = False
+			else:
+				nq = int(al[1])
+	return isnoq, na, isgate, isqlim, nq, isqlist
+
+#####
+## aspec --
+## 	<tag>:n,<tag>:m, ...
+## tags --
+## 	noqc:		-- is a function call NOT a member of qclib.qcsim
+## 	args:n		-- is a function call, takes n arguments (all arguments are integers)
+## 	qgate:n		-- is a gate operation and takes n qubits as argument.
+## 	qclist:n	-- takes the last argument as a list of qubits. if n is *, any number of qubits.
+#####
+
+cmds = {
+	"i": [initqc,"Command: init nqbits","noqc:,args:1"],
+	"r": [qclib.qcsim.qreset, "Command: reset","args:0"],
+	"q": [quit, "Command: quit","noqc:,args:0"],
+	"m": [qclib.qcsim.qmeasure,"Command: measure bit1 bit2 ...","qlist:*"],
+	"?": [help, "Command: list of commands","noqc:args:0"],
+	"help": [help, "Command: list of commands","noqc:args:0"]
+	}
 
 def main():
 	# Process the command line arguments
@@ -29,12 +72,16 @@ def main():
 	except getopt.GetoptError:
 		print sys.argv[0],"-h"
 		sys.exit(2)
+
 	for opt, arg in opts:
 		if opt == '-h':
 			help()
 
-	# Get into teh main loop to get and process commands
-	q = None
+	# copy in the commands into qcdata
+	for k in cmds.keys():
+		qcdata[k] = cmds[k]
+
+	# Get into the main loop to get and process commands
 	while True:
 		try:
 			sys.stdout.write("> ")
@@ -42,42 +89,30 @@ def main():
 			cmdline = l.split()
 			if len(cmdline) < 1:
 				continue
-			cmd = cmdline[0]
-			if cmd == 'q' or cmd == 'Q':
-				quit()
-			elif cmd == 'init' or cmd == 'i':
-				if len(cmdline) != 2:
-					print "Usage:",cmds['i']
-				else:
-					nqbits = int(cmdline[1])
-					q = qclib.qcsim(nqbits,qtrace=True)
-			elif cmd == 'r' or cmd == 'reset':
-				if len(cmdline) != 1:
-					print "Usage:",cmds['r']
-				else:
-					q.qreset()
-			elif cmd == '?' :
-				help()
-			elif cmd == 'm' or cmd == "measure":
-				if len(cmdline) < 2:
-					print "Usage:",cmds['m']
-				blist = []
-				for b in range(len(cmdline)-1):
-					blist.append(int(cmdline[b+1]))
-				q.qmeasure(blist)
-				pass
-			elif cmd in qcdata.keys():
+			cmd = cmdline.pop(0)
+			if cmd in qcdata.keys():
 				f = (qcdata[cmd])[0]
 				desc = (qcdata[cmd])[1]
 				aspec = (qcdata[cmd])[2]
-				(at,ac) = aspec.split(':')
-				ac = int(ac)
-				if ac == (len(cmdline)-1):
+				(isnoq, na, isgate, isqlim, nq, isqlist) = parse_aspec(aspec)
+				if isnoq:
+					alist = []
+				else:
+					alist = [q]
+				if (na <= len(cmdline)) and ((not isqlim) or ((na+nq) == len(cmdline))):
+					for i in range(na):
+						av = int(cmdline.pop(0))
+						alist.append(av)
 					l = []
-					for i in range(ac):
-						bit = int(cmdline[i+1])
+					for i in range(len(cmdline)):
+						bit = int(cmdline.pop(0))
 						l.append(bit)
-					q.qgate(f(q),l)
+					if isgate:
+						q.qgate(f(*alist),l)
+					else:
+						if isqlist:
+							alist.append(l)
+						f(*alist)
 				else:
 					print "Usage:",desc
 			else:
