@@ -66,6 +66,10 @@ cmds = {
 	}
 
 def main():
+	# copy in the commands into clidata
+	for k in cmds.keys():
+		clidata[k] = cmds[k]
+
 	# Process the command line arguments
 	try:
 		opts, args = getopt.getopt(sys.argv[1:],"h")
@@ -76,10 +80,6 @@ def main():
 	for opt, arg in opts:
 		if opt == '-h':
 			help()
-
-	# copy in the commands into clidata
-	for k in cmds.keys():
-		clidata[k] = cmds[k]
 
 	# Get into the main loop to get and process commands
 	while True:
