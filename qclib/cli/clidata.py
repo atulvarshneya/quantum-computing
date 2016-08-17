@@ -28,26 +28,26 @@ igbld = [
 	"qclib.qcsim._qcsim__shuffled_count"
 	]
 qcbld = {
-	"qclib.qcsim.X": ["x","Gate: x bit","qgate:1"],
+	"qclib.qcsim.CSWAP": ["csw","Gate: csw cbit bit1 bit2","qgate:3"],
 	"qclib.qcsim.SWAP": ["sw","Gate: sw bit1 bit2","qgate:2"],
 	"qclib.qcsim.RND": ["rnd","Gate: rnd bit","qgate:1"],
 	"qclib.qcsim.Y": ["y","Gate: y bit","qgate:1"],
-	"qclib.qcsim.H": ["h","Gate: h bit","qgate:1"],
+	"qclib.qcsim.X": ["x","Gate: x bit","qgate:1"],
 	"qclib.qcsim.Z": ["z","Gate: z bit","qgate:1"],
 	"qclib.qcsim.T": ["t","Gate: t cbit1 cbit2 bit","qgate:3"],
 	"qclib.qcsim.SQSWAP": ["sqsw","Gate: sqsw bit1 bit2","qgate:2"],
 	"qclib.qcsim.C": ["c","Gate: c cbit bit","qgate:2"],
-	"qclib.qcsim.CSWAP": ["csw","Gate: csw cbit bit1 bit2","qgate:3"]
+	"qclib.qcsim.H": ["h","Gate: h bit","qgate:1"]
 	}
-qcdata = {
-	"x": [qclib.qcsim.X,"Gate: x bit","qgate:1"],
+clidata = {
+	"csw": [qclib.qcsim.CSWAP,"Gate: csw cbit bit1 bit2","qgate:3"],
 	"sw": [qclib.qcsim.SWAP,"Gate: sw bit1 bit2","qgate:2"],
 	"rnd": [qclib.qcsim.RND,"Gate: rnd bit","qgate:1"],
 	"y": [qclib.qcsim.Y,"Gate: y bit","qgate:1"],
-	"h": [qclib.qcsim.H,"Gate: h bit","qgate:1"],
+	"x": [qclib.qcsim.X,"Gate: x bit","qgate:1"],
 	"z": [qclib.qcsim.Z,"Gate: z bit","qgate:1"],
 	"t": [qclib.qcsim.T,"Gate: t cbit1 cbit2 bit","qgate:3"],
 	"sqsw": [qclib.qcsim.SQSWAP,"Gate: sqsw bit1 bit2","qgate:2"],
 	"c": [qclib.qcsim.C,"Gate: c cbit bit","qgate:2"],
-	"csw": [qclib.qcsim.CSWAP,"Gate: csw cbit bit1 bit2","qgate:3"]
+	"h": [qclib.qcsim.H,"Gate: h bit","qgate:1"]
 	}

@@ -3,7 +3,7 @@
 import sys
 import getopt
 import qclib
-from qcdata import qcdata
+from clidata import clidata
 
 q = None
 def initqc(n):
@@ -11,8 +11,8 @@ def initqc(n):
 	q = qclib.qcsim(n,qtrace=True)
 
 def help():
-	for k in sorted(qcdata.keys()):
-		print k,"	",qcdata[k][1]
+	for k in sorted(clidata.keys()):
+		print k,"	",clidata[k][1]
 
 def parse_aspec(aspec):
 	isgate = False
@@ -77,9 +77,9 @@ def main():
 		if opt == '-h':
 			help()
 
-	# copy in the commands into qcdata
+	# copy in the commands into clidata
 	for k in cmds.keys():
-		qcdata[k] = cmds[k]
+		clidata[k] = cmds[k]
 
 	# Get into the main loop to get and process commands
 	while True:
@@ -90,10 +90,10 @@ def main():
 			if len(cmdline) < 1:
 				continue
 			cmd = cmdline.pop(0)
-			if cmd in qcdata.keys():
-				f = (qcdata[cmd])[0]
-				desc = (qcdata[cmd])[1]
-				aspec = (qcdata[cmd])[2]
+			if cmd in clidata.keys():
+				f = (clidata[cmd])[0]
+				desc = (clidata[cmd])[1]
+				aspec = (clidata[cmd])[2]
 				(isnoq, na, isgate, isqlim, nq, isqlist) = parse_aspec(aspec)
 				if isnoq:
 					alist = []

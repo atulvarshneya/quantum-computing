@@ -4,7 +4,7 @@ import getopt
 import qclib
 import sys
 import types
-from qcdata import qcbld,igbld
+from clidata import qcbld,igbld
 
 def getint(prompt):
 	gotit = False
@@ -105,9 +105,9 @@ def main():
 				# print "qclib.qcsim.{:s}: [\"{:s}\" qgate:{:d}]".format(i,desc,n)
 				qcbld[k] = [cmd,p1,p2]
 
-	outf = open("qcdata.py","w")
+	outf = open("clidata.py","w")
 
-	print "Writing qcdata.py - igbld[]..."
+	print "Writing clidata.py - igbld[]..."
 	outf.write("import qclib\n")
 	outf.write("igbld = [\n")
 	first = True
@@ -119,7 +119,7 @@ def main():
 		outf.write("	\"{:s}\"".format(e))
 	outf.write("\n	]\n")
 
-	print "Writing qcdata.py - qcbld[]..."
+	print "Writing clidata.py - qcbld[]..."
 	outf.write("qcbld = {\n")
 	first = True
 	for e in qcbld.keys():
@@ -130,8 +130,8 @@ def main():
 		outf.write("	\"{:s}\": [\"{:s}\",\"{:s}\",\"{:s}\"]".format(e,qcbld[e][0],qcbld[e][1],qcbld[e][2]))
 	outf.write("\n	}\n")
 
-	print "Writing qcdata.py - qcdata[]..."
-	outf.write("qcdata = {\n")
+	print "Writing clidata.py - clidata[]..."
+	outf.write("clidata = {\n")
 	first = True
 	for e in qcbld.keys():
 		if first:
