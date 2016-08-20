@@ -6,7 +6,7 @@ import numpy as np
 q = qclib.qcsim(3)
 
 # put the qubit 2 in some randoom state
-# this is the qubit that is to be teleported
+# this is the qubit that is to be teleported by Alice to Bob
 print "\nThe qubit 2 is put in some random state, it will be teleported into qubit 0."
 q.qgate(q.RND(),[2], qtrace=True)
 
@@ -21,6 +21,10 @@ q.qgate(q.C(),[0,1])
 1 -o-----(/)--.---|--
               |   |
 0 -----------[X]-[Z]-- qubit 2 teleported into qubit 0
+
+Clearly, while much simpler to understand, this is not a practical way 
+of doing it, as the controlled X and controlled Z gates will need to 
+span the physical distance betwee where Alice and Bob are.
 
 '''
 
