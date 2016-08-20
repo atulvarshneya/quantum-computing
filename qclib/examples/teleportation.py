@@ -4,10 +4,17 @@ import qclib
 import numpy as np
 import random as rnd
 
+'''
+This example shows an implementation of the teleportation protocol
+The implementation done here demonstrates
+	1. creating an initial state in qclib,
+	2. measuring in a specific basis
+'''
+
 theta = rnd.random() * 2 * np.pi
 c = np.cos(theta)
 s = np.sin(theta)
-# prepare the initial state with qbit-3 with the above computed random amplitude
+# prepare the initial state with qbit-2 with the above computed random amplitude
 msb = np.transpose(np.matrix([[c,s]],dtype=complex))
 init = msb
 for i in range(3-1):
