@@ -305,6 +305,15 @@ class qcsim:
 		oper = ["QFT({:d})".format(nqbits),opmat]
 		return oper
 
+	def Hn(self,n):
+		"""
+		H^n gate - very commonly used
+		"""
+		op_list = []
+		for i in range(n):
+			op_list.append(self.H())
+		return self.qcombine_par("H**{:d}".format(n),op_list)
+
 	def RND(self):
 		"""
 		Random apmplitude gate.

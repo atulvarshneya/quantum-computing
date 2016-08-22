@@ -274,6 +274,7 @@ SWAP()		SWAP gate
 CSWAP()		Controlled-SWAP gate
 SQSWAP()	Square root of SWAP gate
 T()		TOFFOLI gate
+Hn(n)		Hadamard gates applied on n qubits, added since it is commonly used
 QFT(n)		QFT gate for n qubits
 RND()		Randomizes the qubit - useful for testing some cases
 
