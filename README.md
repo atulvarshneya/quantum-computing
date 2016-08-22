@@ -14,8 +14,9 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 * Bernstien-Vazirani
 * Quantum Fourier Tramsform
 * Period-finding
+* Grover's algorithm
 * ... more added every few days
-* Shore's and Grover's algos coming soon
+* Shore's algorithm coming soon
 
 
 GATES
@@ -33,6 +34,7 @@ All commonly used gates included
 * Phase rotation by phi
 * Phase rotation by 2*pi/(2^k)
 * n-qubit QFT
+* n-qubit Hadamard
 
 Create a CONTROLLED GATE for any given gate; add any number of control qubits.
 
