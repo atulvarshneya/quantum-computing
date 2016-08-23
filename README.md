@@ -18,6 +18,8 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 * ... more added every few days
 * Shore's algorithm coming soon
 
+An interactive commandline interface (qc-cli.py) to quickly check out operations and sequences.
+
 
 GATES
 -------------------
