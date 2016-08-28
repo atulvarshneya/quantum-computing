@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+import ntpath
 import getopt
 import qclib
 import collections as col
@@ -104,13 +105,14 @@ def main():
 	try:
 		opts, args = getopt.getopt(sys.argv[1:],"h")
 	except getopt.GetoptError:
-		print sys.argv[0],"-h"
+		print "Usage: "+ntpath.basename(sys.argv[0])+" [-h]"
 		sys.exit(2)
 
 	for opt, arg in opts:
 		if opt == '-h':
 			help()
 
+	print "Type '?' for help."
 	# Get into the main loop to get and process commands
 	while True:
 		try:
