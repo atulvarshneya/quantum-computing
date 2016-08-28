@@ -180,7 +180,7 @@ class qcsim:
 		self.sys_state = rrmat * self.sys_state
 
 		if qtrace or self.trace:
-			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probality = " + str(prob_val) 
+			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(prob_val) 
 			self.qreport(header=hdr)
 		return meas_val
 
