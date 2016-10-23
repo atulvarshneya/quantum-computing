@@ -74,17 +74,19 @@ import numpy as np
 import qclib
 
 for e in range(11):
+	# 1. one-after-another create states of different entangelment with D
 	istarr = [1.0-e/10.0,e/10.0,e/10.0,1.0-e/10.0]
 	norm = 0.0
 	for s in istarr:
 		norm += s*s
 	norm = np.sqrt(norm)
 	istarr = istarr/norm
-
 	ist = np.transpose(np.matrix(istarr,dtype=complex))
 
+	# 2. Initialize the QSIM with that as the initial state
 	q = qclib.qcsim(2,initstate=ist,validation=True)
 
+	# 3. now run the test 'sample' number of times to get statistics
 	samples = 1000
 	dist = [0]*2
 	for i in range(samples):
@@ -94,7 +96,7 @@ for e in range(11):
 		v = m[0]
 		dist[v] += 1
 
-	## Pretty print the results
+	# 4. Pretty print the results
 	str_dist = ""
 	for i in range(2):
 		str_dist += "	|"+str(i)+"> "+str(np.round(100.0*float(dist[i])/float(samples),decimals=2))+"%"
