@@ -74,7 +74,7 @@ class qcsim:
 			# Now create the state as a tensor product of the qbits (MSB to the left)
 			self.sys_state = qbit[self.nqbits-1]
 			for i in reversed(range(self.nqbits-1)):
-				self.sys_state = np.kron(self.sys_state,qbit[i])
+				self.sys_state = np.kron(qbit[i],self.sys_state)
 		if self.trace:
 			self.qreport(header="Initial State")
 
