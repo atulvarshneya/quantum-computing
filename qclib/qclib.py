@@ -411,6 +411,57 @@ class qcsim:
 				reord_list.append(i)
 		return reord_list
 
+	## __aligned_op() and __stretched_mat() use two concepts core to
+	## the working of this simulator.
+	##
+	## methods __qbit_realign_list(), __rmat_rrmat(), and __shuffled_count() are used
+	## for the alignment of the operators as described below --
+	##
+	## Lets consider a 2-bit gate, e.g., CNOT gate, C, which, say, is defined
+	## to take bit 1 as the control bit, and bit 0 as the target bit --
+	##
+	##         +---+
+	## |b1> ---|-+-|------
+	##         | | |
+	## |b0> ---|-O-|------
+	##         +---+
+	##
+	## Lets see how we apply this 2-qubit gate to some specifc bits of a 4 qubit system,
+	## say, control qubit 3, and target qubit 1.
+	## We first 'stretch' this to the full 4 qubits U = np.kron(np.eye(4), C).
+	## Note, U operator is a 2**nqbits x 2**nqbits matrix, 16x16 in this example case.
+	## And note, that this will apply the operation to the qubits 0 and 1 as defined,
+	## and leave the other qubits unchanged.
+	##         +---+
+	## |b3> ---|---|------
+	##         |   |
+	## |b2> ---|---|------
+	##         |   |
+	## |b1> ---| + |------
+	##         | | |
+	## |b0> ---| O |------
+	##         +---+
+	##           U
+	##
+	## Then, we apply an operator, r, a 2**nqbits x 2**nqbits matrix, on the state to reorder (realign) it such 
+	## that the state vector is ordered counting with qubit 1 at qbit 0 position, and qubit 3 at qubit 1 position. 
+	## << this requires a bit more explaining>>
+	## Next, apply U. Finally, apply an operator, rr, 
+	## to undo the reordering done by the operator r.
+	##         +---+  +---+  +---+
+	## |b3> ---|  2|--|---|--|  3|----
+	##         |   |  |   |  |   |
+	## |b2> ---|  0|--|---|--|  2|----
+	##         |   |  |   |  |   |
+	## |b1> ---|  3|--| + |--|  1|----
+	##         |   |  | | |  |   |
+	## |b0> ---|  1|--| O |--|  0|----
+	##         +---+  +---+  +---+
+	##           r      U      rr
+	## 
+	## Now, if we multiple these three operators as a_op = (rr x U x r) then the resulting 
+	## operator, a_op, basically is the one that applies C on qubits 3 and 1 as intended.
+
 	def __aligned_op(self, op, qbit_list):
 		"""
 		qbit_reorder is 'visually correct'. So [a,b,c,d] implies bring to MSB 
@@ -421,6 +472,33 @@ class qcsim:
 		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
 		a_op = rrmat * op * rmat
 		return a_op
+
+	## __stretched_mat() and __aligned_op() use two concepts core to
+	## the working of this simulator.
+	##
+	## Qubits |x> and |y>, each is acted upon by 2x2 operators U1 and U2, respectively.
+	## This is equivalent to the combined state of x and y, i.e., |xy> acted upon
+	## by a single 4x4 operator U = np.kron(U1, U2) (see Umesh Vazirani course
+	## on edx.org - Week 3: Quantum Circuits and Teleportation  
+	## Lecture 5: Quantum Gates  Video: Two Qubit Gates and Tensor Products
+	## https://www.youtube.com/watch?v=ISJYwzN-W20 )
+	##
+	##            +-------+
+	##            |       |
+	##            | +---+ |
+	##            | |   | |
+	## |x> -------+-|U1 |-+-------- U1|x>                  +-----+
+	##            | |2x2| |                                |     |
+	##            | +---+ |                                |     |
+	##            |       |                   |xy> --------+  U  +------- U|xy>
+	##            |       |                                |     |
+	##            | +---+ |                                | 4x4 |
+	##            | |   | |                                +-----+
+	## |y> -------+-|U1 |-+-------- U2|y>
+	##            | |2x2| |
+	##            | +---+ |
+	##            |       |
+	##            +-------+
 
 	def __stretched_mat(self,oper,qbit_list):
 		orignm = oper[0]
