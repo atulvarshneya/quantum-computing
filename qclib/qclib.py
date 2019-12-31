@@ -428,10 +428,8 @@ class qcsim:
 	##
 	## Lets see how we apply this 2-qubit gate to some specifc bits of a 4 qubit system,
 	## say, control qubit 3, and target qubit 1.
-	## We first 'stretch' this to the full 4 qubits U = np.kron(np.eye(4), C).
-	## Note, U operator is a 2**nqbits x 2**nqbits matrix, 16x16 in this example case.
-	## And note, that this will apply the operation to the qubits 0 and 1 as defined,
-	## and leave the other qubits unchanged.
+	## We first 'stretch' this to the full 4 qubits U = np.kron(np.eye(4), C). See below 
+	## the description of __stretched_mat().
 	##         +---+
 	## |b3> ---|---|------
 	##         |   |
@@ -442,12 +440,18 @@ class qcsim:
 	## |b0> ---| O |------
 	##         +---+
 	##           U
+	## Note, U operator is a 2**nqbits x 2**nqbits matrix, 16x16 in this example case.
+	## And note, that this will apply the operation to the qubits 0 and 1 as defined,
+	## and leave the other qubits unchanged.
+	## Remember, the operators act on a state vector to compute the resulting state 
+	## vector, that is why the operator is 2**nqbits x 2**nqbits in size
 	##
-	## Then, we apply an operator, r, a 2**nqbits x 2**nqbits matrix, on the state to reorder (realign) it such 
-	## that the state vector is ordered counting with qubit 1 at qbit 0 position, and qubit 3 at qubit 1 position. 
-	## << this requires a bit more explaining>>
-	## Next, apply U. Finally, apply an operator, rr, 
-	## to undo the reordering done by the operator r.
+	## Next, we apply an operator, r, again a 2**nqbits x 2**nqbits matrix, on the state 
+	## to reorder (realign) it such that the state vector is ordered counting with qubit 1 
+	## at qbit 0 position, and qubit 3 at qubit 1 position. 
+	## Next, apply U. Finally, apply an operator, rr, to undo the reordering done by 
+	## the operator r.
+	## So logically, the operators circuit diagram looks like -
 	##         +---+  +---+  +---+
 	## |b3> ---|  2|--|---|--|  3|----
 	##         |   |  |   |  |   |
@@ -460,7 +464,7 @@ class qcsim:
 	##           r      U      rr
 	## 
 	## Now, if we multiple these three operators as a_op = (rr x U x r) then the resulting 
-	## operator, a_op, basically is the one that applies C on qubits 3 and 1 as intended.
+	## operator, calling it a_op, basically is the one that applies C on qubits 3 and 1 as intended.
 
 	def __aligned_op(self, op, qbit_list):
 		"""
