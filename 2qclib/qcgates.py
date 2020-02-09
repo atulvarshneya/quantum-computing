@@ -7,9 +7,9 @@
 import numpy as np
 import random as rnd
 import qcutilsgts as ugts
-from qcerror import *
+from qcerror import QCError
 
-class qcgates:
+class QCGates:
 
 	def __init__(self):
 		self.gate_dict = {
@@ -23,13 +23,25 @@ class qcgates:
 			"SWAP": self.SWAP(),
 			"CSWAP": self.CSWAP(),
 			"RND": self.RND(),
-			"M": ["M"]
+			"M": np.matrix([0],dtype=np.complex) # this matrix is just a dummy
 			}
 
-	def listops(self):
-		return self.gate_dict.keys()
+	def define_gate(self,gtname, gtmatrix):
+		if gtname in self.gate_dict.keys():
+			raise QCError("define_gate error. gate name already exists: {}".format(gtname))
+		if not ugts.qisunitary(gtmatrix):
+			raise QCError("define_gate error - gate matrix is not unitary: {}".format(gtnam))
+		self.gate_dict[gtname] = gtmatrix
+		return gtmatrix
 
-	def getop(self, qcgate):
+	# like a documentation api to see names ll defined gates
+	def list_all_ops(self):
+		allops = []
+		for o in self.gate_dict.keys():
+			allops.append(o)
+		return allops
+
+	def get_op_matrix(self, qcgate):
 		return self.gate_dict[qcgate]
 
 	def validate_gate(self, qcgate):
@@ -47,14 +59,6 @@ class qcgates:
 			return False
 		else:
 			return True
-
-	def mkgate(self,gtname, gtmatrix):
-		if gtname in self.gate_dict.keys():
-			raise QCError("mkgate error. gate name already exists: {}".format(gtname))
-		if not ugts.qisunitary(gtmatrix):
-			raise QCError("mkgate error - gate matrix is not unitary: {}".format(gtnam))
-		self.gate_dict[gtname] = gtmatrix
-		return gtmatrix
 
 	## QC Gates
 	def X(self):
@@ -138,36 +142,6 @@ class qcgates:
 				coparr[i][j] = oparr[i-r][j-r]
 		return np.matrix(coparr,dtype=complex)
 
-'''
-
-	def QFT(nqbits):
-		N = 2**nqbits # number of rows and cols
-		theta = 2.0 * np.pi / N
-		opmat = [None]*N
-		for i in range(N):
-			# print "row",i,"--------------------"
-			row = []
-			for j in range(N):
-				pow = i * j
-				pow = pow % N
-				# print "w^",pow
-				row.append(np.e**(1.j*theta*pow))
-			opmat[i] = row
-		# print opmat
-		opmat = np.matrix(opmat,dtype=complex) / np.sqrt(N)
-		oper = ["QFT({:d})".format(nqbits),opmat]
-		return oper
-
-	def Hn(n):
-		"""
-		H^n gate - very commonly used
-		"""
-		op_list = []
-		for i in range(n):
-			op_list.append(H())
-		return qcombine_par("H**{:d}".format(n),op_list)
-
-'''
 
 if __name__ == "__main__":
 	gt = qcgates()
