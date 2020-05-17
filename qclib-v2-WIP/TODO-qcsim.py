@@ -9,12 +9,11 @@ import random as rnd
 from copy import deepcopy
 import types
 
-from qutil import *
 from qcerror import *
 import qcutilsgts as ugts
 import qcutilsckt as uckt
 
-class qcsim:
+class QCSim:
 
 	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False):
 		# record input variables for reset
@@ -81,7 +80,7 @@ class qcsim:
 		if self.trace:
 			self.qreport(header="Initial State")
 
-	def qgate(self, oper, qbit_list, qtrace=False):
+	def exec_qgate(self, oper, qbit_list, qtrace=False):
 		##
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_qbit_list(qbit_list):
@@ -99,7 +98,7 @@ class qcsim:
 			hdr = opname + " Qubit" + opargs
 			self.qreport(header=hdr)
 
-	def qmeasure(self, qbit_list, basis=None, qtrace=False):
+	def exec_qmeasure(self, qbit_list, basis=None, qtrace=False):
 		##
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_qbit_list(qbit_list):
