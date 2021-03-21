@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-print """
+print("""
 -------------------------------------------------------------------------------------------------------
 Problem Statement:
     Setup an initial prepared state and compute the fourier transform on it.
 -------------------------------------------------------------------------------------------------------
-"""
+""")
 
 import qclib
 import numpy as np
@@ -32,5 +32,5 @@ try:
 	qftgate = q.QFT(nqbits)
 	q.qgate(qftgate, list(reversed(range(nqbits))))
 
-except qclib.QClibError,ex:
-	print ex.args
+except qclib.QClibError as ex:
+	print(ex.args)

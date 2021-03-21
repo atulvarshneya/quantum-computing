@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # This file is part of the QCLIB project covered under GPL v3 license.
 # See the full license in the file LICENSE
@@ -11,9 +11,12 @@ import types
 
 class qcsim:
 
-	def __init__(self, nq, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False):
+	def __init__(self, nq, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False):
 		# record input variables for reset
 		self.nqbits = nq
+		self.ncbits = ncbits
+		if self.ncbits is None:
+			self.ncbits = nq
 		self.initstate = initstate
 		self.prepqubits = prepqubits
 		self.traceINP = qtrace
@@ -23,8 +26,10 @@ class qcsim:
 
 		# Useful constants
 		self.pi = np.pi
-		self.maxerr = 0.000001
-		self.maxproberr = 0.000001
+		self.errprec = 6 # number of digits after decimal
+		self.maxerr = 10**(-self.errprec)
+		self.probprec = 6 # number of digits after decimal
+		self.maxproberr = 10**(-self.probprec)
 
 		self.qreset()
 
@@ -32,6 +37,9 @@ class qcsim:
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
+
+		# Clear the classical bits register
+		self.cregister = [0]*self.ncbits
 
 		# Initial State
 		if not self.initstate is None:
@@ -96,11 +104,26 @@ class qcsim:
 			hdr = opname + " Qubit" + opargs
 			self.qreport(header=hdr)
 
+	def qmeasure_to_cregister(self, qbit_list, cbit_list=None, basis=None, qtrace=False):
+		if cbit_list is None:
+			cbit_list = qbit_list
+		## TODO: check cbit_list has all entries unique and within the cbit register
+		if len(qbit_list) != len(cbit_list):
+			errmsg = "Error: list of classical bits is not valid"
+			raise QClibError(errmsg)
+		mvals = self.qmeasure(qbit_list, basis, qtrace)
+		for i in range(len(cbit_list)):
+			self.cregister[cbit_list[i]] = mvals[i]
+		return self.cregister
+
+	def qsnapshot(self):
+		return self.cregister, self.sys_state
+
 	def qmeasure(self, qbit_list, basis=None, qtrace=False):
 		##
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_qbit_list(qbit_list):
-			errmsg = "Error: teh list of qubits is not valid."
+			errmsg = "Error: the list of qubits is not valid."
 			raise QClibError(errmsg)
 		# check the validity of basis
 		if (not basis is None) and self.validation:
@@ -180,16 +203,17 @@ class qcsim:
 		self.sys_state = rrmat * self.sys_state
 
 		if qtrace or self.trace:
-			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(prob_val) 
+			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
 			self.qreport(header=hdr)
 		return meas_val
+
 
 	def qreport(self, header="State", state=None, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		if state == None:
 			state = self.sys_state
-		print
-		print header
+		print()
+		print(header)
 		for i in range(len(state)):
 			if self.disp_zeros or np.absolute(state[i]) > self.maxerr:
 				barlen = 20
@@ -207,7 +231,7 @@ class qcsim:
 								barstr = barstr + "."
 				ststr = ("{:0"+str(self.nqbits)+"b}    ").format(i)
 				ampstr = "{:.8f}".format(np.around(state[i].item(0),8))
-				print ststr + ampstr + barstr
+				print(ststr + ampstr + barstr)
 
 	def qstate(self):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
@@ -519,7 +543,7 @@ class qcsim:
 		return a_op
 
 	def qstretch(self,oper,qbit_list):
-		return ["{:d}Q-{:s}{:s}".format(self.nqbits,oper[0],qbit_list),self.__stretched_mat(oper,qbit_list)]
+		return ["{0:d}Q-{1:s}{2:s}".format(self.nqbits,oper[0],str(qbit_list)),self.__stretched_mat(oper,qbit_list)]
 
 	def qcombine_seq(self,name,op_list):
 		d = ((op_list[0])[1]).shape[0]
@@ -574,7 +598,7 @@ class qcsim:
 		return True
 
 
-class QClibError:
+class QClibError(BaseException):
 	def __init__(self,arg):
 		self.args = arg
 
@@ -589,22 +613,22 @@ if __name__ == "__main__":
 
 		q = qcsim(8,qtrace=True)
 
-		print "Entangling 4 bits -------------------------"
+		print("Entangling 4 bits -------------------------")
 		q.qgate(q.H(),[3])
 		for i in range(3):
 			q.qgate(q.CTL(),[3,i])
-		print "-------------------------------------------"
+		print("-------------------------------------------")
 		for i in range(4):
 			q.qgate(q.X(),[i+4])
 		q.qgate(q.Rphi(q.pi/2),[7])
-		print "-------------------------------------------"
+		print("-------------------------------------------")
 		v = q.qmeasure([2])
-		print "Qubit 2 value measured = ",v
+		print("Qubit 2 value measured = ",v)
 		v = q.qmeasure([1])
-		print "Qubit 1 value measured = ",v
+		print("Qubit 1 value measured = ",v)
 		q.qreport()
-	except QClibError, m:
-		print m.args
+	except QClibError as m:
+		print(m.args)
 
 	# st = q.qstate()
 	# for i in range(len(st)):

@@ -3,9 +3,9 @@ import qclib
 
 qc = qclib.qcsim(8,qtrace=True)
 
-print
-print "------------------------------------------------"
-print "Demonstrating User-defined CNOT gate ..."
+print()
+print("------------------------------------------------")
+print("Demonstrating User-defined CNOT gate ...")
 def myCNOT():
 	return ["MY-CNOT", numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
 qc.qgate(qc.H(),[4])
@@ -13,9 +13,9 @@ qc.qgate(myCNOT(),[4,7])
 qc.qgate(qc.C(),[4,7])
 qc.qgate(qc.H(),[4])
 
-print
-print "------------------------------------------------"
-print "Demonstrating User-defined Phase Rotation gate ..."
+print()
+print("------------------------------------------------")
+print("Demonstrating User-defined Phase Rotation gate ...")
 def myR(theta):
 	c = numpy.cos(theta)
 	s = numpy.sin(theta)

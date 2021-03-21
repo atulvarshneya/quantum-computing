@@ -8,7 +8,7 @@ try:
 	mybasis = ["MY BASIS",np.matrix([[1.0/sq2,1.0/sq2],[1.0/sq2,-1.0/sq2]],dtype=complex)]
 
 	v = q.qmeasure([1],basis=mybasis)
-	print v
+	print(v)
 	q.qreport()
-except qclib.QClibError, ex:
-	print ex.args
+except qclib.QClibError as ex:
+	print(ex.args)

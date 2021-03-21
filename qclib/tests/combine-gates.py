@@ -2,8 +2,8 @@
 
 import qclib
 
-print
-print "Parallel HHHH and CCCC---------------------------------"
+print()
+print("Parallel HHHH and CCCC---------------------------------")
 qc = qclib.qcsim(8)
 H4 = qc.qcombine_par("H4",[qc.H(),qc.H(),qc.H(),qc.H()])
 C4 = qc.qcombine_par("C4",[qc.C(),qc.C(),qc.C(),qc.C()])
@@ -20,8 +20,8 @@ qc.qgate(qc.H(),[3])
 qc.qgate(qc.H(),[1])
 qc.qreport(header="AFTER 4 individual H's")
 
-print
-print "Sequence HXYZ------------------------------------------"
+print()
+print("Sequence HXYZ------------------------------------------")
 qc = qclib.qcsim(8,qtrace=True)
 HXYZ = qc.qcombine_seq("HXYZ",[qc.H(),qc.X(),qc.Y(),qc.Z()])
 ZYXH = qc.qcombine_seq("ZYXH",[qc.Z(),qc.Y(),qc.X(),qc.H()])

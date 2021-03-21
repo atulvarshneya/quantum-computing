@@ -4,8 +4,8 @@ qc = qclib.qcsim(8,qtrace=True)
 qc.qgate(qc.H(),[3])
 qc.qgate(qc.C(),[3,0])
 
-print
-print "------------------------------------------------------------"
+print()
+print("------------------------------------------------------------")
 
 qc = qclib.qcsim(8,qtrace=True)
 qc.qgate(qc.H(),[3])
