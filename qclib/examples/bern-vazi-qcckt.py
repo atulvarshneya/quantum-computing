@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qcckt
+import random as rand
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -16,10 +17,10 @@ Problem Statement:
 ###########################################################################
 ## This is the function with the secret code
 ###########################################################################
-def get_fx(nq):
+def get_fxckt(nq):
 	nqubits = nq
 	input_sz = nqubits - 1
-	secret_code = 0b11101
+	secret_code = rand.randint(0,2**input_sz-1)
 	code_fmt = "{:0"+"{:d}".format(input_sz)+"b}"
 	print("Pssst... the secret code is ",code_fmt.format(secret_code))
 	fxckt = qcckt.QCkt(nqubits)
@@ -33,9 +34,9 @@ class bernvazi:
 	def __init__(self, qsimsz):
 		self.inputsz = qsimsz -1
 
-	def genckt(self):
+	def gen_bv_ckt(self):
 		print("Getting the secret function box...")
-		fxckt = get_fx(self.inputsz+1) # returns FX that acts on self.inputsz + 1 qbits
+		fxckt = get_fxckt(self.inputsz+1) # returns FX that acts on self.inputsz + 1 qbits
 		print("OK, FX is ready.")
 
 		###########################################################################
@@ -90,7 +91,7 @@ if __name__ == "__main__":
 	# qc = qclib.qcsim(7)
 	nqubits = 6
 	bv = bernvazi(nqubits)
-	bv_ckt = bv.genckt()
+	bv_ckt = bv.gen_bv_ckt()
 	bk = qcckt.Backend()
 	bk.run(bv_ckt,qtrace=False)
 	res = bk.get_creg()
