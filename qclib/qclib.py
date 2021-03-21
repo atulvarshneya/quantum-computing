@@ -104,23 +104,14 @@ class qcsim:
 			hdr = opname + " Qubit" + opargs
 			self.qreport(header=hdr)
 
-	def qmeasure_to_cregister(self, qbit_list, cbit_list=None, basis=None, qtrace=False):
-		if cbit_list is None:
-			cbit_list = qbit_list
-		## TODO: check cbit_list has all entries unique and within the cbit register
-		if len(qbit_list) != len(cbit_list):
-			errmsg = "Error: list of classical bits is not valid"
-			raise QClibError(errmsg)
-		mvals = self.qmeasure(qbit_list, basis, qtrace)
-		for i in range(len(cbit_list)):
-			self.cregister[cbit_list[i]] = mvals[i]
-		return self.cregister
-
 	def qsnapshot(self):
 		return self.cregister, self.sys_state
 
-	def qmeasure(self, qbit_list, basis=None, qtrace=False):
+	def qmeasure(self, qbit_list, cbit_list=None, basis=None, qtrace=False):
 		##
+		if cbit_list is None:
+			cbit_list = qbit_list
+		## TODO: check cbit_list has all entries unique and within the cbit register
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_qbit_list(qbit_list):
 			errmsg = "Error: the list of qubits is not valid."
@@ -202,9 +193,16 @@ class qcsim:
 		# align the qbits back to original
 		self.sys_state = rrmat * self.sys_state
 
+		if len(qbit_list) != len(cbit_list):
+			errmsg = "Error: list of classical bits is not valid"
+			raise QClibError(errmsg)
+		for i in range(len(cbit_list)):
+			self.cregister[cbit_list[i]] = meas_val[i]
+
 		if qtrace or self.trace:
 			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
 			self.qreport(header=hdr)
+
 		return meas_val
 
 
@@ -232,6 +230,10 @@ class qcsim:
 				ststr = ("{:0"+str(self.nqbits)+"b}    ").format(i)
 				ampstr = "{:.8f}".format(np.around(state[i].item(0),8))
 				print(ststr + ampstr + barstr)
+		print("CREGISTER: ", end="")
+		for i in range(self.ncbits):
+			print("{0:01b}".format(self.cregister[i]),end="")
+		print()
 
 	def qstate(self):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.

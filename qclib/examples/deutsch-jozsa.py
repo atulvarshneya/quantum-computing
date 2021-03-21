@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import random as rnd
 import numpy as np
 import qclib
 
-print """
+print("""
 -------------------------------------------------------------------------------------------------------
 Problem Statement:
   Given a function whose output is CONSTANT (fixed output in the result
@@ -14,16 +14,16 @@ Problem Statement:
 This program randomly selects one of the two fx's and the algorithm
 determines which one it is.
 -------------------------------------------------------------------------------------------------------
-"""
+""")
 
 nqbits = 8
 
 def fx(q):
 	toss = int(rnd.random()*2.0)
 	if toss == 0:
-		print "fx is CONSTANT."
+		print("fx is CONSTANT.")
 	elif toss == 1:
-		print "fx is BALANCED."
+		print("fx is BALANCED.")
 		q.qgate(q.C(),[1,0])
 
 try:
@@ -40,11 +40,11 @@ try:
 	for i in range(nqbits-1):
 		q.qgate(q.H(),[i+1])
 
-	v = q.qmeasure(range(nqbits-1,0,-1),qtrace=False)
+	v = q.qmeasure(list(range(nqbits-1,0,-1)),qtrace=False)
 	if 1 in v:
-		print "Found fx is BALANCED"
+		print("Found fx is BALANCED")
 	else:
-		print "Found fx is CONSTANT"
+		print("Found fx is CONSTANT")
 
-except qclib.QClibError,ex:
-	print ex.args
+except qclib.QClibError as ex:
+	print(ex.args)

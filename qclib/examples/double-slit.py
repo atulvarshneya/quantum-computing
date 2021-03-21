@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 '''
 This is a program to simulate an experiment similar to two-slit experiment.
@@ -103,4 +103,4 @@ for e in range(11):
 	str_is = "[ "
 	for v in istarr: str_is += "{:0.2f} ".format(v)
 	str_is += "]"
-	print str_is, str_dist
+	print(str_is, str_dist)

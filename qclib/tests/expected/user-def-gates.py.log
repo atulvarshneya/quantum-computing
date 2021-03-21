@@ -1,6 +1,7 @@
 
 Initial State
 00000000    1.00000000+0.00000000j
+CREGISTER: 00000000
 
 ------------------------------------------------
 Demonstrating User-defined CNOT gate ...
@@ -8,23 +9,29 @@ Demonstrating User-defined CNOT gate ...
 HADAMARD Qubit[4]
 00000000    0.70710678+0.00000000j
 00010000    0.70710678+0.00000000j
+CREGISTER: 00000000
 
 MY-CNOT Qubit[4, 7]
 00000000    0.70710678+0.00000000j
 10010000    0.70710678+0.00000000j
+CREGISTER: 00000000
 
 CNOT Qubit[4, 7]
 00000000    0.70710678+0.00000000j
 00010000    0.70710678+0.00000000j
+CREGISTER: 00000000
 
 HADAMARD Qubit[4]
 00000000    1.00000000+0.00000000j
+CREGISTER: 00000000
 
 ------------------------------------------------
 Demonstrating User-defined Phase Rotation gate ...
 
 X Qubit[5]
 00100000    1.00000000+0.00000000j
+CREGISTER: 00000000
 
 MY-Rotation(1.5708) Qubit[5]
 00100000    0.00000000+1.00000000j
+CREGISTER: 00000000

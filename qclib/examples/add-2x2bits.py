@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-print """
+print("""
 PROBLEM STATEMENT:
 Adds 2 2-bit numbers, result is 3-bits, and scratch register is 3-bits (to hold carry overs)
 Total of 10 qubits, hence simulator runs quite slow - it took 4 minutes elapsed time on my old laptop.
@@ -17,7 +17,7 @@ The circuit used is --
 
 Need to copy the final carry-out bit into the highest order result bit, as shown.
 
-"""
+""")
 
 import qclib
 
@@ -33,7 +33,7 @@ q.qgate(H4,[a[0],a[1],b[0],b[1]])
 
 # run the addition 
 for i in range(2):
-	print "Processing bit", i
+	print("Processing bit", i)
 	q.qgate(q.C(),[a[i],s[i]])
 	q.qgate(q.C(),[b[i],s[i]])
 	q.qgate(q.C(),[c[i],s[i]])
@@ -44,7 +44,7 @@ for i in range(2):
 q.qgate(q.C(),[c[2],s[2]])
 
 # Clean up the junk bits
-print "Cleaning up junk bits"
+print("Cleaning up junk bits")
 for i in reversed(range(2)):
 	q.qgate(q.X(),[s[i]])
 	q.qgate(q.T(),[s[i],c[i],c[i+1]])

@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import numpy as np
 import qclib
 
 
 def intro():
-	print """Grover's Algorithm.
+	print("""Grover's Algorithm.
 
 Problem Statement:
 Well known search algorithm by Lov Grover.
@@ -22,7 +22,7 @@ n-3	|0> --| Hn |-----|  Uf  |-----| Hn |----| UinvM|----| Hn |--- ... --(/)
 			 +------+               +------+
 
 	     \-Init-/  \------------------Iterate-------------------/  \-Measure-/
-"""
+""")
 
 #################################################################################
 # Details @ https://en.wikipedia.org/wiki/Grover%27s_algorithm
@@ -32,7 +32,7 @@ def Uf(q):
 	n = q.qsize()
 	key = 0b11011010 & (2**(n-1) - 1)
 	fmt = "{:0"+str(n-1)+"b}"
-	print "Uf(): Setup to search key =",fmt.format(key)
+	print("Uf(): Setup to search key =",fmt.format(key))
 	return __u(q,key,"Uf")
 
 def UinvM(q):
@@ -67,16 +67,16 @@ def main(n):
 
 	q = qclib.qcsim(n)
 
-	print "Building Uf operator ..."
+	print("Building Uf operator ...")
 	Ufgate = Uf(q)
-	print "Buiding UinvM operator ..."
+	print("Buiding UinvM operator ...")
 	UinvMgate = UinvM(q)
 
-	print "Take from the following, best of 5 results..."
+	print("Take from the following, best of 5 results...")
 	for m in range(5):  # Look for best of 5
 		q.qreset()
 		# Hn on x-register
-		q.qgate(q.Hn(n-1), range(n-1,0,-1))
+		q.qgate(q.Hn(n-1), list(range(n-1,0,-1)))
 		# prepare b as |->
 		q.qgate(q.X(),[0])
 		q.qgate(q.H(),[0])
@@ -84,11 +84,11 @@ def main(n):
 		numitrs = int(q.pi * (2.0**((n-1.0)/2.0))/4.0) # optimal # iter, less or more dont work
 		for itr in range(numitrs):
 			q.qgate(Ufgate,list(reversed(range(n))))
-			q.qgate(q.Hn(n-1), range(n-1,0,-1))
+			q.qgate(q.Hn(n-1), list(range(n-1,0,-1)))
 			q.qgate(UinvMgate,list(reversed(range(n))))
-			q.qgate(q.Hn(n-1), range(n-1,0,-1))
-		res = q.qmeasure(range(n-1,0,-1))
-		print "Result",m,"=",res
+			q.qgate(q.Hn(n-1), list(range(n-1,0,-1)))
+		res = q.qmeasure(list(range(n-1,0,-1)))
+		print("Result",m,"=",res)
 
 if __name__ == "__main__":
 	main(8)

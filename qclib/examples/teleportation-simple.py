@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import qclib
 import numpy as np
@@ -7,7 +7,7 @@ q = qclib.qcsim(3)
 
 # put the qubit 2 in some randoom state
 # this is the qubit that is to be teleported by Alice to Bob
-print "\nThe qubit 2 is put in some random state, it will be teleported into qubit 0."
+print("\nThe qubit 2 is put in some random state, it will be teleported into qubit 0.")
 q.qgate(q.RND(),[2], qtrace=True)
 
 # get qubits 0 and 1 in the triplet state, |00> + |11>
@@ -28,7 +28,7 @@ span the physical distance betwee where Alice and Bob are.
 
 '''
 
-print "\nStarting the teleportation protocol..."
+print("\nStarting the teleportation protocol...")
 q.qgate(q.C(),[2,1])
 q.qgate(q.H(),[2])
 qbit1 = q.qmeasure([1])[0]
@@ -44,4 +44,4 @@ if qbit2 == 1:
 	q.qgate(q.X(),[2])
 
 q.qreport()
-print "qubit 2 teleported into qubit 0."
+print("qubit 2 teleported into qubit 0.")

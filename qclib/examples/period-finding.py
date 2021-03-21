@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import qclib
 import numpy as np
@@ -14,7 +14,7 @@ M = 2**(nqbits-2)
 op1 = q.qstretch(q.C(),[2,0])
 op2 = q.qstretch(q.C(),[3,1])
 f = q.qcombine_seq("F(x)",[op1,op2])
-print "Psst ... f(x) defined as having period of 4\n"
+print("Psst ... f(x) defined as having period of 4\n")
 
 # Now loop to repeatedly find values of multiples of M/r by
 # running the QC repeatedly and reading the outputs
@@ -25,11 +25,11 @@ while idx < 2:
 	q.qreset()
 
 	# QFT(x) - F(x) - QFT(x) - Measure
-	q.qgate(q.QFT(nqbits-2),range(nqbits-1,1,-1))
+	q.qgate(q.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
 	q.qgate(f,list(reversed(range(nqbits))))
 	# measure this if you like - q.qmeasure([1,0])
-	q.qgate(q.QFT(nqbits-2),range(nqbits-1,1,-1))
-	mbyrarr = q.qmeasure(range(nqbits-1,1,-1))
+	q.qgate(q.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
+	mbyrarr = q.qmeasure(list(range(nqbits-1,1,-1)))
 
 	# convert to integer the measured values of the x register
 	mbyr = 0
@@ -39,7 +39,7 @@ while idx < 2:
 			mbyr += 2**sign
 
 	# Look for two distinc non-zero values
-	print "a multiple of M/r = ",mbyr
+	print("a multiple of M/r = ",mbyr)
 	if mbyr != 0:
 		vals[idx] = mbyr
 		if (vals[0] != vals[1]):
@@ -47,7 +47,7 @@ while idx < 2:
 
 # find the GCD of the two values read to get M/r, and compute r, as M is known
 mbyr = int(gcd(vals[0], vals[1]))
-print "GCD of values of M/r = {:d}\n".format(mbyr)
-print "But, M =", M
+print("GCD of values of M/r = {:d}\n".format(mbyr))
+print("But, M =", M)
 r = int(M / mbyr)
-print "Therefore, the period, r = ",r
+print("Therefore, the period, r = ",r)
