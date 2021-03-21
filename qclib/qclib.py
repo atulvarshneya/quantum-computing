@@ -231,7 +231,7 @@ class qcsim:
 				ampstr = "{:.8f}".format(np.around(state[i].item(0),8))
 				print(ststr + ampstr + barstr)
 		print("CREGISTER: ", end="")
-		for i in range(self.ncbits):
+		for i in reversed(range(self.ncbits)): # reversed because cregister[0] is LSB
 			print("{0:01b}".format(self.cregister[i]),end="")
 		print()
 

@@ -35,7 +35,7 @@ class QCkt:
 			self.idx = 0
 			raise StopIteration  # Done iterating.
 
-	def realignckt(self,newnq,newnc,inpqubits): # change the qubits order to a different order
+	def realign(self,newnq,newnc,inpqubits): # change the qubits order to a different order
 		if self.nq != len(inpqubits):
 			errormsg = "Error: error aligning qubits, number of qubits do not match"
 			raise qclib.QClibError(errmsg)
@@ -44,16 +44,18 @@ class QCkt:
 			if g[0] == "M":
 				qbits = g[1][0]
 				cbits = g[1][1]
-				nqbits = self.reorderlist(qbits,inpqubits)
-				ncbits = self.reorderlist(cbits,inpqubits)
+				nqbits = self._reorderlist(qbits,inpqubits)
+				ncbits = self._reorderlist(cbits,inpqubits)
 				newckt.circuit.append([g[0],[nqbits,ncbits]])
+			elif g[0] == "BORDER":
+				newckt.circuit.append([g[0]])
 			else:
 				qbits = g[1]
-				nqbits = self.reorderlist(qbits,inpqubits)
+				nqbits = self._reorderlist(qbits,inpqubits)
 				newckt.circuit.append([g[0],nqbits])
 		return newckt
 
-	def reorderlist(self,oseq,nseq):
+	def _reorderlist(self,oseq,nseq):
 		newseq = []
 		for i in oseq:
 			newseq.append(nseq[i])
@@ -89,11 +91,14 @@ class QCkt:
 		self.circuit.append(["M",[qbits,cbits]])
 		return self
 
+	def Border(self):
+		self.circuit.append(["BORDER"])
+
 	##
 	## Draw related ethods
 	##
 	
-	def initcanvas(self):
+	def _initcanvas(self):
 		canvas = [[" "]*(self.nq*2+2)]
 		for i in range(self.nq*2+2):
 			if i%2 == 0:
@@ -101,9 +106,10 @@ class QCkt:
 			else:
 				canvas[0][i] = "     "
 		canvas[0][self.nq*2] = "creg "
+		self._extend(canvas)
 		return canvas
 
-	def get1col(self):
+	def _get1col(self):
 		col = [" "]*(self.nq*2+2)
 		for i in range(self.nq*2+2):
 			if i%2 == 0:
@@ -113,114 +119,112 @@ class QCkt:
 		col[self.nq*2] = "="
 		return col
     
-	def extend(self, canvas):
-		col = self.get1col()
+	def _extend(self, canvas):
+		col = self._get1col()
 		canvas.append(col)
 		return canvas
 
-	def addX(self, canvas,qbits):
-		col = self.get1col()
+	def _addX(self, canvas, qbits):
+		col = self._get1col()
 		col[qbits[0]*2] = "["
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "X"
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "]"
 		canvas.append(col)
-		canvas = self.extend(canvas)
+		canvas = self._extend(canvas)
 		return canvas
 
-
-	def addY(self, canvas,qbits):
-		col = self.get1col()
+	def _addY(self, canvas, qbits):
+		col = self._get1col()
 		col[qbits[0]*2] = "["
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "Y"
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "]"
 		canvas.append(col)
-		canvas = self.extend(canvas)
+		canvas = self._extend(canvas)
 		return canvas
 
-
-	def addZ(self, canvas,qbits):
-		col = self.get1col()
+	def _addZ(self, canvas, qbits):
+		col = self._get1col()
 		col[qbits[0]*2] = "["
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "Z"
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "]"
 		canvas.append(col)
-		canvas = self.extend(canvas)
+		canvas = self._extend(canvas)
 		return canvas
 
-	def addC(self,canvas,qbits):
-		col = self.get1col()
+	def _addC(self, canvas, qbits):
+		col = self._get1col()
 		col[qbits[0]*2] = "["
 		col[qbits[1]*2] = "["
 		canvas.append(col)
-		col = self.get1col()
-		st = min(qbits[0],qbits[1])*2
-		en = max(qbits[0],qbits[1])*2
+		col = self._get1col()
+		st = min(qbits[0], qbits[1])*2
+		en = max(qbits[0], qbits[1])*2
 		for i in range(en-st-1):
 			col[i+st+1] = "|"
 		col[qbits[0]*2] = "."
 		col[qbits[1]*2] = "X"
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "]"
 		col[qbits[1]*2] = "]"
 		canvas.append(col)
-		canvas = self.extend(canvas)
+		canvas = self._extend(canvas)
 		return canvas
 
-	def addT(self,canvas,qbits):
-		col = self.get1col()
+	def _addT(self, canvas, qbits):
+		col = self._get1col()
 		col[qbits[0]*2] = "["
 		col[qbits[1]*2] = "["
 		col[qbits[2]*2] = "["
 		canvas.append(col)
-		col = self.get1col()
-		st = min(qbits[0],qbits[1],qbits[2])*2
-		en = max(qbits[0],qbits[1],qbits[2])*2
+		col = self._get1col()
+		st = min(qbits[0], qbits[1], qbits[2])*2
+		en = max(qbits[0], qbits[1], qbits[2])*2
 		for i in range(en-st-1):
 			col[i+st+1] = "|"
 		col[qbits[0]*2] = "."
 		col[qbits[1]*2] = "."
 		col[qbits[2]*2] = "X"
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "]"
 		col[qbits[1]*2] = "]"
 		col[qbits[2]*2] = "]"
 		canvas.append(col)
-		canvas = self.extend(canvas)
+		canvas = self._extend(canvas)
 		return canvas
 
-	def addH(self,canvas,qbits):
-		col = self.get1col()
+	def _addH(self, canvas, qbits):
+		col = self._get1col()
 		col[qbits[0]*2] = "["
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "H"
 		canvas.append(col)
-		col = self.get1col()
+		col = self._get1col()
 		col[qbits[0]*2] = "]"
 		canvas.append(col)
-		canvas = self.extend(canvas)
+		canvas = self._extend(canvas)
 		return canvas
 
-	def addM(self, canvas,qbits):
+	def _addM(self, canvas, qbits):
 		for qb in qbits:
-			col = self.get1col()
+			col = self._get1col()
 			col[qb*2] = "["
 			canvas.append(col)
-			col = self.get1col()
+			col = self._get1col()
 			col[qb*2] = "M"
 			st = qb*2
 			en = self.nq*2
@@ -228,13 +232,22 @@ class QCkt:
 				col[i+st+1] = "|"
 			col[en] = "v"
 			canvas.append(col)
-			col = self.get1col()
+			col = self._get1col()
 			col[qb*2] = "]"
 			canvas.append(col)
-			canvas = self.extend(canvas)
+			canvas = self._extend(canvas)
 		return canvas
 
-	def paint(self, canvas):
+	def _addBORDER(self, canvas):
+		canvas = self._extend(canvas)
+		col = self._get1col()
+		en = (self.nq+1)*2
+		for i in range(en):
+			col[i] = "#"
+		canvas.append(col)
+		canvas = self._extend(canvas)
+
+	def _paint(self, canvas):
 		nrows = len(canvas)
 		ncols = len(canvas[0])
 		for i in range(ncols):
@@ -243,24 +256,26 @@ class QCkt:
 			print()
 
 	def draw(self):
-		canvas = self.initcanvas()
+		canvas = self._initcanvas()
 		### run through the circuit
 		for g in self.circuit:
 			if g[0] == "C":
-				self.addC(canvas,g[1])
+				self._addC(canvas,g[1])
 			if g[0] == "H":
-				self.addH(canvas,g[1])
+				self._addH(canvas,g[1])
 			if g[0] == "X":
-				self.addX(canvas,g[1])
+				self._addX(canvas,g[1])
 			if g[0] == "Y":
-				self.addY(canvas,g[1])
+				self._addY(canvas,g[1])
 			if g[0] == "Z":
-				self.addZ(canvas,g[1])
+				self._addZ(canvas,g[1])
 			if g[0] == "T":
-				self.addT(canvas,g[1])
+				self._addT(canvas,g[1])
 			if g[0] == "M":
-				self.addM(canvas,g[1][0])
-		self.paint(canvas)
+				self._addM(canvas,g[1][0])
+			if g[0] == "BORDER":
+				self._addBORDER(canvas)
+		self._paint(canvas)
 
 class Result:
 	def __init__(self):
@@ -293,7 +308,7 @@ class Backend:
 			if g[0] == "T":
 				qc.qgate(qc.T(),g[1])
 			if g[0] == "M":
-				qc.qmeasure_to_cregister(g[1][0],g[1][1])
+				qc.qmeasure(g[1][0],cbit_list=g[1][1])
 
 		# fetch the last value of the cregister, state_vector
 		(self.result.cregister, self.result.state_vector) = qc.qsnapshot()
@@ -312,5 +327,4 @@ class Backend:
 		return self.result.cregister
 
 if __name__ == "__main__":
-	qck = QCkt(4,4)
-	qck.draw()
+	pass
