@@ -290,9 +290,9 @@ class Backend:
 		self.circuit = None
 		self.result = Result()
 
-	def run(self, circuit, qtrace=False):
+	def run(self, circuit, initstate=None, prepqubits=None, qtrace=False):
 		self.circuit = circuit
-		qc = qclib.qcsim(self.circuit.nq, ncbits=self.circuit.nc, qtrace=qtrace)
+		qc = qclib.qcsim(self.circuit.nq, ncbits=self.circuit.nc, initstate=initstate, prepqubits=prepqubits, qtrace=qtrace)
 
 		### run through the circuit
 		for g in self.circuit:
