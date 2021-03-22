@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qclib
+import numpy as np
 
 class QCkt:
 
@@ -320,7 +321,8 @@ class Backend:
 		statefmt = "{0:"+"0{0:d}b".format(self.circuit.nq)+"}"
 		s = 0
 		for i in self.result.state_vector:
-			print(statefmt.format(s), i[0])
+			if np.absolute(i[0]) > 10**(-6):
+				print(statefmt.format(s), i[0])
 			s += 1
 	
 	def get_creg(self):
