@@ -66,7 +66,7 @@ class bernvazi:
 		qbit_list = list(range(self.inputsz+1))
 		# qbit_list.reverse()
 		fxckt = fxckt.realign(self.inputsz+1,self.inputsz+1,qbit_list)
-		bv_ckt = bv_ckt + fxckt
+		bv_ckt = bv_ckt.append(fxckt)
 		bv_ckt.Border()
 		print("Step 2: Applied FX to |b>|x>")
 		# bv_ckt.draw()
@@ -94,7 +94,4 @@ if __name__ == "__main__":
 	bv_ckt = bv.gen_bv_ckt()
 	bk = qcckt.Backend()
 	bk.run(bv_ckt,qtrace=False)
-	res = bk.get_creg()
-	for i in reversed(range(len(res))): # reversed because creg[0] is LSB
-		print(res[i],end="")
-	print()
+	print(bk.get_creg())

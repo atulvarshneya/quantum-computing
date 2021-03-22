@@ -72,11 +72,8 @@ addckt.draw()
 
 bk = qcckt.Backend()
 bk.run(addckt,qtrace=True)
-res = bk.get_creg()
 print()
 print("READ OUT STATE VECTOR: ")
-bk.print_svec()
+print(bk.get_svec())
 print("READ OUT CREGISTER: ", end="")
-for i in reversed(range(len(res))): # reversed because creg[0] is LSB
-	print(res[i],end="")
-print()
+print( bk.get_creg())

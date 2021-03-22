@@ -45,7 +45,7 @@ try:
 	dj_ckt.Border()
 	fx_ckt = get_fxckt(nqbits)
 	# fx(q)
-	dj_ckt = dj_ckt + fx_ckt
+	dj_ckt = dj_ckt.append(fx_ckt)
 	# q.qmeasure([0]) # measure it if you like, does not change anything
 	dj_ckt.Border()
 
@@ -62,11 +62,9 @@ try:
 	bk = qcckt.Backend()
 	bk.run(dj_ckt,qtrace=False)
 	res = bk.get_creg()
-	for i in reversed(range(len(res))): # reversed because creg[0] is LSB
-		print(res[i],end="")
-	print()
+	print(res)
 
-	if 1 in res[1:nqbits]:
+	if 1 in res.value[1:nqbits]:
 		print("Found fx is BALANCED")
 	else:
 		print("Found fx is CONSTANT")

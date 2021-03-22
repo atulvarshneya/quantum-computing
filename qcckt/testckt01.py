@@ -26,6 +26,6 @@ qckt3 = qckt1.realign(4,4,[3,2])
 qckt3.draw()
 
 print("Overall circuit---------------------------------")
-qckt4 = qckt3 + qckt2
+qckt4 = qckt3.append(qckt2)
 qckt4.draw()
 

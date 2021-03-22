@@ -5,24 +5,21 @@ import numpy as np
 
 class QCkt:
 
-	def __init__(self, nq, nc=None, name="QCkt"):
+	def __init__(self, nqubits, nclbits=None, name="QCkt"):
 		# nq - number of quantum bits
 		# nc - number of classical bits
-		if (nc == None):
-			nc = nq
-		self.nq = nq
-		self.nc = nc
+		if (nclbits == None):
+			nclbits = nqubits
+		self.nqubits = nqubits
+		self.nclbits = nclbits
 		self.name = name
 		self.circuit = []
 		self.idx = 0 # for iterations
 
 	def __add__(self, otherckt):
 		# otherckt - the ckt to be appended
-		nq = max(self.nq, otherckt.nq)
-		self.nq = nq
-		for g in otherckt.circuit:
-			self.circuit.append(g)
-		return self
+		print("Warning: Operator + is deprecated. Use qckt.append(qckt) instead.")
+		return self.append(otherckt)
 
 	def __iter__(self):
 		self.idx = 0
@@ -36,8 +33,21 @@ class QCkt:
 			self.idx = 0
 			raise StopIteration  # Done iterating.
 
+	def append(self, otherckt):
+		# otherckt - the ckt to be appended
+		nq = max(self.nqubits, otherckt.nqubits)
+		nc = max(self.nclbits, otherckt.nclbits)
+		self.nqubits = nq
+		self.nclbits = nc
+		for g in otherckt.circuit:
+			self.circuit.append(g)
+		return self
+
+	def get_size(self):
+		return self.nqubits, self.nclbits
+
 	def realign(self,newnq,newnc,inpqubits): # change the qubits order to a different order
-		if self.nq != len(inpqubits):
+		if self.nqubits != len(inpqubits):
 			errormsg = "Error: error aligning qubits, number of qubits do not match"
 			raise qclib.QClibError(errmsg)
 		newckt = QCkt(newnq, newnc)
@@ -86,10 +96,10 @@ class QCkt:
 		self.circuit.append(["T",[ctl1,ctl2,target]])
 		return self
 
-	def M(self, qbits, cbits=None):
-		if cbits is None:
-			cbits = qbits
-		self.circuit.append(["M",[qbits,cbits]])
+	def M(self, qubitslist, clbitslist=None):
+		if clbitslist is None:
+			clbitslist = qubitslist
+		self.circuit.append(["M",[qubitslist,clbitslist]])
 		return self
 
 	def Border(self):
@@ -100,24 +110,24 @@ class QCkt:
 	##
 	
 	def _initcanvas(self):
-		canvas = [[" "]*(self.nq*2+2)]
-		for i in range(self.nq*2+2):
+		canvas = [[" "]*(self.nqubits*2+2)]
+		for i in range(self.nqubits*2+2):
 			if i%2 == 0:
 				canvas[0][i] = "q{0:03d} ".format(i//2)
 			else:
 				canvas[0][i] = "     "
-		canvas[0][self.nq*2] = "creg "
+		canvas[0][self.nqubits*2] = "creg "
 		self._extend(canvas)
 		return canvas
 
 	def _get1col(self):
-		col = [" "]*(self.nq*2+2)
-		for i in range(self.nq*2+2):
+		col = [" "]*(self.nqubits*2+2)
+		for i in range(self.nqubits*2+2):
 			if i%2 == 0:
 				col[i] = "-"
 			else:
 				col[i] = " "
-		col[self.nq*2] = "="
+		col[self.nqubits*2] = "="
 		return col
     
 	def _extend(self, canvas):
@@ -228,7 +238,7 @@ class QCkt:
 			col = self._get1col()
 			col[qb*2] = "M"
 			st = qb*2
-			en = self.nq*2
+			en = self.nqubits*2
 			for i in range(en-st-1):
 				col[i+st+1] = "|"
 			col[en] = "v"
@@ -242,7 +252,7 @@ class QCkt:
 	def _addBORDER(self, canvas):
 		canvas = self._extend(canvas)
 		col = self._get1col()
-		en = (self.nq+1)*2
+		en = (self.nqubits+1)*2
 		for i in range(en):
 			col[i] = "#"
 		canvas.append(col)
@@ -278,10 +288,53 @@ class QCkt:
 				self._addBORDER(canvas)
 		self._paint(canvas)
 
-class Result:
+class Cregister:
+
 	def __init__(self):
-		self.cregister = None
-		self.state_vector = None
+		self.value = None
+
+	def __str__(self):
+		creg_str = ""
+		for i in reversed(range(len(self.value))): # reversed because creg[0] is LSB
+			creg_str = creg_str + "{0:01b}".format(self.value[i])
+		creg_str = creg_str + "\n"
+		return creg_str
+
+class StateVector:
+
+	def __init__(self):
+		self.value = None
+		self.verbosity = False
+
+	def __str__(self):
+		### wonky way to find number of qubits
+		nq = 0
+		n = len(self.value) - 1
+		while n > 0:
+			nq = nq + 1
+			n = n >> 1
+
+		statefmt = "{0:"+"0{0:d}b".format(nq)+"}"
+		svec_str = ""
+		s = 0
+		for i in self.value:
+			if self.verbosity or np.absolute(i[0]) > 10**(-6):
+				svec_str = svec_str + statefmt.format(s) + "  " + str(i[0]) + "\n"
+			s += 1
+		return svec_str
+
+	def verbose(self,v):
+		if v == True:
+			self.verbosity = True
+		else:
+			self.verbosity = False
+		return self
+
+class Result:
+
+	def __init__(self):
+		self.cregister = Cregister()
+		self.state_vector = StateVector()
 
 
 class Backend:
@@ -292,7 +345,7 @@ class Backend:
 
 	def run(self, circuit, initstate=None, prepqubits=None, qtrace=False):
 		self.circuit = circuit
-		qc = qclib.qcsim(self.circuit.nq, ncbits=self.circuit.nc, initstate=initstate, prepqubits=prepqubits, qtrace=qtrace)
+		qc = qclib.qcsim(self.circuit.nqubits, ncbits=self.circuit.nclbits, initstate=initstate, prepqubits=prepqubits, qtrace=qtrace)
 
 		### run through the circuit
 		for g in self.circuit:
@@ -312,21 +365,16 @@ class Backend:
 				qc.qmeasure(g[1][0],cbit_list=g[1][1])
 
 		# fetch the last value of the cregister, state_vector
-		(self.result.cregister, self.result.state_vector) = qc.qsnapshot()
+		(self.result.cregister.value, self.result.state_vector.value) = qc.qsnapshot()
+
+		return self
 
 	def get_svec(self):
 		return self.result.state_vector
 
-	def print_svec(self):
-		statefmt = "{0:"+"0{0:d}b".format(self.circuit.nq)+"}"
-		s = 0
-		for i in self.result.state_vector:
-			if np.absolute(i[0]) > 10**(-6):
-				print(statefmt.format(s), i[0])
-			s += 1
-	
 	def get_creg(self):
 		return self.result.cregister
+
 
 if __name__ == "__main__":
 	pass
