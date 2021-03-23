@@ -3,7 +3,7 @@ Reference
 QCkt
 	QCkt(nqubits, nclbits=None, name="QCkt")
 		Returns an empty quantum circuit
-	C(ctrl, target)
+	CX(ctrl, target)
 		Appends a CNOT gate to the quantum circuit
 		Returns the updted quantum circuit
 	H(qubit)
@@ -40,7 +40,7 @@ QCkt
 		Draws a text drawing of the circuit
 Backend
 	Backend()
-		Returns a handle object to a backend execution environment
+		Returns a handle object to a backend execution environment (a local qc simulator)
 	run(circuit, initstate=None, prepqubits=None, qtrace=False)
 		Runs the given circuit on the backend execution environment
 		Initial state can be passed inform of state vector, or list of prepared qubits
@@ -51,6 +51,6 @@ Backend
 		The state-vector array can be accessed through the .value field of the returned object
 		The returned object supports conversion to string representation for pretty printing
 		That handle supports a method svec.verbose(boolean), and returns the same handle
-	def get_creg(self)
+	get_creg()
 		Returns the result classical bits register object
 		The classical bits array can be accessed through the .value field of the returned object

@@ -10,7 +10,7 @@ print("================================================")
 nq = 4
 qckt = qcckt.QCkt(nq,nq)
 qckt.H(0)
-qckt.C(0,1)
+qckt.CX(0,1)
 qckt.M([0,1])
 qckt.draw()
 

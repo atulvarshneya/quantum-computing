@@ -26,7 +26,7 @@ def get_fxckt(nq):
 	fxckt = qcckt.QCkt(nqubits)
 	for i in range(input_sz):
 		if secret_code & (0x1<<i):
-			fxckt.C(i,input_sz)
+			fxckt.CX(i,input_sz)
 	# fxckt.draw()
 	return fxckt
 

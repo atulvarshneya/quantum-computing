@@ -5,7 +5,7 @@ import qcckt as qk
 ckt1 = qk.QCkt(4,4)
 
 ckt1.X(0)
-ckt1.C(0,1)
+ckt1.CX(0,1)
 ckt1.H(1)
 ckt1.X(2)
 ckt1.T(2,0,1)

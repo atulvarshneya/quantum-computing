@@ -11,7 +11,7 @@ print()
 print("subcircuit--------------------------------------")
 qckt1 = qcckt.QCkt(2,name="ckt01")
 qckt1.H(0)
-qckt1.C(0,1)
+qckt1.CX(0,1)
 qckt1.Border()
 qckt1.draw()
 

@@ -72,8 +72,8 @@ class QCkt:
 			newseq.append(nseq[i])
 		return newseq
 
-	def C(self, ctrl, target):
-		self.circuit.append(["C",[ctrl,target]])
+	def CX(self, ctrl, target):
+		self.circuit.append(["CX",[ctrl,target]])
 		return self
 	
 	def H(self, qubit):
@@ -174,7 +174,7 @@ class QCkt:
 		canvas = self._extend(canvas)
 		return canvas
 
-	def _addC(self, canvas, qbits):
+	def _addCX(self, canvas, qbits):
 		col = self._get1col()
 		col[qbits[0]*2] = "["
 		col[qbits[1]*2] = "["
@@ -270,8 +270,8 @@ class QCkt:
 		canvas = self._initcanvas()
 		### run through the circuit
 		for g in self.circuit:
-			if g[0] == "C":
-				self._addC(canvas,g[1])
+			if g[0] == "CX":
+				self._addCX(canvas,g[1])
 			if g[0] == "H":
 				self._addH(canvas,g[1])
 			if g[0] == "X":
@@ -349,7 +349,7 @@ class Backend:
 
 		### run through the circuit
 		for g in self.circuit:
-			if g[0] == "C":
+			if g[0] == "CX":
 				qc.qgate(qc.C(),g[1])
 			if g[0] == "H":
 				qc.qgate(qc.H(),g[1])

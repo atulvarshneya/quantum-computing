@@ -25,37 +25,28 @@ def get_fxckt(nq):
 		print("fx is CONSTANT.")
 	elif toss == 1:
 		print("fx is BALANCED.")
-		fxckt.C(1,0)
-		# q.qgate(q.C(),[1,0])
+		fxckt.CX(1,0)
 	return fxckt
 
 try:
 
 	dj_ckt = qcckt.QCkt(nqbits)
-	# q = qclib.qcsim(nqbits)
 	dj_ckt.X(0)
-	# q.qgate(q.X(),[0])
 	dj_ckt.H(0)
-	# q.qgate(q.H(),[0])
 
 	for i in range(nqbits-1):
 		dj_ckt.H(i+1)
-		# q.qgate(q.H(),[i+1])
 
 	dj_ckt.Border()
 	fx_ckt = get_fxckt(nqbits)
-	# fx(q)
 	dj_ckt = dj_ckt.append(fx_ckt)
-	# q.qmeasure([0]) # measure it if you like, does not change anything
 	dj_ckt.Border()
 
 	for i in range(nqbits-1):
 		dj_ckt.H(i+1)
-		# q.qgate(q.H(),[i+1])
 
 	qbits_list = list(range(nqbits-1,0,-1))
 	dj_ckt.M(qbits_list, qbits_list)
-	# v = q.qmeasure(list(range(nqbits-1,0,-1)),qtrace=False)
 	
 	dj_ckt.draw()
 
