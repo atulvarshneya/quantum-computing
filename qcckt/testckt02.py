@@ -11,6 +11,7 @@ nq = 4
 qckt = qcckt.QCkt(nq,nq)
 qckt.H(0)
 qckt.CX(0,1)
+qckt.QFT([0,1,2,3])
 qckt.M([0,1])
 qckt.draw()
 

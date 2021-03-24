@@ -24,6 +24,10 @@ QCkt
 	M(qubitslist, clbitslist=None)
 		Appends MEASUREMENT gates for measuring given qubits list into classical bits list
 		Returns the updted quantum circuit
+	QFT(qubitslist)
+		Appends a QFT gate across the given qubits list
+		The drawn circuit depicts multiple QFT gates, but it is 1 QFT gate acting on those qubits
+		Returns the updted quantum circuit
 	Border()
 		Places a border in the quantum circuit. Has effect only in the drawing of the circuit
 	get_size()

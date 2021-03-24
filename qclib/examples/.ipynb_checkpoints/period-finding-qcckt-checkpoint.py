@@ -1,36 +1,42 @@
 #!/usr/bin/python3
 
-import qclib
+import qcckt
 import numpy as np
 from fractions import gcd
 
-# Initialize the Quantum Computer
 nqbits = 8 # per the definition of f(x) below, must be >= 4
-q = qclib.qcsim(nqbits)
-
 M = 2**(nqbits-2)
 
 # setup the periodic function
-op1 = q.qstretch(q.C(),[2,0])
-op2 = q.qstretch(q.C(),[3,1])
-f = q.qcombine_seq("F(x)",[op1,op2])
-print(f)
+fx = qcckt.QCkt(nqbits)
+fx.Border()
+fx.CX(2,0)
+fx.CX(3,1)
+fx.Border()
+fx.draw()
 print("Psst ... f(x) defined as having period of 4\n")
 
 # Now loop to repeatedly find values of multiples of M/r by
 # running the QC repeatedly and reading the outputs
 idx = 0
 vals = np.zeros(2)
+
+# QFT(x) - F(x) - QFT(x) - Measure
+ckt = qcckt.QCkt(nqbits)
+ckt.QFT(list(range(nqbits-1,1,-1)))
+fx = fx.realign(nqbits,nqbits, list(reversed(range(nqbits))))
+ckt.append(fx)
+ckt.QFT(list(range(nqbits-1,1,-1)))
+ckt.M(list(range(nqbits-1,1,-1)),list(range(nqbits-1,1,-1)))
+ckt.draw()
+
 while idx < 2:
 	# Restart the QC machine
-	q.qreset()
-
-	# QFT(x) - F(x) - QFT(x) - Measure
-	q.qgate(q.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
-	q.qgate(f,list(reversed(range(nqbits))))
-	# measure this if you like - q.qmeasure([1,0])
-	q.qgate(q.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
-	mbyrarr = q.qmeasure(list(range(nqbits-1,1,-1)))
+	bk = qcckt.Backend()
+	bk.run(ckt,qtrace=False)
+	mbyrarr = bk.get_creg().value
+	print("CREGISTER = ",bk.get_creg())
+	# mbyrarr = q.qmeasure(list(range(nqbits-1,1,-1)))
 
 	# convert to integer the measured values of the x register
 	mbyr = 0
@@ -45,6 +51,8 @@ while idx < 2:
 		vals[idx] = mbyr
 		if (vals[0] != vals[1]):
 			idx += 1
+
+	idx = 4
 
 # find the GCD of the two values read to get M/r, and compute r, as M is known
 mbyr = int(gcd(vals[0], vals[1]))

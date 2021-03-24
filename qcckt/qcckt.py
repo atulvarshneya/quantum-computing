@@ -47,8 +47,10 @@ class QCkt:
 		return self.nqubits, self.nclbits
 
 	def realign(self,newnq,newnc,inpqubits): # change the qubits order to a different order
+		# newq and newc are teh new positions of the positions.
+		# i.e., [3,0,2,1] means old 0 to new 3, old 1 to new 0, old 2, to new 2, old 3 to new 1
 		if self.nqubits != len(inpqubits):
-			errormsg = "Error: error aligning qubits, number of qubits do not match"
+			errmsg = "Error: error aligning qubits, number of qubits do not match"
 			raise qclib.QClibError(errmsg)
 		newckt = QCkt(newnq, newnc)
 		for g in self.circuit:
@@ -71,6 +73,9 @@ class QCkt:
 		for i in oseq:
 			newseq.append(nseq[i])
 		return newseq
+
+	## All gates are added to circuit as ["name", [q0,q1,...]].
+	## Only M is an exception - ["M", [[q1,q2,...],[c0,c1,...]]]
 
 	def CX(self, ctrl, target):
 		self.circuit.append(["CX",[ctrl,target]])
@@ -99,11 +104,22 @@ class QCkt:
 	def M(self, qubitslist, clbitslist=None):
 		if clbitslist is None:
 			clbitslist = qubitslist
+		if (type(qubitslist) != list) or (type(clbitslist) != list):
+			errmsg = "Error: M gate requires a list of qubits and optionally a list of classical bits as arguments"
+			raise qclib.QClibError(errmsg)
 		self.circuit.append(["M",[qubitslist,clbitslist]])
+		return self
+
+	def QFT(self, qubitslist):
+		if type(qubitslist) != list:
+			errmsg = "Error: QFT gate requires a list of qubits as argument"
+			raise qclib.QClibError(errmsg)
+		self.circuit.append(["QFT",qubitslist])
 		return self
 
 	def Border(self):
 		self.circuit.append(["BORDER"])
+		return self
 
 	##
 	## Draw related ethods
@@ -249,6 +265,42 @@ class QCkt:
 			canvas = self._extend(canvas)
 		return canvas
 
+	def _addQFT(self, canvas, qbits):
+		st = min(qbits) * 2
+		en = max(qbits) * 2
+
+		col = self._get1col()
+		for i in range(en-st-1):
+			col[i+st+1] = "|"
+		for b in qbits:
+			col[b*2] = "["
+		canvas.append(col)
+
+		col = self._get1col()
+		for b in qbits:
+			col[b*2] = "Q"
+		canvas.append(col)
+
+		col = self._get1col()
+		for b in qbits:
+			col[b*2] = "F"
+		canvas.append(col)
+
+		col = self._get1col()
+		for b in qbits:
+			col[b*2] = "T"
+		canvas.append(col)
+
+		col = self._get1col()
+		for i in range(en-st-1):
+			col[i+st+1] = "|"
+		for b in qbits:
+			col[b*2] = "]"
+		canvas.append(col)
+
+		canvas = self._extend(canvas)
+		return canvas
+
 	def _addBORDER(self, canvas):
 		canvas = self._extend(canvas)
 		col = self._get1col()
@@ -284,6 +336,8 @@ class QCkt:
 				self._addT(canvas,g[1])
 			if g[0] == "M":
 				self._addM(canvas,g[1][0])
+			if g[0] == "QFT":
+				self._addQFT(canvas,g[1])
 			if g[0] == "BORDER":
 				self._addBORDER(canvas)
 		self._paint(canvas)
@@ -297,7 +351,7 @@ class Cregister:
 		creg_str = ""
 		for i in reversed(range(len(self.value))): # reversed because creg[0] is LSB
 			creg_str = creg_str + "{0:01b}".format(self.value[i])
-		creg_str = creg_str + "\n"
+		# creg_str = creg_str + "\n"
 		return creg_str
 
 class StateVector:
@@ -319,7 +373,7 @@ class StateVector:
 		s = 0
 		for i in self.value:
 			if self.verbosity or np.absolute(i[0]) > 10**(-6):
-				svec_str = svec_str + statefmt.format(s) + "  " + str(i[0]) + "\n"
+				svec_str = svec_str + statefmt.format(s) + "  " + "{:.8f}".format(i[0]) + "\n"
 			s += 1
 		return svec_str
 
@@ -363,9 +417,12 @@ class Backend:
 				qc.qgate(qc.T(),g[1])
 			if g[0] == "M":
 				qc.qmeasure(g[1][0],cbit_list=g[1][1])
+			if g[0] == "QFT":
+				qc.qgate(qc.QFT(len(g[1])),g[1])
 
 		# fetch the last value of the cregister, state_vector
-		(self.result.cregister.value, self.result.state_vector.value) = qc.qsnapshot()
+		(creg, svec) = qc.qsnapshot()
+		(self.result.cregister.value, self.result.state_vector.value) = (creg,svec.tolist())
 
 		return self
 
