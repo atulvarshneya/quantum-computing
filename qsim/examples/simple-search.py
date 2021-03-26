@@ -2,7 +2,7 @@
 
 import random as rnd
 import numpy as np
-import qcsim
+import qsim
 
 
 def fx(q):
@@ -41,7 +41,7 @@ print("This program randomly selects one of the four fx's and the algorithm dete
 print("-------------------------------------------------------------------------------------------------------")
 print()
 
-q = qcsim.QSimulator(3)
+q = qsim.QSimulator(3)
 q.qgate(q.X(),[0])
 q.qgate(q.H(),[0])
 q.qgate(q.H(),[2])

@@ -71,7 +71,7 @@ does the measurement of the location of the electron (qubit 0).
 '''
 
 import numpy as np
-import qcsim
+import qsim
 
 for e in range(11):
 	# 1. one-after-another create states of different entangelment with D
@@ -84,7 +84,7 @@ for e in range(11):
 	ist = np.transpose(np.matrix(istarr,dtype=complex))
 
 	# 2. Initialize the QSIM with that as the initial state
-	q = qcsim.QSimulator(2,initstate=ist,validation=True)
+	q = qsim.QSimulator(2,initstate=ist,validation=True)
 
 	# 3. now run the test 'sample' number of times to get statistics
 	samples = 1000

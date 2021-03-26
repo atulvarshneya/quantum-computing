@@ -1,16 +1,16 @@
-import qcsim
+import qsim
 import numpy as np
 
 try:
 	nqbits = 6
 
 	# initialise with the default state of all qbits = |0>
-	q = qcsim.QSimulator(nqbits,qtrace=True)
+	q = qsim.QSimulator(nqbits,qtrace=True)
 	q.qgate(q.H(),[1])
 	q.qgate(q.C(),[1,0])
 
 	# initialise with initial states of qbits
-	q = qcsim.QSimulator(nqbits,prepqubits=[[1,0],[1,0],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
+	q = qsim.QSimulator(nqbits,prepqubits=[[1,0],[1,0],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
 	q.qgate(q.H(),[1])
 	q.qgate(q.C(),[1,0])
 
@@ -24,9 +24,9 @@ try:
 		initstate[i] = complex(c,s)
 		p += np.absolute(initstate[i])**2
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
-	q = qcsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
+	q = qsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
 	q.qgate(q.H(),[1])
 	q.qgate(q.C(),[1,0])
 
-except qcsim.QClibError as ex:
+except qsim.QClibError as ex:
 	print(ex.args)

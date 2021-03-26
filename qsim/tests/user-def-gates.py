@@ -1,7 +1,7 @@
 import numpy
-import qcsim
+import qsim
 
-qc = qcsim.QSimulator(8,qtrace=True)
+qc = qsim.QSimulator(8,qtrace=True)
 
 print()
 print("------------------------------------------------")

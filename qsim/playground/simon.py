@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 '''
  x  f(x)
@@ -12,7 +12,7 @@
 111 010
 '''
 
-import qclib
+import qsim
 import numpy as np
 
 nqbits = 6
@@ -30,7 +30,7 @@ initstate[0b101110] = amp
 initstate[0b110101] = amp
 initstate[0b111010] = amp
 
-qc = qclib.qcsim(6,initstate=initstate,qtrace=True)
+qc = qsim.QSimulator(6,initstate=initstate,qtrace=True)
 # qc.qmeasure([2,1,0])
 qc.qgate(qc.Hn(3),[5,4,3])
 qc.qmeasure([5,4,3])

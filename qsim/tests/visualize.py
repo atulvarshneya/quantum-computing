@@ -1,6 +1,6 @@
-import qcsim
+import qsim
 
-q = qcsim.QSimulator(4,qtrace=True,qzeros=True,visualize=True)
+q = qsim.QSimulator(4,qtrace=True,qzeros=True,visualize=True)
 
 q.qgate(q.H(),[1])
 q.qgate(q.C(),[1,0])

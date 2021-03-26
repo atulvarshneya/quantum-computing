@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-import qcsim
+import qsim
 import numpy as np
 import random as rnd
 
 '''
 This example shows an implementation of the teleportation protocol
 The implementation done here demonstrates
-	1. creating an initial state in qcsim,
+	1. creating an initial state in qsim,
 	2. measuring in a specific basis
 '''
 
@@ -22,7 +22,7 @@ for i in range(3-1):
 
 
 # now get started ...
-q = qcsim.QSimulator(3,initstate=init)
+q = qsim.QSimulator(3,initstate=init)
 q.qreport(header="Initial State")
 
 # first put qbits 0 and 1 in bell state

@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
-import qcsim
+import qsim
 import numpy as np
 from fractions import gcd
 
 # Initialize the Quantum Computer
 nqbits = 8 # per the definition of f(x) below, must be >= 4
-q = qcsim.QSimulator(nqbits)
+q = qsim.QSimulator(nqbits)
 
 M = 2**(nqbits-2)
 

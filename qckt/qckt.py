@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import qcsim
+import qsim
 import numpy as np
 
 class QCkt:
@@ -51,7 +51,7 @@ class QCkt:
 		# i.e., [3,0,2,1] means old 0 to new 3, old 1 to new 0, old 2, to new 2, old 3 to new 1
 		if self.nqubits != len(inpqubits):
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
-			raise qcsim.QClibError(errmsg)
+			raise qsim.QClibError(errmsg)
 		newckt = QCkt(newnq, newnc)
 		for g in self.circuit:
 			if g[0] == "M":
@@ -106,14 +106,14 @@ class QCkt:
 			clbitslist = qubitslist
 		if (type(qubitslist) != list) or (type(clbitslist) != list):
 			errmsg = "Error: M gate requires a list of qubits and optionally a list of classical bits as arguments"
-			raise qcsim.QClibError(errmsg)
+			raise qsim.QClibError(errmsg)
 		self.circuit.append(["M",[qubitslist,clbitslist]])
 		return self
 
 	def QFT(self, qubitslist):
 		if type(qubitslist) != list:
 			errmsg = "Error: QFT gate requires a list of qubits as argument"
-			raise qcsim.QClibError(errmsg)
+			raise qsim.QClibError(errmsg)
 		self.circuit.append(["QFT",qubitslist])
 		return self
 
@@ -416,7 +416,7 @@ class Backend:
 
 	def run(self, circuit, initstate=None, prepqubits=None, qtrace=False):
 		self.circuit = circuit
-		qc = qcsim.QSimulator(self.circuit.nqubits, ncbits=self.circuit.nclbits, initstate=initstate, prepqubits=prepqubits, qtrace=qtrace)
+		qc = qsim.QSimulator(self.circuit.nqubits, ncbits=self.circuit.nclbits, initstate=initstate, prepqubits=prepqubits, qtrace=qtrace)
 
 		### run through the circuit
 		for g in self.circuit:

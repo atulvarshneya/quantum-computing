@@ -3,13 +3,13 @@
 import sys
 import ntpath
 import getopt
-import qcsim
+import qsim
 import collections as col
 
 q = None
 def initqc(n):
 	global q
-	q = qcsim.QSimulator(n,qtrace=True)
+	q = qsim.QSimulator(n,qtrace=True)
 
 def help():
 	print("Commands:")
@@ -38,7 +38,7 @@ def help():
 ## aspec --
 ## 	<tag>:val,<tag>:val, ...
 ## tags --
-## 	qcsim:		-- is a member function of qcsim.QSimulator
+## 	qsim:		-- is a member function of qsim.QSimulator
 ## 	args:[if]*	-- arguments list as a string of i and f, e.g., fiii (float, int, int, int)
 ## 	qlist:n		-- takes the last argument as a list of qubits. if n is '*', any number of qubits.
 ## 	qgate:		-- is a gate operation. Called as q.qgate(f(args),qlist)
@@ -46,30 +46,30 @@ def help():
 
 clidata = {
 	"i":	[initqc,		"nqbits",	"args:i",		"Initialize QC"],
-	"r":	[qcsim.QSimulator.qreset,	"",		"qcsim:",		"Reset to init"],
+	"r":	[qsim.QSimulator.qreset,	"",		"qsim:",		"Reset to init"],
 	"q":	[quit,			"",		"",			"Quit"],
-	"m":	[qcsim.QSimulator.qmeasure,	"bit1 bit2 ...","qcsim:,qlist:*",	"Measure qubits"],
+	"m":	[qsim.QSimulator.qmeasure,	"bit1 bit2 ...","qsim:,qlist:*",	"Measure qubits"],
 	"?":	[help,			"",		"",			"Help"],
 	"help": [help,			"",		"",			"Help"],
-	"sqsw":	[qcsim.QSimulator.SQSWAP,	"bit1 bit2",	"qcsim:,qgate:,qlist:2","SQ root SWAP gate"],
-	"h":	[qcsim.QSimulator.H,		"bit",		"qcsim:,qgate:,qlist:1","HADAMARD Gate"],
-	"z":	[qcsim.QSimulator.Z,		"bit",		"qcsim:,qgate:,qlist:1","Z Gate"],
-	"c":	[qcsim.QSimulator.C,		"cbit bit",	"qcsim:,qgate:,qlist:2","CNOT Gate"],
-	"rk":	[qcsim.QSimulator.Rk,	"k bit",	"qcsim:,args:i,qgate:,qlist:1","ROT(k) Gate"],
-	"y":	[qcsim.QSimulator.Y,		"bit",		"qcsim:,qgate:,qlist:1","Y Gate"],
-	"x":	[qcsim.QSimulator.X,		"bit",		"qcsim:,qgate:,qlist:1","X Gate"],
-	"rphi":	[qcsim.QSimulator.Rphi,	"phi bit",	"qcsim:,args:f,qgate:,qlist:1","ROT(Phi) Gate"],
-	"t":	[qcsim.QSimulator.T,		"cbit1 cbit2 bit",	"qcsim:,qgate:,qlist:3","TOFFOLI Gate"],
-	"csw":	[qcsim.QSimulator.CSWAP,	"cbit bit1 bit2",	"qcsim:,qgate:,qlist:3","C-SWAP Gate"],
-	"sw":	[qcsim.QSimulator.SWAP,	"bit1 bit2",		"qcsim:,qgate:,qlist:2","SWAP Gate"],
-	"rnd":	[qcsim.QSimulator.RND,	"bit",		"qcsim:,qgate:,qlist:1","Random aplitude Gate"],
-	"qft":	[qcsim.QSimulator.QFT,	"n n-bits ...",	"qcsim:,args:i,qgate:,qlist:*","QFT(n) Gate"],
-	"hn":	[qcsim.QSimulator.Hn,	"n n-bits ...",	"qcsim:,args:i,qgate:,qlist:*","Simultabeous n-HADAMARD Gates"]
+	"sqsw":	[qsim.QSimulator.SQSWAP,	"bit1 bit2",	"qsim:,qgate:,qlist:2","SQ root SWAP gate"],
+	"h":	[qsim.QSimulator.H,		"bit",		"qsim:,qgate:,qlist:1","HADAMARD Gate"],
+	"z":	[qsim.QSimulator.Z,		"bit",		"qsim:,qgate:,qlist:1","Z Gate"],
+	"c":	[qsim.QSimulator.C,		"cbit bit",	"qsim:,qgate:,qlist:2","CNOT Gate"],
+	"rk":	[qsim.QSimulator.Rk,	"k bit",	"qsim:,args:i,qgate:,qlist:1","ROT(k) Gate"],
+	"y":	[qsim.QSimulator.Y,		"bit",		"qsim:,qgate:,qlist:1","Y Gate"],
+	"x":	[qsim.QSimulator.X,		"bit",		"qsim:,qgate:,qlist:1","X Gate"],
+	"rphi":	[qsim.QSimulator.Rphi,	"phi bit",	"qsim:,args:f,qgate:,qlist:1","ROT(Phi) Gate"],
+	"t":	[qsim.QSimulator.T,		"cbit1 cbit2 bit",	"qsim:,qgate:,qlist:3","TOFFOLI Gate"],
+	"csw":	[qsim.QSimulator.CSWAP,	"cbit bit1 bit2",	"qsim:,qgate:,qlist:3","C-SWAP Gate"],
+	"sw":	[qsim.QSimulator.SWAP,	"bit1 bit2",		"qsim:,qgate:,qlist:2","SWAP Gate"],
+	"rnd":	[qsim.QSimulator.RND,	"bit",		"qsim:,qgate:,qlist:1","Random aplitude Gate"],
+	"qft":	[qsim.QSimulator.QFT,	"n n-bits ...",	"qsim:,args:i,qgate:,qlist:*","QFT(n) Gate"],
+	"hn":	[qsim.QSimulator.Hn,	"n n-bits ...",	"qsim:,args:i,qgate:,qlist:*","Simultabeous n-HADAMARD Gates"]
 	}
 
 def parse_aspec(aspec):
-	a = col.namedtuple("ArgSpec","isqcsim na isqlist nq isqlim isgate")
-	a.isqcsim = False
+	a = col.namedtuple("ArgSpec","isqsim na isqlist nq isqlim isgate")
+	a.isqsim = False
 	a.na = ""
 	a.isqlist = False
 	a.nq = 0
@@ -85,8 +85,8 @@ def parse_aspec(aspec):
 		else:
 			al = [e,""]
 		tag = al[0]
-		if tag == "qcsim":
-			a.isqcsim = True
+		if tag == "qsim":
+			a.isqsim = True
 		if tag == "args":
 			a.na = al[1]
 		if tag == "qlist":
@@ -98,7 +98,7 @@ def parse_aspec(aspec):
 		if tag == "qgate":
 			a.isgate = True
 	return a
-	# return isqcsim, na, isqlist, nq, isqlim, isgate
+	# return isqsim, na, isqlist, nq, isqlim, isgate
 
 def main():
 	# Process the command line arguments
@@ -128,9 +128,9 @@ def main():
 				desc = (clidata[cmd])[1]
 				aspec = (clidata[cmd])[2]
 				a = parse_aspec(aspec)
-				# (isqcsim, na, isqlist, nq, isqlim, isgate) = parse_aspec(aspec)
+				# (isqsim, na, isqlist, nq, isqlim, isgate) = parse_aspec(aspec)
 				alist = []
-				if a.isqcsim:
+				if a.isqsim:
 					alist = [q]
 				if (len(a.na) <= len(cmdline)) and ((not a.isqlim) or ((len(a.na)+a.nq) == len(cmdline))):
 					for i in a.na:
@@ -158,7 +158,7 @@ def main():
 				print("Command not recognized")
 		except ValueError:
 			print("Error in value provided")
-		except qcsim.QClibError as m:
+		except qsim.QClibError as m:
 			print(m)
 
 if __name__ == "__main__":

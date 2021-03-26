@@ -88,7 +88,6 @@ class bernvazi:
 
 
 if __name__ == "__main__":
-	# qc = qclib.qcsim(7)
 	nqubits = 6
 	bv = bernvazi(nqubits)
 	bv_ckt = bv.gen_bv_ckt()

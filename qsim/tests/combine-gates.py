@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-import qcsim
+import qsim
 
 print()
 print("Parallel HHHH and CCCC---------------------------------")
-qc = qcsim.QSimulator(8)
+qc = qsim.QSimulator(8)
 H4 = qc.qcombine_par("H4",[qc.H(),qc.H(),qc.H(),qc.H()])
 C4 = qc.qcombine_par("C4",[qc.C(),qc.C(),qc.C(),qc.C()])
 qc.qgate(H4,[7,5,3,1], qtrace=True)
@@ -22,7 +22,7 @@ qc.qreport(header="AFTER 4 individual H's")
 
 print()
 print("Sequence HXYZ------------------------------------------")
-qc = qcsim.QSimulator(8,qtrace=True)
+qc = qsim.QSimulator(8,qtrace=True)
 HXYZ = qc.qcombine_seq("HXYZ",[qc.H(),qc.X(),qc.Y(),qc.Z()])
 ZYXH = qc.qcombine_seq("ZYXH",[qc.Z(),qc.Y(),qc.X(),qc.H()])
 qc.qgate(HXYZ,[0],qtrace=True)

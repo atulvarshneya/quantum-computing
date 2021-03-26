@@ -1,7 +1,7 @@
 
-import qcsim
+import qsim
 
-q = qcsim.QSimulator(4,qtrace=True)
+q = qsim.QSimulator(4,qtrace=True)
 
 ## X gate
 q.qgate(q.X(),[0])

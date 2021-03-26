@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-import qcsim
+import qsim
 import numpy as np
 
-q = qcsim.QSimulator(3)
+q = qsim.QSimulator(3)
 
 # put the qubit 2 in some randoom state
 # this is the qubit that is to be teleported by Alice to Bob

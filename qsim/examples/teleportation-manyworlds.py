@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import qcsim
+import qsim
 import numpy as np
 import random as rnd
 
@@ -36,7 +36,7 @@ for i in range(NQUBITS-1):
 		initstate = np.kron(initstate,np.transpose(np.matrix([[1,0]],dtype=complex)))
 
 # now get started ...
-q = qcsim.QSimulator(NQUBITS,initstate=initstate)
+q = qsim.QSimulator(NQUBITS,initstate=initstate)
 q.qreport(header="Initial State")
 
 # first put qbits 0 and 1 in bell state

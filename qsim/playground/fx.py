@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-import qclib
+import qsim
 
 NQUBITS = 4
 verbose = 0
@@ -29,7 +29,7 @@ def measure_x(qc):
 
 # ===============================================
 
-qc = qclib.qcsim(NQUBITS)
+qc = qsim.QSimulator(NQUBITS)
 
 for i in range(16):
 		qc.qreset()

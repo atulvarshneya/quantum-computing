@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -7,7 +7,7 @@ Problem Statement:
 -------------------------------------------------------------------------------------------------------
 """)
 
-import qcsim
+import qsim
 import numpy as np
 
 nqbits = 8
@@ -26,11 +26,11 @@ try:
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 
 	# Start the Quantum Computer Simulator
-	q = qcsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
+	q = qsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
 
 	# Perform QFT
 	qftgate = q.QFT(nqbits)
 	q.qgate(qftgate, list(reversed(range(nqbits))))
 
-except qcsim.QClibError as ex:
+except qsim.QClibError as ex:
 	print(ex.args)

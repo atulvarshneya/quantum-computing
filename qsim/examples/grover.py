@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import numpy as np
-import qcsim
+import qsim
 
 
 def intro():
@@ -65,7 +65,7 @@ def __u(q,key,name):
 def main(n):
 	intro()
 
-	q = qcsim.QSimulator(n)
+	q = qsim.QSimulator(n)
 
 	print("Building Uf operator ...")
 	Ufgate = Uf(q)
