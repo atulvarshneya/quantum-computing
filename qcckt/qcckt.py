@@ -268,6 +268,8 @@ class QCkt:
 	def _addQFT(self, canvas, qbits):
 		st = min(qbits) * 2
 		en = max(qbits) * 2
+		l = qbits[-1]  # the MSB qubit
+		m = qbits[0]   # the LSB qubit
 
 		col = self._get1col()
 		for i in range(en-st-1):
@@ -289,6 +291,21 @@ class QCkt:
 		col = self._get1col()
 		for b in qbits:
 			col[b*2] = "T"
+		canvas.append(col)
+
+		col = self._get1col()
+		for b in qbits:
+			col[b*2] = " "
+		canvas.append(col)
+
+		col = self._get1col()
+		for b in qbits:
+			if b == l:
+				col[b*2] = "L"
+			elif b == m:
+				col[b*2] = "M"
+			else:
+				col[b*2] = " "
 		canvas.append(col)
 
 		col = self._get1col()
@@ -349,7 +366,7 @@ class Cregister:
 
 	def __str__(self):
 		creg_str = ""
-		for i in reversed(range(len(self.value))): # reversed because creg[0] is LSB
+		for i in (range(len(self.value))): # creg[0] is MSB
 			creg_str = creg_str + "{0:01b}".format(self.value[i])
 		# creg_str = creg_str + "\n"
 		return creg_str

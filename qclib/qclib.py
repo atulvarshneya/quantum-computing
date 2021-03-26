@@ -9,6 +9,12 @@ import random as rnd
 from copy import deepcopy
 import types
 
+## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
+##            NOTE: when refering to bits by position numbers, MSB would be 7, in an 8-qubit machine
+##            So, CNOT 3,0 in an 8-qubit machine, woudld act on [ -, -, -, -, C, -, -, T], C=control, T = target
+##            BUT, the state vector ordering is [0000, ...., 1111]. Good that it does not impact the user.
+## Sorry, for this confusion, but too much effort to change now.
+
 class qcsim:
 
 	def __init__(self, nq, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False):
@@ -193,11 +199,15 @@ class qcsim:
 		# align the qbits back to original
 		self.sys_state = rrmat * self.sys_state
 
+		# finally update classical bits register with the measurement
 		if len(qbit_list) != len(cbit_list):
 			errmsg = "Error: list of classical bits is not valid"
 			raise QClibError(errmsg)
+		# print("meas_val = ", meas_val)
+		# print("qbit_list = ", qbit_list)
+		# print("cbit_list = ", cbit_list)
 		for i in range(len(cbit_list)):
-			self.cregister[cbit_list[i]] = meas_val[i]
+			self.cregister[self.nqbits - cbit_list[i]-1] = meas_val[i]
 
 		if qtrace or self.trace:
 			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
@@ -231,7 +241,7 @@ class qcsim:
 				ampstr = "{:.8f}".format(np.around(state[i].item(0),8))
 				print(ststr + ampstr + barstr)
 		print("CREGISTER: ", end="")
-		for i in reversed(range(self.ncbits)): # reversed because cregister[0] is LSB
+		for i in range(self.ncbits): # cregister[0] is MSB
 			print("{0:01b}".format(self.cregister[i]),end="")
 		print()
 

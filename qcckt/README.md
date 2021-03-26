@@ -1,9 +1,17 @@
 Reference
 
+MSB - LSB ordering:
+	qcckt as well as qclib follow the convention that when providing arguments to any of the functions 
+	the list argument representing qubits or clbits is ordered as [MSB, ...., LSB].
+	Yes, :-), the [0] element is MSB!
+	Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target),
+	or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT 
+	it very much *does* matter.
+
 QCkt
 	QCkt(nqubits, nclbits=None, name="QCkt")
 		Returns an empty quantum circuit
-	CX(ctrl, target)
+	CX(control, target)
 		Appends a CNOT gate to the quantum circuit
 		Returns the updted quantum circuit
 	H(qubit)
@@ -18,7 +26,7 @@ QCkt
 	Z(qubit)
 		Appends a PAULI-Z gate to the quantum circuit
 		Returns the updted quantum circuit
-	T(ctl1, ctl2, target)
+	T(control1, control2, target)
 		Appends a TOFFOLI gate to the quantum circuit
 		Returns the updted quantum circuit
 	M(qubitslist, clbitslist=None)

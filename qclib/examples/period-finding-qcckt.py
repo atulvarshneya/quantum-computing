@@ -37,18 +37,18 @@ while idx < 2:
 	bk.run(ckt,qtrace=False)
 	mbyrarr = bk.get_creg().value
 	print("CREGISTER = ",bk.get_creg())
-	# mbyrarr = q.qmeasure(list(range(nqbits-1,1,-1)))
 
 	# convert to integer the measured values of the x register
 	# remember the Cregister holds *all* classical bits, not just the ones measured
+	# and remember the bits ordering [MSB, ..., LSB]
 	mbyr = 0
-	for i in range(2,nqbits):
-		pow_of_2 = i-2
+	for i in range(0,nqbits-2):
 		if mbyrarr[i] == 1:
+			pow_of_2 = nqbits - 2 - i - 1 
 			mbyr += 2**pow_of_2
 
 	# Look for two distinc non-zero values
-	print("a multiple of M/r = ",mbyr)
+	print("A multiple of M/r = ", mbyr)
 	if mbyr != 0:
 		vals[idx] = int(mbyr)
 		if (vals[0] != vals[1]):
