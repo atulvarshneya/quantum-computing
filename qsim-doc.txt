@@ -4,10 +4,10 @@
 1.2	TUTORIAL INTRODUCTION
 --------
 (see accompanying helloworld.py)
-Lets start with a simple example of using qcsim, something like a 'hello world' --
+Lets start with a simple example of using qsim, something like a 'hello world' --
 
-	import qcsim
-	qc = qcsim.QSimulator(8)
+	import qsim
+	qc = qsim.QSimulator(8)
 	qc.qgate(qc.H(),[0])
 	qc.qgate(qc.C(),[0,3])
 	qc.qreport()
@@ -40,11 +40,11 @@ The output emitted by the above code is the dump of the state right after the se
 
 Lets go line by line to understand the code --
 
->>> import qcsim
-This line imports the qcsim. Fairly straight forward.
+>>> import qsim
+This line imports the qsim. Fairly straight forward.
 
->>> qc = qcsim.QSimulator(8)
-The main class in the qcsim library is QSimulator. This line creates an instance of that class. As a convention in this document, qc is always used to represent an instance of the class QSimulator. The QSimulator class instance, qc, represents a quantum computer. The number 8 as the argument to the constructor of class qcsim, specifies the number of qubits in that quantum computer.
+>>> qc = qsim.QSimulator(8)
+The main class in qsim is QSimulator. This line creates an instance of that class. As a convention in this document, qc is always used to represent an instance of the class QSimulator. The QSimulator class instance, qc, represents a quantum computer. The number 8 as the argument to the constructor of class QSimulator, specifies the number of qubits in that quantum computer.
 
 >>> qc.qgate(qc.H(),[0])
 qgate() is the function that applies a quantum gate on a given set of qubits in the system. In the above line of code, it applies the hadamard gate (H()), to qubit 0. See the documentation below for the gates available.
@@ -63,8 +63,8 @@ This last qreport() function call outputs the state after the measurement of the
  
 Now, let us run the same code with trace turned on (therefore removed the qreport() calls). Turning trace ON, it outputs the state after init and each gate and measurement steps (see accompanying helloworld_traceON.py) --
 
-	import qcsim
-	qc = qcsim.QSimulator(8, qtrace=True)
+	import qsim
+	qc = qsim.QSimulator(8, qtrace=True)
 	qc.qgate(qc.H(),[0])
 	qc.qgate(qc.C(),[0,3])
 	qc.qmeasure([0])
@@ -87,24 +87,24 @@ and, here is its output --
 
 1.2	PROGRAMMING MODEL
 --------
-The qcsim assumes a programming model as shown below.
+qsim assumes a programming model as shown below.
 
-Users write the algorithms on a front-end classical computer using standard programming language (Python), and qcsim provides an API to access and perform operations on a Quantum Computer as a back-end resource.
+Users write the algorithms on a front-end classical computer using standard programming language (Python), and qsim provides an API to access and perform operations on a Quantum Computer as a back-end resource.
 
 	                     +--------------------+          +----------------+
 	                     |                +---|          |                |
 	    +-------+        |                | q |          |                |
-	    |       |        |  Classical     | c |          |    Quantum     |
-	    |       |--------|  Computer      | l |----------|    Computer    |
-	    +-------+        |  (Front-end)   | i |          |   (Back-end)   |
-	   /       /         |                | b |          |                |
+	    |       |        |  Classical     | s |          |    Quantum     |
+	    |       |--------|  Computer      | i |----------|    Computer    |
+	    +-------+        |  (Front-end)   | m |          |   (Back-end)   |
+	   /       /         |                |   |          |                |
 	  ---------          |                +---|          |                |
 	                     +--------------------+          +----------------+
 
 2. CORE FUNCTIONS
 --------------------------------------------------------------------------------
 
-2.1	qcsim.QSimulator(nqubits, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False)
+2.1	qsim.QSimulator(nqubits, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False)
 --------
 First argument specifies the number of qubits in the system. If neither initstate or prepqubits is provided, prepares all qubits to |0>.
 
@@ -130,7 +130,7 @@ Brings the simulator to the same state as after QSimulator() call - initial stat
 --------
 qgate() is used to perform quantum gate operations on a set of qubits.
 
-There are a number of gates pre-created within the qcsim class, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, SWAP gate, etc.) then the list in the second argument (list_of_qubits) must contain that many qubits.
+There are a number of gates pre-created within the QSimulator class, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, SWAP gate, etc.) then the list in the second argument (list_of_qubits) must contain that many qubits.
 
 The function qgate() validates the number of bits passed in list_of_qubits against the number of qubits required for the gate, if not correct, throws an exception.
 
@@ -233,7 +233,7 @@ Create 2 entangled |Phi+> bell states, between quits 7,6 and 5,4 using these --
 --------
 qstretch takes a gate and an ordered list of qubits on which it would operate and "stretches" it to handle *all* qubits in the system. Basically, the resulting newgate takes as input all the qubits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qubits, and passes through all the other qubits unaffected.
 
-For instance, lets assume we created a 4 qubit system (qcsim.QSimulator(4)), and in that we use C gate on qubits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. qstretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
+For instance, lets assume we created a 4 qubit system (qsim.QSimulator(4)), and in that we use C gate on qubits 3 and 0 (qgate(qc.C(),[3,0])). Shown on the left side of the figure below. qstretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
 	                         +---+
 	3 ---.-----          3 --| . |--
              |                   | | |
@@ -261,7 +261,7 @@ Checks if the provided operator is unitary opperator or not. Returns boolean val
 
 4.1	PRE-DEFINED GATES
 --------
-A number of gates are pre-defined in the qcsim class. The following is the list --
+A number of gates are pre-defined in the QSimulator class. The following is the list --
 
 H()		Hadamard gate
 X()		Pauli_x gate
@@ -341,15 +341,15 @@ Note, the row number (top row is row 0) is the value that will be measured for t
 
 8. ERROR HANDLING, EXCEPTIONS
 --------------------------------------------------------------------------------
-Various function calls raise exceptions, mostly in cases where user passed arguments are incorrect. The exceptions are raised using class qcsim.QClibError, having an argument of a text string describing the error encountered.
+Various function calls raise exceptions, mostly in cases where user passed arguments are incorrect. The exceptions are raised using class qsim.QClibError, having an argument of a text string describing the error encountered.
 
 Following is an example shows how these exceptions are handled --
 
 	try:
-		q = qcsim.QSimulator(8)
+		q = qsim.QSimulator(8)
 		q.qgate(q.H(),[0])
 		q.qgate(q.C(),[0,1])
-	except qcsim.QClibError as exp:
+	except qsim.QClibError as exp:
 		print(exp.args)
 
 Following is the list of error messages with the name of the function, thrown in an exception --
