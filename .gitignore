@@ -1,4 +1,5 @@
-qclib/tests/runlogs
-qclib/qclib.pyc
-qclib/playground
+qsim/tests/runlogs
+qsim/_pycache__/
+qsim/playground
+qckt/_pycache__/
 .project_props
