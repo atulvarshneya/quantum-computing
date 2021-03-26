@@ -1,5 +1,5 @@
 qsim/tests/runlogs
-qsim/_pycache__/
+qsim/_pycache__
 qsim/playground
-qckt/_pycache__/
+qckt/_pycache__
 .project_props
