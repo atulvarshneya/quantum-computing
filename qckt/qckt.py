@@ -120,6 +120,10 @@ class QCkt:
 	def Border(self):
 		self.circuit.append(["BORDER"])
 		return self
+	
+	def RND(self, qubit):
+		self.circuit.append(["RND",[qubit]])
+		return self
 
 	##
 	## Draw related ethods
@@ -326,6 +330,26 @@ class QCkt:
 			col[i] = "#"
 		canvas.append(col)
 		canvas = self._extend(canvas)
+		return canvas
+
+	def _addRND(self, canvas, qbits):
+		col = self._get1col()
+		col[qbits[0]*2] = "["
+		canvas.append(col)
+		col = self._get1col()
+		col[qbits[0]*2] = "R"
+		canvas.append(col)
+		col = self._get1col()
+		col[qbits[0]*2] = "N"
+		canvas.append(col)
+		col = self._get1col()
+		col[qbits[0]*2] = "D"
+		canvas.append(col)
+		col = self._get1col()
+		col[qbits[0]*2] = "]"
+		canvas.append(col)
+		canvas = self._extend(canvas)
+		return canvas
 
 	def _paint(self, canvas):
 		nrows = len(canvas)
@@ -357,6 +381,8 @@ class QCkt:
 				self._addQFT(canvas,g[1])
 			if g[0] == "BORDER":
 				self._addBORDER(canvas)
+			if g[0] == "RND":
+				self._addRND(canvas,g[1])
 		self._paint(canvas)
 
 class Cregister:
@@ -436,6 +462,8 @@ class Backend:
 				qc.qmeasure(g[1][0],cbit_list=g[1][1])
 			if g[0] == "QFT":
 				qc.qgate(qc.QFT(len(g[1])),g[1])
+			if g[0] == "RND":
+				qc.qgate(qc.RND(),g[1])
 
 		# fetch the last value of the cregister, state_vector
 		(creg, svec) = qc.qsnapshot()
