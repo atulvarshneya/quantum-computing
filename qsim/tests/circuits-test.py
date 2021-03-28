@@ -16,9 +16,9 @@ ckt2.Y(4)
 ckt2.Z(5)
 ckt2.Border()
 
-ckt1 = ckt1.realign(6,6,[3,2,1,0])
+ckt1 = ckt1.realign(6,6,[0,1,2,3])
 
-ckt3 = ckt1 + ckt2
+ckt3 = ckt1.append(ckt2)
 ckt3.T(4,5,3)
 ckt3.M([3,4,5],[3,4,5])
 

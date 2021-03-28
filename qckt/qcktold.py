@@ -47,6 +47,9 @@ class QCkt:
 		return self.nqubits, self.nclbits
 
 	def realign(self,newnq,newnc,inpqubits): # change the qubits order to a different order
+		### WARNING This realign is PER AN OLD SPECIFICATION 
+		### It is IMCOPATIBLE with the new definition of realign being used now
+		-- WARNING -- put this marker so the file becomes non-useable
 		# newq and newc are the new sizes of the qubits register and clbits register
 		# inpqubits gives the new positions of the qubits
 		# i.e., [3,0,2,1] means old 0 to new 3, old 1 to new 0, old 2, to new 2, old 3 to new 1

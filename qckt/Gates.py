@@ -10,6 +10,8 @@ class QGate:
 			newseq.append(nseq[nqbits-i-1])
 		return newseq
 '''
+	## The code below was per the OLD specification
+	## New specification is alignment with the MSB, ..., LSB ordering convention in qsim and qckt
 	def _reorderlist(self,oseq,nseq):
 		newseq = []
 		for i in oseq:
@@ -134,6 +136,37 @@ class CX(QGate):
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
 		qc.qgate(qc.C(),self.qbits)
+
+class T(QGate):
+
+	def __init__(self, control1, control2, target):
+		self.qbits = [control1, control2, target]
+
+	def addtocanvas(self,canvas):
+		col = canvas._get1col(3)
+		st = min(self.qbits)
+		en = max(self.qbits)
+		for i in range(st,en):
+			col[i*2] = "-|-"
+			col[i*2+1] = " | "
+		col[self.qbits[0]*2] = "[.]"
+		col[self.qbits[1]*2] = "[.]"        
+		col[self.qbits[2]*2] = "[X]"        
+		canvas.append(col)
+		canvas._extend()
+		return self
+
+	def realign(self,newseq):
+		self.qbits = self._reorderlist(self.qbits,newseq)
+		return self
+
+	def __str__(self):
+		return "T:"+str(self.qbits)
+
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qgate(qc.T(),self.qbits)
+
 
 class QFT(QGate):
 

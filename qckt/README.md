@@ -41,8 +41,22 @@ QCkt
 	get_size()
 		Returns the size of quantum and classical registers as a a tuple (nqubits, nclbits)
 	realign(newnq,newnc,inpqubits)
-		Creates a new circuit from the current circuit with a changed order of the qubits
+		Creates a potentially larger new circuit from the current circuit with a changed order of the qubits
 		Returns the new circuit
+		Parameters newnq and newnc are the sizesof the new (larger or equal sized) circuit
+		inpqubits is a vector that specifies how the old circuit's qubits be replaced in teh new circuit
+		As an example see the circuits below --
+		say,                    current circuit                   new circuit
+		               q000 ----[H]-[.]----------     q000 --------------------------
+		                             |                                               
+		               q001 --------[X]----------     q001 -----------[H]------------
+		                                                                             
+		               q002 ------------[H]------     q002 --------[X]---------------
+		                                                            |                
+		                                              q003 ----[H]-[.]---------------
+		For this realignment, this vector basically answers the questions [q002 -> q?, q001 -> q?, q000 -> q?]
+		so, the vector should be [1,2,3], and the realign call should be realign(4,4,[1,2,3])
+
 	append(othercircuit)
 		Append a circuit to the current circuit.
 		Returned circuit qubits match the larger one.

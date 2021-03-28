@@ -26,6 +26,7 @@ class QCkt:
 		self.QFT = GateWrapper(self.circuit,QFT).addGate
 		self.M = GateWrapper(self.circuit,M).addGate
 		self.Border = GateWrapper(self.circuit,Border).addGate
+		self.T = GateWrapper(self.circuit,T).addGate
 
 		self.idx = 0 # for iterations
 
