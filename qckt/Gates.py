@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+class GateWrapper:
+	def __init__(self, circuit, gateCls):
+		self.circuit = circuit
+		self.GateCls = gateCls
+	def addGate(self, *args, **kwargs):
+		gate = self.GateCls(*args, **kwargs)
+		self.circuit.append(gate)
+
 class QGate:
 	def __init__(self):
 		pass
@@ -9,15 +17,6 @@ class QGate:
 		for i in oseq:
 			newseq.append(nseq[nqbits-i-1])
 		return newseq
-'''
-	## The code within the comment below was per the OLD specification
-	## New specification is alignment with the MSB, ..., LSB ordering convention in qsim and qckt
-	def _reorderlist(self,oseq,nseq):
-		newseq = []
-		for i in oseq:
-			newseq.append(nseq[i])
-		return newseq
-'''
 
 class X(QGate):
 	def __init__(self, qbit):
@@ -281,3 +280,109 @@ class RND(QGate):
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
 		qc.qgate(qc.RND(),self.qbits)
+
+class ROT(QGate):
+	def __init__(self, phi, qbit):
+		self.qbits = [qbit]
+		self.phi = phi
+
+	def addtocanvas(self,canvas):
+		col = canvas._get1col(5)
+		col[self.qbits[0]*2] = "[ROT]"
+		canvas.append(col)
+		canvas._extend()
+		return self
+
+	def realign(self,newseq):
+		self.qbits = self._reorderlist(self.qbits,newseq)
+		return self
+
+	def __str__(self):
+		return "ROT:"+str(self.qbits)
+
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qgate(qc.Rphi(self.phi),self.qbits)
+
+class Rk(QGate):
+	def __init__(self, k, qbit):
+		self.qbits = [qbit]
+		self.k = k
+
+	def addtocanvas(self,canvas):
+		col = canvas._get1col(4)
+		col[self.qbits[0]*2] = "[Rk]"
+		canvas.append(col)
+		canvas._extend()
+		return self
+
+	def realign(self,newseq):
+		self.qbits = self._reorderlist(self.qbits,newseq)
+		return self
+
+	def __str__(self):
+		return "Rk:"+str(self.qbits)
+
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qgate(qc.Rk(self.k),self.qbits)
+
+GatesList = [X,Y,Z,H,CX,T,M,Border,QFT,RND,ROT,Rk]
+
+###################################################
+### Support for Custom Gates
+###################################################
+
+class CustomGateWrapper:
+	def __init__(self, circuit, gatename, opMatrix):
+		self.gatename = gatename
+		self.opMatrix = opMatrix
+		self.circuit = circuit
+	def addGate(self, qbits):
+		qbitsList = qbits
+		if type(qbitsList).__name__ != 'list':
+			qbitsList = [qbits]
+		gate = CustomGate(self.gatename, self.opMatrix, qbitsList)
+		self.circuit.append(gate)
+
+class CustomGate(QGate):
+
+	def __init__(self, gatename, opMatrix, qbits):
+		self.gatename = gatename
+		self.opMatrix = opMatrix
+		self.qbits = qbits
+
+	def addtocanvas(self,canvas):
+		ncols = len(self.gatename) + 2 # 2 for '[', ']'
+		usegname = self.gatename
+		if (len(self.qbits) > 1):
+			ncols += 2 # for ' M' and ' L' to indicate MSB, LSB
+			usegname = self.gatename+"  "
+			usegnameM = self.gatename+" M"
+			usegnameL = self.gatename+" L"
+		col = canvas._get1col(ncols)
+		st = min(self.qbits)
+		en = max(self.qbits)
+		for i in range(st,en):
+			col[i*2] = "|"+ "-"*(ncols-2)+"|"
+			col[i*2+1] = "|"+ " "*(ncols-2)+"|"
+		for q in self.qbits:
+			col[q*2] = "["+usegname+"]"
+		if len(self.qbits) > 1:
+			col[self.qbits[0]*2] = '['+usegnameM+']'
+			col[self.qbits[-1]*2] = '['+usegnameL+']'
+		canvas.append(col)
+		canvas._extend()
+		return self
+
+	def realign(self,newseq):
+		self.qbits = self._reorderlist(self.qbits,newseq)
+		return self
+
+	def __str__(self):
+		return self.gatename+":"+str(self.qbits)
+
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qgate([self.gatename,self.opMatrix],self.qbits)
+

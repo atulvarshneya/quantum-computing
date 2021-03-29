@@ -18,16 +18,8 @@ class QCkt:
 		self.name = name
 		self.canvas = Canvas(self)
 
-		self.X = GateWrapper(self.circuit,X).addGate
-		self.Y = GateWrapper(self.circuit,Y).addGate
-		self.Z = GateWrapper(self.circuit,Z).addGate
-		self.H = GateWrapper(self.circuit,H).addGate
-		self.CX = GateWrapper(self.circuit,CX).addGate
-		self.T = GateWrapper(self.circuit,T).addGate
-		self.M = GateWrapper(self.circuit,M).addGate
-		self.Border = GateWrapper(self.circuit,Border).addGate
-		self.QFT = GateWrapper(self.circuit,QFT).addGate
-		self.RND = GateWrapper(self.circuit,RND).addGate
+		for gclass in GatesList:
+			self._registerGate(gclass.__name__, GateWrapper(self.circuit,gclass).addGate)
 
 		self.idx = 0 # for iterations
 
@@ -42,6 +34,12 @@ class QCkt:
 		except IndexError:
 			self.idx = 0
 			raise StopIteration  # Done iterating.
+
+	def _registerGate(self, gatename, addgateHandle):
+		setattr(self,gatename,addgateHandle)
+
+	def custom_gate(self, gatename, opMatrix):
+		self._registerGate(gatename, CustomGateWrapper(self.circuit,gatename,opMatrix).addGate)
 
 	def append(self, otherckt):
 		# otherckt - the ckt to be appended
@@ -71,14 +69,6 @@ class QCkt:
 
 	def draw(self):
 		self.canvas.draw()
-
-class GateWrapper:
-	def __init__(self, circuit, gateCls):
-		self.circuit = circuit
-		self.GateCls = gateCls
-	def addGate(self, *args, **kwargs):
-		gate = self.GateCls(*args, **kwargs)
-		self.circuit.append(gate)
 
 		
 ######################################################################
@@ -162,38 +152,22 @@ class Result:
 
 
 if __name__ == "__main__":
-	c1 = QCkt(4)
-	c1.X(0)
-	c1.draw()
-	bk = Backend()
-	bk.run(c1,qtrace=True)
-	print("RESULT STATE VECTOR:")
-	print(bk.get_svec())
+	# for i in GatesList:
+	#	print(i.__name__)
+	import numpy as np
+	opMat = np.matrix([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],dtype=complex)
 
-	c1 = QCkt(4)
-	c1.X(0)
-	c1.Y(0)
-	c1.X(1)
-	c1.Z(1)
-	c1.draw()
-	bk = Backend()
-	bk.run(c1,qtrace=True)
-	print("RESULT STATE VECTOR:")
-	print(bk.get_svec())
+	ck = QCkt(8)
+	ck.custom_gate("ID",opMat)
+	ck.X(0)
+	ck.H(1)
+	ck.CX(1,2)
+	ck.Border()
+	ck.ID([5,4])
+	ck.draw()
+	ck = ck.realign(8,8,[5,4,7,6,3,2,1,0])
+	ck.draw()
 
-	c1 = QCkt(4)
-	c1.H(0)
-	c1.CX(0,2)
-	c1.draw()
 	bk = Backend()
-	bk.run(c1,qtrace=True)
-	print("RESULT STATE VECTOR:")
-	print(bk.get_svec())
+	bk.run(ck,qtrace=True)
 
-	c1 = QCkt(8)
-	c1.QFT([6,5,4,3,2,1])
-	c1.draw()
-	bk = Backend()
-	bk.run(c1,qtrace=True)
-	print("RESULT STATE VECTOR:")
-	print(bk.get_svec())
