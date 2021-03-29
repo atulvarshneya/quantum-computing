@@ -23,10 +23,11 @@ class QCkt:
 		self.Z = GateWrapper(self.circuit,Z).addGate
 		self.H = GateWrapper(self.circuit,H).addGate
 		self.CX = GateWrapper(self.circuit,CX).addGate
-		self.QFT = GateWrapper(self.circuit,QFT).addGate
+		self.T = GateWrapper(self.circuit,T).addGate
 		self.M = GateWrapper(self.circuit,M).addGate
 		self.Border = GateWrapper(self.circuit,Border).addGate
-		self.T = GateWrapper(self.circuit,T).addGate
+		self.QFT = GateWrapper(self.circuit,QFT).addGate
+		self.RND = GateWrapper(self.circuit,RND).addGate
 
 		self.idx = 0 # for iterations
 

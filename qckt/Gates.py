@@ -10,7 +10,7 @@ class QGate:
 			newseq.append(nseq[nqbits-i-1])
 		return newseq
 '''
-	## The code below was per the OLD specification
+	## The code within the comment below was per the OLD specification
 	## New specification is alignment with the MSB, ..., LSB ordering convention in qsim and qckt
 	def _reorderlist(self,oseq,nseq):
 		newseq = []
@@ -107,7 +107,6 @@ class H(QGate):
 		# print("exec qc.qgate(",str(self),")")
 		qc.qgate(qc.H(),self.qbits)
 
-
 class CX(QGate):
 
 	def __init__(self, control, target):
@@ -166,38 +165,6 @@ class T(QGate):
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
 		qc.qgate(qc.T(),self.qbits)
-
-
-class QFT(QGate):
-
-	def __init__(self, qbits):
-		self.qbits = qbits
-
-	def addtocanvas(self,canvas):
-		col = canvas._get1col(7)
-		st = min(self.qbits)
-		en = max(self.qbits)
-		for i in range(st,en):
-			col[i*2] = "|-----|"
-			col[i*2+1] = "|     |"
-		for q in self.qbits:
-			col[q*2] = "[QFT  ]"
-		col[self.qbits[0]*2] = "[QFT M]"
-		col[self.qbits[-1]*2] = "[QFT L]"
-		canvas.append(col)
-		canvas._extend()
-		return self
-
-	def realign(self,newseq):
-		self.qbits = self._reorderlist(self.qbits,newseq)
-		return self
-
-	def __str__(self):
-		return "QFT:"+str(self.qbits)
-
-	def exec(self,qc):
-		# print("exec qc.qgate(",str(self),")")
-		qc.qgate(qc.QFT(len(self.qbits)),self.qbits)
 
 class M(QGate):
 
@@ -262,3 +229,55 @@ class Border(QGate):
 		# print("exec qc.qgate(",str(self),")")
 		pass
 
+class QFT(QGate):
+
+	def __init__(self, qbits):
+		self.qbits = qbits
+
+	def addtocanvas(self,canvas):
+		col = canvas._get1col(7)
+		st = min(self.qbits)
+		en = max(self.qbits)
+		for i in range(st,en):
+			col[i*2] = "|-----|"
+			col[i*2+1] = "|     |"
+		for q in self.qbits:
+			col[q*2] = "[QFT  ]"
+		col[self.qbits[0]*2] = "[QFT M]"
+		col[self.qbits[-1]*2] = "[QFT L]"
+		canvas.append(col)
+		canvas._extend()
+		return self
+
+	def realign(self,newseq):
+		self.qbits = self._reorderlist(self.qbits,newseq)
+		return self
+
+	def __str__(self):
+		return "QFT:"+str(self.qbits)
+
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qgate(qc.QFT(len(self.qbits)),self.qbits)
+
+class RND(QGate):
+	def __init__(self, qbit):
+		self.qbits = [qbit]
+	
+	def addtocanvas(self,canvas):
+		col = canvas._get1col(5)
+		col[self.qbits[0]*2] = "[RND]"
+		canvas.append(col)
+		canvas._extend()
+		return self
+
+	def realign(self,newseq):
+		self.qbits = self._reorderlist(self.qbits,newseq)
+		return self
+
+	def __str__(self):
+		return "RND:"+str(self.qbits)
+	
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qgate(qc.RND(),self.qbits)
