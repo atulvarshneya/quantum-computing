@@ -59,7 +59,7 @@ class QCkt:
 		# i.e., [3,0,2,1] means old 0 to new 3, old 1 to new 0, old 2, to new 2, old 3 to new 1
 		if self.nqubits != len(inpqubits):
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
-			raise qsim.QClibError(errmsg)
+			raise qsim.QSimError(errmsg)
 		newckt = QCkt(newnq, newnc)
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)

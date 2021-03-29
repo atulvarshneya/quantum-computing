@@ -60,5 +60,5 @@ try:
 	else:
 		print("Found fx is CONSTANT")
 
-except qclib.QClibError as ex:
+except qclib.QSimError as ex:
 	print(ex.args)

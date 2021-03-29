@@ -28,5 +28,5 @@ try:
 	q.qgate(q.H(),[1])
 	q.qgate(q.C(),[1,0])
 
-except qsim.QClibError as ex:
+except qsim.QSimError as ex:
 	print(ex.args)

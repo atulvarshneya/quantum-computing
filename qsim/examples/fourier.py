@@ -32,5 +32,5 @@ try:
 	qftgate = q.QFT(nqbits)
 	q.qgate(qftgate, list(reversed(range(nqbits))))
 
-except qsim.QClibError as ex:
+except qsim.QSimError as ex:
 	print(ex.args)

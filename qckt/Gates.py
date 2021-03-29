@@ -173,7 +173,7 @@ class M(QGate):
 			clbitslist = qubitslist
 		if (type(qubitslist) != list) or (type(clbitslist) != list):
 			errmsg = "Error: M gate requires a list of qubits and optionally a list of classical bits as arguments"
-			raise qsim.QClibError(errmsg)
+			raise qsim.QSimError(errmsg)
 		self.qbits = qubitslist
 		self.cbits = clbitslist
 

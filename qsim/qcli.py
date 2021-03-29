@@ -158,7 +158,7 @@ def main():
 				print("Command not recognized")
 		except ValueError:
 			print("Error in value provided")
-		except qsim.QClibError as m:
+		except qsim.QSimError as m:
 			print(m)
 
 if __name__ == "__main__":

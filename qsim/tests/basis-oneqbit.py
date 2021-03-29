@@ -10,5 +10,5 @@ try:
 	v = q.qmeasure([1],basis=mybasis)
 	print(v)
 	q.qreport()
-except qsim.QClibError as ex:
+except qsim.QSimError as ex:
 	print(ex.args)
