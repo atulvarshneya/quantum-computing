@@ -1,14 +1,18 @@
-Reference
+# Reference
 
 A note about MSB - LSB ordering:
+----------------------------------
 	qckt as well as qsim follow the convention that when providing arguments to any of the functions 
 	the list argument representing qubits or clbits is ordered as [MSB, ...., LSB].
 	Yes, :-), the [0] element is MSB!
+
 	Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target),
 	or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT 
 	it very much *does* matter.
 
-QCkt
+API Documentation
+----------------------------------
+# QCkt
 	QCkt(nqubits, nclbits=None, name="QCkt")
 		Returns an empty quantum circuit
 	CX(control, target)
@@ -64,7 +68,8 @@ QCkt
 		Returns the updated circuit
 	draw()
 		Draws a text drawing of the circuit
-Backend
+
+# Backend
 	Backend()
 		Returns a handle object to a backend execution environment (a local qc simulator)
 	run(circuit, initstate=None, prepqubits=None, qtrace=False)

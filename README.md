@@ -18,7 +18,6 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 * Period-finding
 * Grover's algorithm
 * ... more added every few days
-* Shore's algorithm coming soon
 
 An interactive commandline interface (qc-cli.py) to quickly check out operations and sequences.
 
@@ -42,7 +41,7 @@ All commonly used gates included
 
 Create a CONTROLLED GATE for any given gate; add any number of control qubits.
 
-Allows addition of any user-defined gates.
+Allows easy addition of user-defined gates.
 
 BASIS
 -------------------
