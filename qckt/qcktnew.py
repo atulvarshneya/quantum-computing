@@ -70,6 +70,9 @@ class QCkt:
 	def draw(self):
 		self.canvas.draw()
 
+	def list(self):
+		for g in self.circuit:
+			print(g)
 		
 ######################################################################
 ## Backend classes ###################################################
