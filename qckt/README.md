@@ -1,7 +1,7 @@
 # Reference
 
 A note about MSB - LSB ordering:
-----------------------------------
+---
 	qckt as well as qsim follow the convention that when providing arguments to any of the functions 
 	the list argument representing qubits or clbits is ordered as [MSB, ...., LSB].
 	Yes, :-), the [0] element is MSB!
@@ -11,8 +11,9 @@ A note about MSB - LSB ordering:
 	it very much *does* matter.
 
 API Documentation
-----------------------------------
-# QCkt
+---
+QCkt
+---
 	QCkt(nqubits, nclbits=None, name="QCkt")
 		Returns an empty quantum circuit
 	CX(control, target)
@@ -42,6 +43,9 @@ API Documentation
 		Returns the updted quantum circuit
 	Border()
 		Places a border in the quantum circuit. Has effect only in the drawing of the circuit
+	custom_gate(gatename, op_matrix)
+		To add user defined custom gates
+		gatename should be per the syntax of a Python variable; op_matrix is the operator matrix in form of numpy.matrix([...],dtype=complex)
 	get_size()
 		Returns the size of quantum and classical registers as a a tuple (nqubits, nclbits)
 	realign(newnq,newnc,inpqubits)
@@ -69,7 +73,8 @@ API Documentation
 	draw()
 		Draws a text drawing of the circuit
 
-# Backend
+Backend
+---
 	Backend()
 		Returns a handle object to a backend execution environment (a local qc simulator)
 	run(circuit, initstate=None, prepqubits=None, qtrace=False)
