@@ -298,7 +298,7 @@ class ROT(QGate):
 		return self
 
 	def __str__(self):
-		return "ROT("+"{:f}".format(self.phi)+"):"+str(self.qbits)
+		return "ROT("+"{:.4f}".format(self.phi)+"):"+str(self.qbits)
 
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
