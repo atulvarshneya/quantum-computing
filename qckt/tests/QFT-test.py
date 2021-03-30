@@ -13,7 +13,7 @@ print("Psst ... f(x) defined as having period of 4\n")
 ckt = qckt.QCkt(nqbits)
 ckt.X(0)
 ckt.QFT(list(range(nqbits-1,1,-1)))
-ckt.append(cktf)
+ckt = ckt.append(cktf)
 ckt.QFT(list(range(nqbits-1,1,-1)))
 ckt.draw()
 

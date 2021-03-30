@@ -19,7 +19,7 @@ print("Psst ... f(x) defined as having period of 4\n")
 # QFT(x) - F(x) - QFT(x) - Measure
 ckt = qckt.QCkt(nqbits)
 ckt.QFT(list(range(nqbits-1,1,-1)))
-ckt.append(fx)
+ckt = ckt.append(fx)
 # actually you would expect to measure output of fx now
 # ckt.M([0,1])
 # but due to principle of defered measurement, it is not necessary

@@ -49,7 +49,8 @@ QCkt
 	get_size()
 		Returns the size of quantum and classical registers as a a tuple (nqubits, nclbits)
 	realign(newnq,newnc,inpqubits)
-		Creates a potentially larger new circuit from the current circuit with a changed order of the qubits
+		Creates a potentially larger new circuit from the current circuit with a changed order of the qubits. The original circuitis left intact.
+		All the custom gate definitions from the circuit are copied over to the new circuit.
 		Returns the new circuit
 		Parameters newnq and newnc are the sizesof the new (larger or equal sized) circuit
 		inpqubits is a vector that specifies how the old circuit's qubits be replaced in the new circuit
@@ -70,10 +71,10 @@ QCkt
 		want qubit 2 be control and qubit 4 be target, you would say CX(2,4), i.e., inpqubits = [2,4]
 
 	append(othercircuit)
-		Append a circuit to the current circuit.
-		Returned circuit qubits match the larger one.
-		Returned circuit clbits match the larger one.
-		Returns the updated circuit
+		Creates a new circuit by appending othercircuit to the current circuit. Both the original circuits are left intact.
+		Returned circuit qubits match the larger one.  Returned circuit clbits match the larger one.
+		All the custom gate definitions from both the circuits are copied over to the new circuit.
+		Returns the updated new circuit
 	draw()
 		Draws a text drawing of the circuit
 

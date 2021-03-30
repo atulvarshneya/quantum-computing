@@ -18,6 +18,7 @@ class QCkt:
 		self.name = name
 		self.canvas = Canvas(self)
 
+		self.custom_redolog = []
 		for gclass in GatesList:
 			self._registerGate(gclass.__name__, GateWrapper(self.circuit,gclass).addGate)
 
@@ -39,26 +40,46 @@ class QCkt:
 		setattr(self,gatename,addgateHandle)
 
 	def custom_gate(self, gatename, opMatrix):
-		self._registerGate(gatename, CustomGateWrapper(self.circuit,gatename,opMatrix).addGate)
+		if hasattr(self,gatename):
+			print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}.".format(gatename))
+		else:
+			self.custom_redolog.append([gatename,opMatrix])
+			self._registerGate(gatename, CustomGateWrapper(self.circuit,gatename,opMatrix).addGate)
+
+	def get_custom_redolog(self):
+		return self.custom_redolog
 
 	def append(self, otherckt):
 		# otherckt - the ckt to be appended
 		nq = max(self.nqubits, otherckt.nqubits)
 		nc = max(self.nclbits, otherckt.nclbits)
-		self.nqubits = nq
-		self.nclbits = nc
+		newckt = QCkt(nq,nc)
+
+		# register custom gates from these circuits to the new circuit
+		for cg in self.get_custom_redolog():
+			newckt.custom_gate(cg[0], cg[1])
+		for cg in otherckt.get_custom_redolog():
+			newckt.custom_gate(cg[0], cg[1])
+
+		# copy circuits over to the new circuit
+		for g in self.circuit:
+			newckt.circuit.append(g)
 		for g in otherckt.circuit:
-			self.circuit.append(g)
-		return self
+			newckt.circuit.append(g)
+
+		return newckt
 
 	def realign(self,newnq,newnc,inpqubits): # change the qubits order to a different order
 		# newq and newc are the new sizes of the qubits register and clbits register
 		# inpqubits gives the new positions of the qubits
-		# i.e., [3,0,2,1] means old 0 to new 3, old 1 to new 0, old 2, to new 2, old 3 to new 1
+		# See README.md for details
 		if self.nqubits != len(inpqubits):
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
 			raise qsim.QSimError(errmsg)
 		newckt = QCkt(newnq, newnc)
+		# register custom gates to the new circuit
+		for cg in self.get_custom_redolog():
+			newckt.custom_gate(cg[0], cg[1])
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
 			newckt.circuit.append(galigned)
@@ -160,15 +181,26 @@ if __name__ == "__main__":
 	import numpy as np
 	opMat = np.matrix([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],dtype=complex)
 
-	ck = QCkt(8)
-	ck.custom_gate("ID",opMat)
-	ck.X(0)
-	ck.H(1)
-	ck.CX(1,2)
-	ck.Border()
-	ck.ID([5,4])
-	ck.draw()
-	ck = ck.realign(8,8,[5,4,7,6,3,2,1,0])
+	print("ck1 -----")
+	ck1 = QCkt(8)
+	ck1.custom_gate("ID",opMat)
+	ck1.ID([2,3])
+	ck1.draw()
+
+	print("ck2 -----")
+	ck2 = QCkt(8)
+	ck2.custom_gate("ID",opMat)
+	ck2.H(5)
+	ck2.draw()
+
+	print("ck3 -----")
+	ck3 = ck1.append(ck2)
+	ck3.ID([6,7])
+	ck3.draw()
+
+	print("ck  -----")
+	ck = ck3.realign(8,8,[5,4,7,6,3,2,1,0])
+	ck.ID([4,5])
 	ck.draw()
 
 	bk = Backend()
