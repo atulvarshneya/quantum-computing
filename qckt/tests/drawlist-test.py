@@ -4,7 +4,6 @@ import qckt
 
 # test 01
 print("================================================")
-print("Test 01 ========================================")
 print("Composing circuits from subcircuits ============")
 print("================================================")
 print()
@@ -48,3 +47,15 @@ qckt5 = (qckt1.append(qckt2)).append(qckt3)
 qckt5.draw()
 qckt5.list()
 
+#### RND, ROT and Rk gates draw and list
+print()
+print("================================================")
+print("RND, ROT, Rk gates draw and list test===========")
+print("================================================")
+
+ck = qckt.QCkt(4)
+ck.RND(0)
+ck.ROT(3.14/4,1)
+ck.Rk(3,2)
+ck.draw()
+ck.list()
