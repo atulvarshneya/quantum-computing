@@ -52,7 +52,7 @@ QCkt
 		Creates a potentially larger new circuit from the current circuit with a changed order of the qubits
 		Returns the new circuit
 		Parameters newnq and newnc are the sizesof the new (larger or equal sized) circuit
-		inpqubits is a vector that specifies how the old circuit's qubits be replaced in teh new circuit
+		inpqubits is a vector that specifies how the old circuit's qubits be replaced in the new circuit
 		As an example see the circuits below --
 		say,                    current circuit                   new circuit
 		               q000 ----[H]-[.]----------     q000 --------------------------
@@ -64,6 +64,10 @@ QCkt
 		                                              q003 ----[H]-[.]---------------
 		For this realignment, this vector basically answers the questions [q002 -> q?, q001 -> q?, q000 -> q?]
 		so, the vector should be [1,2,3], and the realign call should be realign(4,4,[1,2,3])
+
+		In much simpler terms, consider the current circuit as a large gate, and inpqubits vector basically is 
+		the way you would use that gate. E.g., CX is defined as MSB = control, LSB as target, but if you 
+		want qubit 2 be control and qubit 4 be target, you would say CX(2,4), i.e., inpqubits = [2,4]
 
 	append(othercircuit)
 		Append a circuit to the current circuit.
