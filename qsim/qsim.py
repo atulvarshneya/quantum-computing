@@ -218,7 +218,7 @@ class QSimulator:
 
 	def qreport(self, header="State", state=None, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
-		if state == None:
+		if state is None:
 			state = self.sys_state
 		print()
 		print(header)
@@ -586,7 +586,7 @@ class QSimulator:
 		return [name,res]
 
 	def qinverse(self,op,name=None):
-		if name == None:
+		if name is None:
 			name = "INV-"+op[0]
 		mat = deepcopy(op[1])
 		invmat = np.conjugate(np.transpose(mat))
