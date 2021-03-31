@@ -10,7 +10,7 @@ class QCkt:
 	def __init__(self, nqubits, nclbits=None, name="QCkt"):
 		# nq - number of quantum bits
 		# nc - number of classical bits
-		if (nclbits == None):
+		if (nclbits is None):
 			nclbits = nqubits
 		self.nqubits = nqubits
 		self.nclbits = nclbits
@@ -161,7 +161,7 @@ class _StateVector:
 		return svec_str
 
 	def verbose(self,v):
-		if v == True:
+		if v is True:
 			self.verbosity = True
 		else:
 			self.verbosity = False
