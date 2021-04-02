@@ -42,18 +42,18 @@ for i in range(2):
 	addckt.CX(a[i],s[i])
 	addckt.CX(b[i],s[i])
 	addckt.CX(c[i],s[i])
-	addckt.T(a[i],b[i],c[i+1])
+	addckt.CCX(a[i],b[i],c[i+1])
 	addckt.X(s[i])
-	addckt.T(s[i],c[i],c[i+1])
+	addckt.CCX(s[i],c[i],c[i+1])
 	addckt.X(s[i])
 addckt.CX(c[2],s[2])
 
 # Clean up the junk bits
 for i in reversed(range(2)):
 	addckt.X(s[i])
-	addckt.T(s[i],c[i],c[i+1])
+	addckt.CCX(s[i],c[i],c[i+1])
 	addckt.X(s[i])
-	addckt.T(a[i],b[i],c[i+1])
+	addckt.CCX(a[i],b[i],c[i+1])
 # addckt.M([0,1,2],[0,1,2])
 
 addckt.draw()

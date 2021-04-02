@@ -8,7 +8,7 @@ ckt1.X(0)
 ckt1.CX(0,1)
 ckt1.H(1)
 ckt1.X(2)
-ckt1.T(2,0,1)
+ckt1.CCX(2,0,1)
 ckt1.Border()
 
 ckt2 = qk.QCkt(6,6)
@@ -19,7 +19,7 @@ ckt2.Border()
 ckt1 = ckt1.realign(6,6,[0,1,2,3])
 
 ckt3 = ckt1.append(ckt2)
-ckt3.T(4,5,3)
+ckt3.CCX(4,5,3)
 ckt3.M([3,4,5],[3,4,5])
 
 ckt3.draw()

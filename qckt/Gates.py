@@ -139,12 +139,12 @@ class CX(QGate):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-class T(QGate):
+class CCX(QGate):
 
 	def __init__(self, control1, control2, target):
 		super().__init__()
 		self.qbits = [control1, control2, target]
-		self.name = "T"
+		self.name = "CCX"
 		self.opMatrix = self.CTL(self.CTL(np.matrix([[0,1],[1,0]],dtype=complex)))
 
 	def addtocanvas(self,canvas):
@@ -287,12 +287,12 @@ class RND(QGate):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-class UROT(QGate):
+class P(QGate):
 	def __init__(self, rotphi, qbit):
 		super().__init__()
 		self.qbits = [qbit]
 		self.gateparams = [rotphi]
-		self.name = "UROT"
+		self.name = "P"
 
 		phi = self.gateparams[0]
 		cphi = np.cos(phi)
@@ -300,19 +300,19 @@ class UROT(QGate):
 		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"UROT")
+		canvas._add_simple(self.qbits[0],"P")
 		return self
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-class CROT(QGate):
+class CP(QGate):
 	def __init__(self, rotphi, control, target):
 		super().__init__()
 		self.qbits = [control, target]
 		self.gateparams = [rotphi]
-		self.name = "CROT"
+		self.name = "CP"
 
 		phi = self.gateparams[0]
 		cphi = np.cos(phi)
@@ -320,19 +320,19 @@ class CROT(QGate):
 		self.opMatrix = self.CTL(np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex))
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,[".","UROT"])
+		canvas._add_connected(self.qbits,[".","P"])
 		return self
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-class Rk(QGate):
+class UROTk(QGate):
 	def __init__(self, rotk, qbit):
 		super().__init__()
 		self.qbits = [qbit]
 		self.gateparams = [rotk]
-		self.name = "Rk"
+		self.name = "UROTk"
 
 		k = self.gateparams[0]
 		ck = np.cos(2*np.pi/(2**k))
@@ -340,14 +340,35 @@ class Rk(QGate):
 		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Rk")
+		canvas._add_simple(self.qbits[0],"UROTk")
 		return self
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-GatesList = [X,Y,Z,H,CX,T,SWAP,M,Border,QFT,RND,UROT,CROT,Rk]
+class CROTk(QGate):
+	def __init__(self, rotk, qbits):
+		super().__init__()
+		self.qbits = qbits
+		self.gateparams = [rotk]
+		self.name = "CROTk"
+
+		k = self.gateparams[0]
+		ck = np.cos(2*np.pi/(2**k))
+		sk = np.sin(2*np.pi/(2**k))
+		self.opMatrix = self.CTL(np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex))
+
+	def addtocanvas(self,canvas):
+		# canvas._add_simple(self.qbits,[".","UROTk"])
+		canvas._add_connected(self.qbits,[".","UROTk"])
+		return self
+
+	# INHERIT def realign(self,newseq):
+	# INHERIT def exec(self,qc):
+	# INHERIT def __str__(self):
+
+GatesList = [X,Y,Z,H,CX,CCX,SWAP,M,Border,QFT,RND,P,CP,UROTk,CROTk]
 
 ###################################################
 ### Support for Custom Gates
