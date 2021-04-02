@@ -30,6 +30,63 @@ class Canvas:
 		self.paper.append(col)
 		return self
 
+	def _add_simple(self,qbit,symbol):
+		ncols = len(symbol) + 2
+		col = self._get1col(ncols)
+		col[2*qbit] = "[" + symbol + "]"
+		self._append(col)
+		self._extend()
+		return self
+
+	def _add_multiple(self,qbits,symbol):
+		ncols = len(symbol) + 2
+		col = self._get1col(ncols)
+		for i in range(len(qbits)):
+			col[2*qbits[i]] = "[" + symbol + "]"
+		self._append(col)
+		self._extend()
+		return self
+
+	def _add_connected(self,qbits,symbols):
+		ncols = max([len(e) + 2 for e in symbols])
+		post = (ncols-1) // 2
+		pre = (ncols-1) - post
+		col = self._get1col(ncols)
+		st = min(qbits)
+		en = max(qbits)
+		for i in range(st,en):
+			col[i*2] = "-"*pre + "|" + "-"*post
+			col[i*2+1] = " "*pre + "|" + " "*post
+		for i in range(len(qbits)):
+			padding = ncols - len(symbols[i]) - 2
+			post = padding // 2
+			pre = padding - post
+			col[2*qbits[i]] = "-"*pre + "[" + symbols[i] + "]" + "-"*post
+		self._append(col)
+		self._extend()
+		return self
+
+	def _add_boxed(self,qbits,symbol):
+		ncols =  len(symbol) + 4 # 4 to make space for "[", " M"/" L", "]"
+		col = self._get1col(ncols)
+		st = min(qbits)
+		en = max(qbits)
+		for i in range(st,en):
+			col[i*2] = "|" + "-"*(ncols - 2) + "|"
+			col[i*2+1] = "|" + " "*(ncols - 2) + "|"
+		lsb = qbits[-1]
+		msb = qbits[0]
+		for q in qbits:
+			if q == msb:
+				col[2*msb] = "[" + symbol + " M]"
+			elif q == lsb:
+				col[2*lsb] = "[" + symbol + " L]"
+			else:
+				col[2*q] = "[" + symbol + "  ]"
+		self._append(col)
+		self._extend()
+		return self
+
 	def _paint(self):
 		nrows = len(self.paper)
 		ncols = len(self.paper[0])
@@ -38,7 +95,7 @@ class Canvas:
 				print(self.paper[j][i], end='')
 			print()
 
-	def append(self,col):
+	def _append(self,col):
 		list = self.paper
 		list.append(col)
 		return self

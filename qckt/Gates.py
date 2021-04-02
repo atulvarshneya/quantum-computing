@@ -15,6 +15,7 @@ class QGate:
 	def __init__(self):
 		self.qbits = None
 		self.cbits = None
+		self.gateparams = []
 		self.name = None
 		self.opMatrix = None
 
@@ -36,7 +37,20 @@ class QGate:
 		qc.qgate([self.name,self.opMatrix], self.qbits)
 
 	def __str__(self):
-		return self.name+":"+str(self.qbits)
+		stringify = self.name
+		for p in self.gateparams:
+			if type(p) is int:
+				pstr = f'{p:d}'
+			elif type(p) is float:
+				pstr = f'{p:.4f}'
+			else:
+				pstr = str(p)
+			stringify = stringify+"|"+pstr
+		stringify = stringify+":"+str(self.qbits)
+		if self.cbits is not None:
+			stringify = stringify + ":"+str(self.cbits)
+		return stringify
+		# return self.name+":"+str(self.qbits)
 
 	## Utility function to add control bit
 	def CTL(self,opMatrix):
@@ -56,10 +70,7 @@ class X(QGate):
 		self.opMatrix = np.matrix([[0,1],[1,0]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		col[self.qbits[0]*2] = "[X]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"X")
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -74,10 +85,7 @@ class Y(QGate):
 		self.opMatrix = np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		col[self.qbits[0]*2] = "[Y]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"Y")
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -92,10 +100,7 @@ class Z(QGate):
 		self.opMatrix = np.matrix([[1,0],[0,-1]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		col[self.qbits[0]*2] = "[Z]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"Z")
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -111,10 +116,7 @@ class H(QGate):
 		self.opMatrix = np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		col[self.qbits[0]*2] = "[H]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"H")
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -130,16 +132,7 @@ class CX(QGate):
 		self.opMatrix = self.CTL(np.matrix([[0,1],[1,0]],dtype=complex))
 
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		st = min(self.qbits)
-		en = max(self.qbits)
-		for i in range(st,en):
-			col[i*2] = "-|-"
-			col[i*2+1] = " | "
-		col[self.qbits[0]*2] = "[.]"
-		col[self.qbits[1]*2] = "[X]"        
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_connected(self.qbits,[".","X"])
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -155,17 +148,7 @@ class T(QGate):
 		self.opMatrix = self.CTL(self.CTL(np.matrix([[0,1],[1,0]],dtype=complex)))
 
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		st = min(self.qbits)
-		en = max(self.qbits)
-		for i in range(st,en):
-			col[i*2] = "-|-"
-			col[i*2+1] = " | "
-		col[self.qbits[0]*2] = "[.]"
-		col[self.qbits[1]*2] = "[.]"        
-		col[self.qbits[2]*2] = "[X]"        
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_connected(self.qbits,[".",".","X"])
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -181,16 +164,7 @@ class SWAP(QGate):
 		self.opMatrix = np.matrix([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(3)
-		st = min(self.qbits)
-		en = max(self.qbits)
-		for i in range(st,en):
-			col[i*2] = "-|-"
-			col[i*2+1] = " | "
-		col[self.qbits[0]*2] = "[*]"
-		col[self.qbits[1]*2] = "[*]"        
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_connected(self.qbits,["*","*"])
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -220,25 +194,23 @@ class M(QGate):
 				col[2*i+1] = " | "
 			col[qb*2] = "[M]"
 			col[en*2] = "=v="
-			canvas.append(col)
+			canvas._append(col)
 			canvas._extend()
 		return self
 
 	# INHERIT realign(self,newseq):
 	# INHERIT def realign(self,newseq):
+	# INHERIT def __str__(self):
 
 	def exec(self,qc):
 		# print("exec qc.qmeasure(",str(self),")")
 		qc.qmeasure(self.qbits,cbit_list=self.cbits)
 
-	# OVERRIDE __str__(self) - additionally include cbits
-	def __str__(self):
-		return "M:"+str(self.qbits)+":"+str(self.cbits)
-
 class Border(QGate):
 
 	def __init__(self):
 		super().__init__()
+		self.qbits = []
 		self.name = "BORDER"
 
 	def addtocanvas(self,canvas):
@@ -248,13 +220,11 @@ class Border(QGate):
 		for i in range(en):
 			col[2*i] = "#"
 			col[2*i+1] = "#"
-		canvas.append(col)
+		canvas._append(col)
 		canvas._extend()
 		return self
 
-	# OVERRIDE realign(self,newseq) - no realignment
-	def realign(self,newseq):
-		return self
+	# INHERIT realign(self,newseq):
 
 	# OVERRIDE exec(self,qc) - nothing to execute
 	def exec(self,qc):
@@ -286,18 +256,7 @@ class QFT(QGate):
 		self.opMatrix = np.matrix(opMat,dtype=complex) / np.sqrt(N)
 
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(7)
-		st = min(self.qbits)
-		en = max(self.qbits)
-		for i in range(st,en):
-			col[i*2] = "|-----|"
-			col[i*2+1] = "|     |"
-		for q in self.qbits:
-			col[q*2] = "[QFT  ]"
-		col[self.qbits[0]*2] = "[QFT M]"
-		col[self.qbits[-1]*2] = "[QFT L]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_boxed(self.qbits,"QFT")
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -321,67 +280,74 @@ class RND(QGate):
 		self.OpMatrix = np.matrix([[complex(-re1,-im1),complex(re2,im2)],[complex(re2,im2),complex(re1,im1)]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(5)
-		col[self.qbits[0]*2] = "[RND]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"RND")
 		return self
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-class ROT(QGate):
-	def __init__(self, phi, qbit):
+class UROT(QGate):
+	def __init__(self, rotphi, qbit):
 		super().__init__()
 		self.qbits = [qbit]
-		self.phi = phi
-		self.name = "ROT"
+		self.gateparams = [rotphi]
+		self.name = "UROT"
 
-		cphi = np.cos(self.phi)
-		sphi = np.sin(self.phi)
+		phi = self.gateparams[0]
+		cphi = np.cos(phi)
+		sphi = np.sin(phi)
 		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(5)
-		col[self.qbits[0]*2] = "[ROT]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"UROT")
 		return self
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
+	# INHERIT def __str__(self):
 
-	# OVERRIDE def __str__(self): additional gate config parameter
-	def __str__(self):
-		return "ROT|"+"{:.4f}".format(self.phi)+":"+str(self.qbits)
+class CROT(QGate):
+	def __init__(self, rotphi, control, target):
+		super().__init__()
+		self.qbits = [control, target]
+		self.gateparams = [rotphi]
+		self.name = "CROT"
+
+		phi = self.gateparams[0]
+		cphi = np.cos(phi)
+		sphi = np.sin(phi)
+		self.opMatrix = self.CTL(np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex))
+
+	def addtocanvas(self,canvas):
+		canvas._add_connected(self.qbits,[".","UROT"])
+		return self
+
+	# INHERIT def realign(self,newseq):
+	# INHERIT def exec(self,qc):
+	# INHERIT def __str__(self):
 
 class Rk(QGate):
-	def __init__(self, k, qbit):
+	def __init__(self, rotk, qbit):
 		super().__init__()
 		self.qbits = [qbit]
-		self.k = k
+		self.gateparams = [rotk]
 		self.name = "Rk"
 
+		k = self.gateparams[0]
 		ck = np.cos(2*np.pi/(2**k))
 		sk = np.sin(2*np.pi/(2**k))
 		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		col = canvas._get1col(4)
-		col[self.qbits[0]*2] = "[Rk]"
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_simple(self.qbits[0],"Rk")
 		return self
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
+	# INHERIT def __str__(self):
 
-	# OVERRIDE def __str__(self): additional gate config parameter
-	def __str__(self):
-		return "Rk|"+"{:d}".format(self.k)+":"+str(self.qbits)
-
-GatesList = [X,Y,Z,H,CX,T,SWAP,M,Border,QFT,RND,ROT,Rk]
+GatesList = [X,Y,Z,H,CX,T,SWAP,M,Border,QFT,RND,UROT,CROT,Rk]
 
 ###################################################
 ### Support for Custom Gates
@@ -408,26 +374,7 @@ class CustomGate(QGate):
 		self.qbits = qbits
 
 	def addtocanvas(self,canvas):
-		ncols = len(self.name) + 2 # 2 for '[', ']'
-		usegname = self.name
-		if (len(self.qbits) > 1):
-			ncols += 2 # for ' M' and ' L' to indicate MSB, LSB
-			usegname = self.name+"  "
-			usegnameM = self.name+" M"
-			usegnameL = self.name+" L"
-		col = canvas._get1col(ncols)
-		st = min(self.qbits)
-		en = max(self.qbits)
-		for i in range(st,en):
-			col[i*2] = "|"+ "-"*(ncols-2)+"|"
-			col[i*2+1] = "|"+ " "*(ncols-2)+"|"
-		for q in self.qbits:
-			col[q*2] = "["+usegname+"]"
-		if len(self.qbits) > 1:
-			col[self.qbits[0]*2] = '['+usegnameM+']'
-			col[self.qbits[-1]*2] = '['+usegnameL+']'
-		canvas.append(col)
-		canvas._extend()
+		canvas._add_boxed(self.qbits,self.name)
 		return self
 
 	# INHERIT def realign(self,newseq):
