@@ -88,10 +88,10 @@ class Canvas:
 		return self
 
 	def _paint(self):
-		nrows = len(self.paper)
-		ncols = len(self.paper[0])
-		for i in range(ncols):
-			for j in range(nrows):
+		ncols = len(self.paper)
+		nrows = len(self.paper[0])
+		for i in range(nrows):
+			for j in range(ncols):
 				print(self.paper[j][i], end='')
 			print()
 
