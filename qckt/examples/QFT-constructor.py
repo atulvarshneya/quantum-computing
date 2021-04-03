@@ -45,7 +45,7 @@ ck = qckt.QCkt(nqubits)
 for i in range(nqubits // 2):
 	ck.X(i)
 ck.Border()
-ck.QFT([5,4,3,2,1,0])
+ck.QFT(*[5,4,3,2,1,0])
 ck.Border()
 ck.draw()
 ck.list()

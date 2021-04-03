@@ -23,7 +23,10 @@ class QGate:
 		newseq = []
 		nqbits = len(nseq)
 		for i in oseq:
-			newseq.append(nseq[nqbits-i-1])
+			if type(i) is list:
+				newseq.append(self._reorderlist(i,nseq))
+			else:
+				newseq.append(nseq[nqbits-i-1])
 		return newseq
 
 	def realign(self,newseq):
@@ -34,7 +37,11 @@ class QGate:
 
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
-		qc.qgate([self.name,self.opMatrix], self.qbits)
+		if type(self.qbits[0]) is list and len(self.qbits) == 1:
+			for q in self.qbits[0]:
+				qc.qgate([self.name,self.opMatrix], [q])
+		else:
+			qc.qgate([self.name,self.opMatrix], self.qbits)
 
 	def __str__(self):
 		stringify = self.name
@@ -125,14 +132,16 @@ class H(QGate):
 
 class CX(QGate):
 
-	def __init__(self, control, target):
+	def __init__(self, *allqbits):
 		super().__init__()
-		self.qbits = [control, target]
+		self.qbits = list(allqbits)
 		self.name = "CX"
-		self.opMatrix = self.CTL(np.matrix([[0,1],[1,0]],dtype=complex))
+		self.opMatrix = np.matrix([[0,1],[1,0]],dtype=complex)
+		for i in range(len(self.qbits)-1):
+			self.opMatrix = self.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,[".","X"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["X"])
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -237,9 +246,12 @@ class Border(QGate):
 
 class QFT(QGate):
 
-	def __init__(self, qbits):
+	def __init__(self, *allqbits):
 		super().__init__()
-		self.qbits = qbits
+		if type(allqbits[0]) is list:
+			self.qbits = allqbits[0]
+		else:
+			self.qbits = list(allqbits)
 		self.name = "QFT"
 
 		N = 2**len(self.qbits) # number of rows and cols
@@ -308,19 +320,22 @@ class P(QGate):
 	# INHERIT def __str__(self):
 
 class CP(QGate):
-	def __init__(self, rotphi, control, target):
+
+	def __init__(self, rotphi, *allqbits):
 		super().__init__()
-		self.qbits = [control, target]
+		self.qbits = list(allqbits)
 		self.gateparams = [rotphi]
 		self.name = "CP"
 
 		phi = self.gateparams[0]
 		cphi = np.cos(phi)
 		sphi = np.sin(phi)
-		self.opMatrix = self.CTL(np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex))
+		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
+		for q in range(len(self.qbits)-1):
+			self.opMatrix = self.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,[".","P"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["P"])
 		return self
 
 	# INHERIT def realign(self,newseq):
@@ -348,20 +363,22 @@ class UROTk(QGate):
 	# INHERIT def __str__(self):
 
 class CROTk(QGate):
-	def __init__(self, rotk, qbits):
+	def __init__(self, rotk, *allqbits):
 		super().__init__()
-		self.qbits = qbits
+		self.qbits = list(allqbits)
 		self.gateparams = [rotk]
 		self.name = "CROTk"
 
 		k = self.gateparams[0]
 		ck = np.cos(2*np.pi/(2**k))
 		sk = np.sin(2*np.pi/(2**k))
-		self.opMatrix = self.CTL(np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex))
+		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
+		for i in range(len(self.qbits)-1):
+			self.opMatrix = self.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
 		# canvas._add_simple(self.qbits,[".","UROTk"])
-		canvas._add_connected(self.qbits,[".","UROTk"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["UROTk"])
 		return self
 
 	# INHERIT def realign(self,newseq):

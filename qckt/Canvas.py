@@ -31,12 +31,15 @@ class Canvas:
 		return self
 
 	def _add_simple(self,qbit,symbol):
-		ncols = len(symbol) + 2
-		col = self._get1col(ncols)
-		col[2*qbit] = "[" + symbol + "]"
-		self._append(col)
-		self._extend()
-		return self
+		if type(qbit) is list:
+			return self._add_multiple(qbit,symbol)
+		else:
+			ncols = len(symbol) + 2
+			col = self._get1col(ncols)
+			col[2*qbit] = "[" + symbol + "]"
+			self._append(col)
+			self._extend()
+			return self
 
 	def _add_multiple(self,qbits,symbol):
 		ncols = len(symbol) + 2
