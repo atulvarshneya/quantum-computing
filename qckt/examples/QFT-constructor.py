@@ -26,20 +26,29 @@ def qft(circuit, n):
     swap_registers(circuit, n)
     return circuit
 
-ck = qckt.QCkt(4)
-ck.X(0)
-ck.X(2)
-qft(ck,4)
+nqubits = 6
+
+ck = qckt.QCkt(nqubits)
+for i in range(nqubits // 2):
+	ck.X(i)
+ck.Border()
+qft(ck,nqubits)
+ck.Border()
 ck.draw()
+ck.list()
 bk = qckt.Backend()
 bk.run(ck)
 svec1 = bk.get_svec()
 print(svec1)
 
-ck = qckt.QCkt(4)
-ck.X(0)
-ck.X(2)
-ck.QFT([3,2,1,0])
+ck = qckt.QCkt(nqubits)
+for i in range(nqubits // 2):
+	ck.X(i)
+ck.Border()
+ck.QFT([5,4,3,2,1,0])
+ck.Border()
+ck.draw()
+ck.list()
 bk = qckt.Backend()
 bk.run(ck)
 svec2 = bk.get_svec()
@@ -57,4 +66,7 @@ else:
 		if abs(amp1.real - amp2.real) > maxerr or abs(amp1.imag - amp2.imag) > maxerr :
 			print(f"i = {i:} is different", svec1.value[i][0], svec2.value[i][0])
 			isequal = False
-print(f"isequal = {isequal:}")
+if isequal:
+	print("QFT and composed-QFT circuit are equivalent")
+else:
+	print("ERROR: QFT and composed-QFT circuit are significantly different")
