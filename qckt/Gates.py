@@ -281,6 +281,37 @@ class Border(QGate):
 	def __str__(self):
 		return "BORDER"
 
+class Probe(QGate):
+
+	def __init__(self, header="Probe"):
+		super().__init__()
+		self.qbits = []
+		self.header = "PROBE: "+header
+		self.name = "Probe"
+
+	def addtocanvas(self,canvas):
+		canvas._extend()
+		col = canvas._get1col(1)
+		en = len(col)//2
+		for i in range(en):
+			col[2*i] = "v"
+			col[2*i+1] = "V"
+		canvas._append(col)
+		canvas._extend()
+		return self
+
+	# INHERIT realign(self,newseq):
+
+	# OVERRIDE exec(self,qc) - nothing to execute
+	def exec(self,qc):
+		# print("exec qc.qgate(",str(self),")")
+		qc.qreport(header=self.header)
+
+	# OVERRIDE __str__(self) - no [qbits]
+	def __str__(self):
+		return "BORDER"
+
+
 class QFT(QGate):
 
 	def __init__(self, *allqbits):
@@ -422,7 +453,7 @@ class CROTk(QGate):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,QFT,RND,P,CP,UROTk,CROTk]
+GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,Probe,QFT,RND,P,CP,UROTk,CROTk]
 
 ###################################################
 ### Support for Custom Gates
