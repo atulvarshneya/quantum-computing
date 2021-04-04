@@ -1,6 +1,18 @@
+COMING SOON
+
+Watch this space.
+
 # Reference
 
-A note about MSB - LSB ordering:
+Convention for arguments for quantum gates API
+---
+* All single qubit gates, such as, X, Y, Z, H, P, UROTk, RND, accept a list of qubits as argument, e.g., circuit.H([3,2,1]) applies hadamard gate to each of these qubits. As a shortcut a single integer can also be provided as input argument to apply the gate to that sigle qubit.
+* parameterized quantum gates such as phase-rotation gate P, takes teh frst argument the phase value, and teh second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., circuit.P(numpy.pi/4,[3,2,1,0]), circuit.P(numpy.pi,3), circuit.UROTk(4,[7,6,5,4])
+* All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the last one is the target qubit and all other preceding ones are control qubits. E.g., circuit.CX(ctrl1, ctrl2, ctrl3, target), circuit.CP(numpy.pi/8,control, target).
+* Gates that inherently take variable number of qubits as arguments, such as QFT, inputs to those are provided as multiple input arguments, e.g., circuit.QFT(7,6,5,4,3,2,1,0). As a shortcut, QFT also accepts a list of qubits as the one argument, e.g., circuit.QFT([i for i in range(8)])
+
+
+A note about MSB - LSB ordering
 ---
 	qckt as well as qsim follow the convention that when providing arguments to any of the functions 
 	the list argument representing qubits or clbits is ordered as [MSB, ...., LSB].
