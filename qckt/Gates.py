@@ -306,11 +306,21 @@ class Probe(QGate):
 	# OVERRIDE exec(self,qc) - nothing to execute
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
-		qc.qreport(header=self.header, probestates=self.probestates)
+		nqbits = qc.qsize()
+		(creglist, sveclist) = qc.qsnapshot()
+		print(self.header)
+		for i in range(len(sveclist)):
+			if self.probestates is False or i in self.probestates:
+				print(("{0:0"+str(nqbits)+"b}    {1:.8f}").format(i, sveclist[i].item(0)))
+		cregsz = len(creglist)
+		print("CREGISTER: ",end="")
+		for i in range(cregsz):
+			print("{:01b}".format(creglist[i]),end="")
+		print()
 
 	# OVERRIDE __str__(self) - no [qbits]
 	def __str__(self):
-		return "BORDER"
+		return "PROBE"
 
 
 class QFT(QGate):
