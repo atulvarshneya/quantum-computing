@@ -216,10 +216,12 @@ class QSimulator:
 		return meas_val
 
 
-	def qreport(self, header="State", state=None, visualize=False):
+	def qreport(self, header="State", state=None, probestates=False, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		if state is None:
 			state = self.sys_state
+		if probestates is not False:
+			header = header + " - Probestates: "+str(probestates)
 		print()
 		print(header)
 		for i in range(len(state)):
@@ -239,7 +241,8 @@ class QSimulator:
 								barstr = barstr + "."
 				ststr = ("{:0"+str(self.nqbits)+"b}    ").format(i)
 				ampstr = "{:.8f}".format(np.around(state[i].item(0),8))
-				print(ststr + ampstr + barstr)
+				if probestates is False or i in probestates:
+					print(ststr + ampstr + barstr)
 		print("CREGISTER: ", end="")
 		for i in range(self.ncbits): # cregister[0] is MSB
 			print("{0:01b}".format(self.cregister[i]),end="")

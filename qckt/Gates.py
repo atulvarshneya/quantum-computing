@@ -283,10 +283,11 @@ class Border(QGate):
 
 class Probe(QGate):
 
-	def __init__(self, header="Probe"):
+	def __init__(self, header="Probe",probestates=False):
 		super().__init__()
 		self.qbits = []
 		self.header = "PROBE: "+header
+		self.probestates = probestates
 		self.name = "Probe"
 
 	def addtocanvas(self,canvas):
@@ -305,7 +306,7 @@ class Probe(QGate):
 	# OVERRIDE exec(self,qc) - nothing to execute
 	def exec(self,qc):
 		# print("exec qc.qgate(",str(self),")")
-		qc.qreport(header=self.header)
+		qc.qreport(header=self.header, probestates=self.probestates)
 
 	# OVERRIDE __str__(self) - no [qbits]
 	def __str__(self):
