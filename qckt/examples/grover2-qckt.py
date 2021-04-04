@@ -54,8 +54,9 @@ for i in range(numitrs):
 fullckt.M([i for i in range(nqubits)])
 # fullckt.draw()
 
+nattempts = 5
 stats = {}
-for _ in range(5):
+for _ in range(nattempts):
 	bk = qckt.Backend()
 	bk.run(fullckt)
 	creg = bk.get_creg()
@@ -73,4 +74,4 @@ for k in stats.keys():
 	if stats[k] > maxcount:
 		maxkey = k
 		maxcount = stats[k]
-print("Result = {0:s}, with {1:d} hits.".format(maxkey,maxcount))
+print("Result = {0:s}, with {1:d} hits in {2:d}.".format(maxkey,maxcount,nattempts))

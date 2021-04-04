@@ -68,13 +68,13 @@ init_ckt.H(nqbits-1)
 
 fullckt = qckt.QCkt(nqbits)
 fullckt = fullckt.append(init_ckt)
-# fullckt.Probe("after initialization")
+# fullckt.Probe("after initialization", probestates=[marker])
 numitrs = int((np.pi/4.0) * (2.0**((nqbits-1.0)/2.0))) # optimal # iter, less or more dont work
 print("number of Invert-Amplify iterations = ",numitrs)
 for itr in range(numitrs):
 	fullckt = fullckt.append(uf_ckt)
 	fullckt = fullckt.append(amp_ckt)
-	# fullckt.Probe("after iteration "+str(itr+1))
+	# fullckt.Probe("after iteration "+str(itr+1), probestates=[marker])
 fullckt.M([i for i in range(nqbits-1)])
 fullckt.draw()
 
