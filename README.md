@@ -53,6 +53,6 @@ UTILITIES
 -------------------
 A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates into a single gate, check for unitarity, inverse.
 
-Easy to follow documentation with tutorial introduction. See qsim-doc.txt (https://raw.githubusercontent.com/atulvarshneya/quantum-computing/master/qsim-doc.txt).
+Easy to follow documentation with tutorial introduction - see qsim/README.md and qckt/README.md.
 
 Code for [automated] regression tests also serves as examples to quickly learn qsim.
