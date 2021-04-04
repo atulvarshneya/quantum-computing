@@ -1,7 +1,3 @@
-COMING SOON
-
-Watch this space.
-
 # Reference
 
 Convention for arguments for quantum gates API
@@ -14,13 +10,9 @@ Convention for arguments for quantum gates API
 
 A note about MSB - LSB ordering
 ---
-	qckt as well as qsim follow the convention that when providing arguments to any of the functions 
-	the list argument representing qubits or clbits is ordered as [MSB, ...., LSB].
-	Yes, :-), the [0] element is MSB!
+qckt as well as qsim follow the convention that when providing arguments to any of the functions the list argument representing qubits or clbits is ordered as [MSB, ...., LSB]. Yes, :-), the [0] element is MSB!
 
-	Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target),
-	or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT 
-	it very much *does* matter.
+Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target), or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT it very much *does* matter.
 
 API Documentation
 ---
