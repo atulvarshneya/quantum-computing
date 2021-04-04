@@ -148,10 +148,11 @@ Cleary, the computations can continue after the measurement operations. Just tha
 
 If qtrace is True, the resulting state is printed out.
 
-2.5	qreport(state=None, header="State")
+2.5	qreport(state=None, header="State", probestates=False)
 --------
 Prints the current state of the system. if state argument is provided with a column numpy.matrix, it prints that state instead.
 The argument header provides the text to be printed above the state information.
+The argument probestates is used to limit the dumping of states information, it gets limited to only the states listed, e.g., probestates=[0,1,2,3]
 
 2.6	st = qstate()
 --------
