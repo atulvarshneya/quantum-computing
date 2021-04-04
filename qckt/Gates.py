@@ -148,6 +148,43 @@ class CX(QGate):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
+class CY(QGate):
+
+	def __init__(self, *allqbits):
+		super().__init__()
+		self.qbits = list(allqbits)
+		self.name = "CY"
+		self.opMatrix = np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)
+		for i in range(len(self.qbits)-1):
+			self.opMatrix = self.CTL(self.opMatrix)
+
+	def addtocanvas(self,canvas):
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Y"])
+		return self
+
+	# INHERIT def realign(self,newseq):
+	# INHERIT def exec(self,qc):
+	# INHERIT def __str__(self):
+
+class CZ(QGate):
+
+	def __init__(self, *allqbits):
+		super().__init__()
+		self.qbits = list(allqbits)
+		self.name = "CZ"
+		self.opMatrix = np.matrix([[1,0],[0,-1]],dtype=complex)
+		for i in range(len(self.qbits)-1):
+			self.opMatrix = self.CTL(self.opMatrix)
+
+	def addtocanvas(self,canvas):
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Z"])
+		return self
+
+	# INHERIT def realign(self,newseq):
+	# INHERIT def exec(self,qc):
+	# INHERIT def __str__(self):
+
+
 class CCX(QGate):
 
 	def __init__(self, control1, control2, target):
@@ -385,7 +422,7 @@ class CROTk(QGate):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-GatesList = [X,Y,Z,H,CX,CCX,SWAP,M,Border,QFT,RND,P,CP,UROTk,CROTk]
+GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,QFT,RND,P,CP,UROTk,CROTk]
 
 ###################################################
 ### Support for Custom Gates

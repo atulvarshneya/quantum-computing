@@ -13,6 +13,27 @@ ck.draw()
 bk = qckt.Backend()
 bk.run(ck,qtrace=True)
 
+# CY
+print("CY ---------------------------------------")
+ck = qckt.QCkt(8)
+ck.CY(2,1,0)
+ck.X([4,5,6])
+ck.CY(6,5,4,3)
+ck.list()
+ck.draw()
+bk = qckt.Backend()
+bk.run(ck,qtrace=True)
+
+# CZ
+print("CZ ---------------------------------------")
+ck = qckt.QCkt(8)
+ck.CZ(2,1,0)
+ck.X([3,4,5,6])
+ck.CZ(6,5,4,3)
+ck.list()
+ck.draw()
+bk = qckt.Backend()
+bk.run(ck,qtrace=True)
 
 # CP
 print("CP ---------------------------------------")
