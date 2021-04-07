@@ -6,8 +6,8 @@ import qsim
 import numpy as np
 
 class QCkt:
-	
-	def __init__(self, nqubits, nclbits=None, name="QCkt"):
+
+	def __init__(self, nqubits, nclbits=None, name=None):
 		# nq - number of quantum bits
 		# nc - number of classical bits
 		if (nclbits is None):
@@ -114,6 +114,10 @@ class Backend():
 		# fetch the last value of the cregister, state_vector
 		(creg, svec) = qc.qsnapshot()
 		(self.result.cregister.value, self.result.state_vector.value) = (creg,svec.tolist())
+		self.result.cregister.intvalue = 0
+		for i in range(len(self.result.cregister.value)):
+			self.result.cregister.intvalue = 2 * self.result.cregister.intvalue
+			self.result.cregister.intvalue += self.result.cregister.value[i]
 
 		return self
 
@@ -128,6 +132,7 @@ class _Cregister:
 
 	def __init__(self):
 		self.value = None
+		self.intvalue = None
 
 	def __str__(self):
 		creg_str = ""

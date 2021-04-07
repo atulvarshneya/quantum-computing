@@ -91,6 +91,8 @@ class Canvas:
 		return self
 
 	def _paint(self):
+		if self.circuit.name is not None:
+			print(self.circuit.name)
 		ncols = len(self.paper)
 		nrows = len(self.paper[0])
 		for i in range(nrows):
