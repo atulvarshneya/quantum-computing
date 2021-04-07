@@ -283,7 +283,7 @@ class Border(QGate):
 
 class Probe(QGate):
 
-	def __init__(self, header="Probe",probestates=False):
+	def __init__(self, header="",probestates=None):
 		super().__init__()
 		self.qbits = []
 		self.header = "PROBE: "+header
@@ -310,7 +310,8 @@ class Probe(QGate):
 		(creglist, sveclist) = qc.qsnapshot()
 		print(self.header)
 		for i in range(len(sveclist)):
-			if self.probestates is False or i in self.probestates:
+			if (self.probestates is None and abs(sveclist[i].item(0)) > 0.0) \
+					or (self.probestates is not None and i in self.probestates):
 				print(("{0:0"+str(nqbits)+"b}    {1:.8f}").format(i, sveclist[i].item(0)))
 		cregsz = len(creglist)
 		print("CREGISTER: ",end="")
