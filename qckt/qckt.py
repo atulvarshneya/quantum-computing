@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from Canvas import *
-from Gates import *
+import Canvas as cnv
+import Gates as gts
 import qsim
 import numpy as np
 
@@ -16,11 +16,11 @@ class QCkt:
 		self.nclbits = nclbits
 		self.circuit = []
 		self.name = name
-		self.canvas = Canvas(self)
+		self.canvas = cnv.Canvas(self)
 
 		self.custom_redolog = []
-		for gclass in GatesList:
-			self._registerGate(gclass.__name__, GateWrapper(self.circuit,gclass).addGate)
+		for gclass in gts.GatesList:
+			self._registerGate(gclass.__name__, gts.GateWrapper(self.circuit,gclass).addGate)
 
 		self.idx = 0 # for iterations
 
@@ -44,7 +44,7 @@ class QCkt:
 			print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}.".format(gatename))
 		else:
 			self.custom_redolog.append([gatename,opMatrix])
-			self._registerGate(gatename, CustomGateWrapper(self.circuit,gatename,opMatrix).addGate)
+			self._registerGate(gatename, gts.CustomGateWrapper(self.circuit,gatename,opMatrix).addGate)
 
 	def get_custom_redolog(self):
 		return self.custom_redolog
@@ -92,6 +92,8 @@ class QCkt:
 		self.canvas.draw()
 
 	def list(self):
+		if self.name is not None:
+			print(self.name)
 		for g in self.circuit:
 			print(g)
 		
