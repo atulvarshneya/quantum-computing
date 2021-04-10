@@ -20,7 +20,7 @@ class QCkt:
 
 		self.custom_redolog = []
 		for gclass in gts.GatesList:
-			self._registerGate(gclass.__name__, gts.GateWrapper(self.circuit,gclass).addGate)
+			self._registerGate(gclass.__name__, gts.GateWrapper(self.nqubits,self.circuit,gclass).addGate)
 
 		self.idx = 0 # for iterations
 
@@ -44,7 +44,7 @@ class QCkt:
 			print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}.".format(gatename))
 		else:
 			self.custom_redolog.append([gatename,opMatrix])
-			self._registerGate(gatename, gts.CustomGateWrapper(self.circuit,gatename,opMatrix).addGate)
+			self._registerGate(gatename, gts.CustomGateWrapper(self.nqubits,self.circuit,gatename,opMatrix).addGate)
 
 	def get_custom_redolog(self):
 		return self.custom_redolog

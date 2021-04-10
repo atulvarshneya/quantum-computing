@@ -4,15 +4,18 @@ import numpy as np
 import random as rnd
 
 class GateWrapper:
-	def __init__(self, circuit, gateCls):
+	def __init__(self, cktsz, circuit, gateCls):
+		self.cktsz = cktsz
 		self.circuit = circuit
 		self.GateCls = gateCls
 	def addGate(self, *args, **kwargs):
 		gate = self.GateCls(*args, **kwargs)
+		gate.cktsize = self.cktsz
 		self.circuit.append(gate)
 
 class QGate:
 	def __init__(self):
+		self.cktsize = None
 		self.qbits = None
 		self.cbits = None
 		self.gateparams = []
@@ -225,7 +228,7 @@ class M(QGate):
 			clbitslist = qubitslist
 		if (type(qubitslist) != list) or (type(clbitslist) != list):
 			errmsg = "Error: M gate requires a list of qubits and optionally a list of classical bits as arguments"
-			raise qsim.QSimError(errmsg)
+			raise BaseException(errmsg)
 		self.qbits = qubitslist
 		self.cbits = clbitslist
 		self.name = "M"
@@ -482,7 +485,8 @@ GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,Probe,QFT,RND,P,CP,UROTk,CROTk]
 ###################################################
 
 class CustomGateWrapper:
-	def __init__(self, circuit, name, opMatrix):
+	def __init__(self, cktsz, circuit, name, opMatrix):
+		self.cktsz = cktsz
 		self.name = name
 		self.opMatrix = opMatrix
 		self.circuit = circuit
@@ -491,6 +495,7 @@ class CustomGateWrapper:
 		if type(qbitsList).__name__ != 'list':
 			qbitsList = [qbits]
 		gate = CustomGate(self.name, self.opMatrix, qbitsList)
+		gate.cktsize = self.cktsz
 		self.circuit.append(gate)
 
 class CustomGate(QGate):
