@@ -466,44 +466,45 @@ class QSimulator:
 	##         +---+
 	##
 	## Lets see how we apply this 2-qubit gate to some specifc bits of a 4 qubit system,
-	## say, control qubit 3, and target qubit 1.
-	## We first 'stretch' this to the full 4 qubits U = np.kron(np.eye(4), C). See below 
+	## say, control qubit 1, and target qubit 3.
+	## We first 'stretch' this to the full 4 qubits U = np.kron(C, np.eye(4)). See below 
 	## the description of __stretched_mat().
 	##         +---+
-	## |b3> ---|---|------
-	##         |   |
-	## |b2> ---|---|------
-	##         |   |
-	## |b1> ---| + |------
+	## |b3> ---|-+-|------
 	##         | | |
-	## |b0> ---| O |------
+	## |b2> ---|-O-|------
+	##         |   |
+	## |b1> ---|---|------
+	##         |   |
+	## |b0> ---|---|------
 	##         +---+
 	##           U
 	## Note, U operator is a 2**nqbits x 2**nqbits matrix, 16x16 in this example case.
-	## And note, that this will apply the operation to the qubits 0 and 1 as defined,
-	## and leave the other qubits unchanged.
-	## Remember, the operators act on a state vector to compute the resulting state 
+	## And note, that this will apply the operation to the qubits 3 (control) and 2 (target) i.e., 
+	## most-significant qubits, and leave the other qubits unchanged.
+	##
+	## Remember, operators act on a state vector to compute the resulting state 
 	## vector, that is why the operator is 2**nqbits x 2**nqbits in size
 	##
-	## Next, we apply an operator, r, again a 2**nqbits x 2**nqbits matrix, on the state 
+	## Next, we apply an operator, r, a 2**nqbits x 2**nqbits matrix, on the state 
 	## to reorder (realign) it such that the state vector is ordered counting with qubit 1 
-	## at qbit 0 position, and qubit 3 at qubit 1 position. 
+	## at qubit 3 position, and qubit 3 at qubit 2 position. 
 	## Next, apply U. Finally, apply an operator, rr, to undo the reordering done by 
 	## the operator r.
 	## So logically, the operators circuit diagram looks like -
 	##         +---+  +---+  +---+
-	## |b3> ---|  2|--|---|--|  3|----
-	##         |   |  |   |  |   |
-	## |b2> ---|  0|--|---|--|  2|----
-	##         |   |  |   |  |   |
-	## |b1> ---|  3|--| + |--|  1|----
+	## |b3> ---|3 1|--|-+-|--|1 3|----
 	##         |   |  | | |  |   |
-	## |b0> ---|  1|--| O |--|  0|----
+	## |b2> ---|2 3|--|-O-|--|3 2|----
+	##         |   |  |   |  |   |
+	## |b1> ---|1 2|--|---|--|2 1|----
+	##         |   |  |   |  |   |
+	## |b0> ---|0 0|--|---|--|0 0|----
 	##         +---+  +---+  +---+
 	##           r      U      rr
 	## 
 	## Now, if we multiple these three operators as a_op = (rr x U x r) then the resulting 
-	## operator, calling it a_op, basically is the one that applies C on qubits 3 and 1 as intended.
+	## operator, calling it a_op, basically is the one that applies C on qubits 1 and 3 as intended.
 
 	def __aligned_op(self, op, qbit_list):
 		"""
@@ -518,30 +519,6 @@ class QSimulator:
 
 	## __stretched_mat() and __aligned_op() use two concepts core to
 	## the working of this simulator.
-	##
-	## Qubits |x> and |y>, each is acted upon by 2x2 operators U1 and U2, respectively.
-	## This is equivalent to the combined state of x and y, i.e., |xy> acted upon
-	## by a single 4x4 operator U = np.kron(U1, U2) (see Umesh Vazirani course
-	## on edx.org - Week 3: Quantum Circuits and Teleportation  
-	## Lecture 5: Quantum Gates  Video: Two Qubit Gates and Tensor Products
-	## https://www.youtube.com/watch?v=ISJYwzN-W20 )
-	##
-	##            +-------+
-	##            |       |
-	##            | +---+ |
-	##            | |   | |
-	## |x> -------+-|U1 |-+-------- U1|x>                  +-----+
-	##            | |2x2| |                                |     |
-	##            | +---+ |                                |     |
-	##            |       |                   |xy> --------+  U  +------- U|xy>
-	##            |       |                                |     |
-	##            | +---+ |                                | 4x4 |
-	##            | |   | |                                +-----+
-	## |y> -------+-|U1 |-+-------- U2|y>
-	##            | |2x2| |
-	##            | +---+ |
-	##            |       |
-	##            +-------+
 
 	def __stretched_mat(self,oper,qbit_list):
 		orignm = oper[0]
@@ -576,6 +553,31 @@ class QSimulator:
 			res = op*res # remember order of multiplication is opposite of the visual order
 		return [name,res]
 
+	## qcombine_par(self,name,op_list):
+	##
+	## Qubits |x> and |y>, each is acted upon by 2x2 operators U1 and U2, respectively.
+	## This is equivalent to the combined state of x and y, i.e., |xy> acted upon
+	## by a single 4x4 operator U = np.kron(U1, U2) (see Umesh Vazirani course
+	## on edx.org - Week 3: Quantum Circuits and Teleportation  
+	## Lecture 5: Quantum Gates  Video: Two Qubit Gates and Tensor Products
+	## https://www.youtube.com/watch?v=ISJYwzN-W20 )
+	##
+	##            +-------+
+	##            |       |
+	##            | +---+ |
+	##            | |   | |
+	## |x> -------+-|U1 |-+-------- U1|x>                  +-----+
+	##            | |2x2| |                                |     |
+	##            | +---+ |                                |     |
+	##            |       |                   |xy> --------+  U  +------- U|xy>
+	##            |       |                                |     |
+	##            | +---+ |                                | 4x4 |
+	##            | |   | |                                +-----+
+	## |y> -------+-|U1 |-+-------- U2|y>
+	##            | |2x2| |
+	##            | +---+ |
+	##            |       |
+	##            +-------+
 	def qcombine_par(self,name,op_list):
 		res = None
 		first = True
