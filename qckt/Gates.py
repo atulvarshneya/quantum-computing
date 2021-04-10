@@ -283,11 +283,12 @@ class Border(QGate):
 
 class Probe(QGate):
 
-	def __init__(self, header="",probestates=None):
+	def __init__(self, header="",probestates=None,probeobject=None):
 		super().__init__()
 		self.qbits = []
 		self.header = "PROBE: "+header
 		self.probestates = probestates
+		self.probeobject = probeobject
 		self.name = "Probe"
 
 	def addtocanvas(self,canvas):
@@ -308,6 +309,8 @@ class Probe(QGate):
 		# print("exec qc.qgate(",str(self),")")
 		nqbits = qc.qsize()
 		(creglist, sveclist) = qc.qsnapshot()
+		if self.probeobject is not None:
+			self.probeobject.analyze(creglist,sveclist)
 		print(self.header)
 		for i in range(len(sveclist)):
 			if (self.probestates is None and abs(sveclist[i].item(0)) > 0.0) \
@@ -322,6 +325,13 @@ class Probe(QGate):
 	# OVERRIDE __str__(self) - no [qbits]
 	def __str__(self):
 		return "PROBE"
+
+class ProbeAnalyzer:
+	'if an object of ProbeAnalyzer class is passed in Probe gate, its analyze() method is called when Probe gate is invoked.'
+	def __init__(self):
+		pass
+	def analyze(self,creglist,sveclist):
+		pass
 
 
 class QFT(QGate):
