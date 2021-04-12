@@ -4,6 +4,7 @@ import Canvas as cnv
 import Gates as gts
 import qsim
 import numpy as np
+from qException import QCktException
 
 class QCkt:
 
@@ -20,7 +21,7 @@ class QCkt:
 
 		self.custom_redolog = []
 		for gclass in gts.GatesList:
-			self._registerGate(gclass.__name__, gts.GateWrapper(self.nqubits,self.circuit,gclass).addGate)
+			self._registerGate(gclass.__name__, gts.GateWrapper(self,gclass).addGate)
 
 		self.idx = 0 # for iterations
 
@@ -44,7 +45,7 @@ class QCkt:
 			print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}.".format(gatename))
 		else:
 			self.custom_redolog.append([gatename,opMatrix])
-			self._registerGate(gatename, gts.CustomGateWrapper(self.nqubits,self.circuit,gatename,opMatrix).addGate)
+			self._registerGate(gatename, gts.CustomGateWrapper(self,gatename,opMatrix).addGate)
 
 	def get_custom_redolog(self):
 		return self.custom_redolog
@@ -63,9 +64,9 @@ class QCkt:
 
 		# copy circuits over to the new circuit
 		for g in self.circuit:
-			newckt.circuit.append(g)
+			g.addtoqckt(newckt)
 		for g in otherckt.circuit:
-			newckt.circuit.append(g)
+			g.addtoqckt(newckt)
 
 		return newckt
 
@@ -75,14 +76,14 @@ class QCkt:
 		# See README.md for details
 		if self.nqubits != len(inpqubits):
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
-			raise qsim.QSimError(errmsg)
+			raise QCktException(errmsg)
 		newckt = QCkt(newnq, newnc)
 		# register custom gates to the new circuit
 		for cg in self.get_custom_redolog():
 			newckt.custom_gate(cg[0], cg[1])
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
-			newckt.circuit.append(galigned)
+			galigned.addtoqckt(newckt)
 		return newckt
 
 	def get_size(self):
