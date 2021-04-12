@@ -47,6 +47,10 @@ QCkt
 		Returns the updted quantum circuit
 	Border()
 		Places a border in the quantum circuit. Has effect only in the drawing of the circuit
+	Probe(header,probestates)
+		This is a debuggig aid. Its execution gets skipped on backends which are actual quantum compuetrs.
+		header is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout.
+		probestates is either None or a list of states, and probe prints only the amplitude of only those states.
 	custom_gate(gatename, op_matrix)
 		To add user defined custom gates
 		gatename should be per the syntax of a Python variable; op_matrix is the operator matrix in form of numpy.matrix([...],dtype=complex)
@@ -88,14 +92,16 @@ Backend
 		Returns a handle object to a backend execution environment (a local qc simulator)
 	run(circuit, initstate=None, prepqubits=None, qtrace=False)
 		Runs the given circuit on the backend execution environment
-		Initial state can be passed inform of state vector, or list of prepared qubits
+		Initial state can be passed inform of state-vector, or list of prepared qubits
 		The results of the execution are stored in the environment handle object
 		Returns the same backend environment handle object
 	get_svec()
 		returns the result state-vector object
 		The state-vector array can be accessed through the .value field of the returned object
 		The returned object supports conversion to string representation for pretty printing
-		That handle supports a method svec.verbose(boolean), and returns the same handle
+		The returned object also supports a method svec.verbose(boolean), which affects the string conversion in that 
+		it includes all states even those with an amplitude of 0. Svec.verbose(boolean) returns the same state-vector object
 	get_creg()
-		Returns the result classical bits register object
-		The classical bits array can be accessed through the .value field of the returned object
+		returns the result classical bits register object
+		The classical bits array can be accessed through the .value field and its integer value through .intvalue field of the returned object
+		The returned object supports conversion to string representation for pretty printing
