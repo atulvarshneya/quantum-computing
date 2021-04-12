@@ -9,7 +9,6 @@ try:
 	ck.X(8)
 except QCktException as e:
 	print(e.msg)
-
 try:
 	ck.X(0)
 	ck.X([0,1,2,6])
@@ -20,7 +19,6 @@ try:
 	ck.Y(8)
 except QCktException as e:
 	print(e.msg)
-
 try:
 	ck.Y(0)
 	ck.Y([0,1,2,6])
@@ -31,7 +29,6 @@ try:
 	ck.Z(8)
 except QCktException as e:
 	print(e.msg)
-
 try:
 	ck.Z(0)
 	ck.Z([0,1,2,6])
@@ -49,8 +46,100 @@ except QCktException as e:
 	print(e)
 
 try:
+	ck.RND(8)
+except QCktException as e:
+	print(e.msg)
+try:
+	ck.RND(0)
+	ck.RND([0,1,6])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.P(3.14/2,8)
+except QCktException as e:
+	print(e.msg)
+try:
+	ck.P(3.14/2,0)
+	ck.P(3.14/2,[0,1,6])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.UROTk(12,8)
+except QCktException as e:
+	print(e.msg)
+try:
+	ck.UROTk(10,0)
+	ck.UROTk(8,[0,1,6])
+except QCktException as e:
+	print(e)
+
+try:
 	ck.CX(0,1)
 	ck.CX(1)
+except QCktException as e:
+	print(e)
+try:
+	ck.CX([0,1,2,3])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.CY(0,1)
+	ck.CY(1)
+except QCktException as e:
+	print(e)
+try:
+	ck.CY([0,1,2,3])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.CZ(0,1)
+	ck.CZ(1)
+except QCktException as e:
+	print(e)
+try:
+	ck.CZ([0,1,2,3])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.CCX(0,1,2)
+	ck.CCX(1,1,3)
+except QCktException as e:
+	print(e)
+try:
+	ck.CCX(1,2,8)
+except QCktException as e:
+	print(e)
+try:
+	ck.CCX([0,1],2,3)
+except QCktException as e:
+	print(e)
+
+try:
+	ck.CP(3.14/2,0,1)
+	ck.CP(3.14/2, 0,1,2,3)
+	ck.CP(3.14/2,1)
+except QCktException as e:
+	print(e)
+try:
+	ck.CP(3.14/2, 0,1,2,3)
+	ck.CP(3.14/2, [0,1,2,3])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.CROTk(2, 0,1)
+	ck.CROTk(2, 0,1,2,3)
+	ck.CROTk(2, 1)
+except QCktException as e:
+	print(e)
+try:
+	ck.CROTk(2, 0,1,2,3)
+	ck.CROTk(2, 0,1,2,8)
 except QCktException as e:
 	print(e)
 
@@ -61,7 +150,26 @@ except QCktException as e:
 	print(e)
 
 try:
-	ck.CX([0,1,2,3])
+	ck.SWAP(0,1)
+	ck.SWAP(0,8)
+except QCktException as e:
+	print(e)
+try:
+	ck.SWAP([0,1],[2,3])
+except QCktException as e:
+	print(e)
+
+try:
+	ck.M([0,1])
+	ck.M([0,8])
+except QCktException as e:
+	print(e)
+try:
+	ck.M([0,1],[2,5])
+except QCktException as e:
+	print(e)
+try:
+	ck.M([0,2],[2,1,2])
 except QCktException as e:
 	print(e)
 

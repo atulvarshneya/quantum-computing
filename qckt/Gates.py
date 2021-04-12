@@ -86,17 +86,20 @@ class QGate:
 		## to be overridden by individual gates
 		print("TODO: Arcgs validation missing for ",type(self).__name__)
 
-	def oneqbit_args(self):
+	def oneqbit_args(self,qbits_list=None):
 		multiqbits = []
 		retval = None
-		if len(self.qbits) == 1:
-			if type(self.qbits[0]) is int:
+		qbits = self.qbits
+		if qbits_list is not None:
+			qbits = qbits_list
+		if len(qbits) == 1:
+			if type(qbits[0]) is int:
 				multiqbits = self.qbits
 				retval = None # just asserting that retval is None here
-			elif type(self.qbits[0]) is list:
-				if len(self.qbits[0]) > 0:
+			elif type(qbits[0]) is list:
+				if len(qbits[0]) > 0:
 					retval = None # just asserting that retval is None here
-					for q in self.qbits[0]:
+					for q in qbits[0]:
 						if type(q) is int:
 							multiqbits.append(q)
 						else:
@@ -111,11 +114,14 @@ class QGate:
 			retval = self.isvalid_qbits_gen(multiqbits)
 		return retval
 
-	def fixedqbit_args(self,nq):
+	def fixedqbit_args(self,nq,qbits_list=None):
 		multiqbits = []
 		retval = None
-		if len(self.qbits) == nq:
-			for q in self.qbits:
+		qbits = self.qbits
+		if qbits_list is not None:
+			qbits = qbits_list
+		if len(qbits) == nq:
+			for q in qbits:
 				if type(q) is int:
 					multiqbits.append(q)
 				else:
@@ -126,11 +132,14 @@ class QGate:
 			retval = self.isvalid_qbits_gen(multiqbits)
 		return retval
 
-	def varqbit_args(self, minnq):
+	def varqbit_args(self, minnq, qbits_list=None):
 		multiqbits = []
 		retval = None
-		if len(self.qbits) >= minnq:
-			for q in self.qbits:
+		qbits = self.qbits
+		if qbits_list is not None:
+			qbits = qbits_list
+		if len(qbits) >= minnq:
+			for q in qbits:
 				if type(q) is int:
 					multiqbits.append(q)
 				else:
@@ -302,7 +311,7 @@ class CCX(QGate):
 		return self
 
 	def check_qbit_args(self):
-		return self.varqbit_args(3)
+		return self.fixedqbit_args(3)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -355,10 +364,14 @@ class M(QGate):
 		return self
 
 	def check_qbit_args(self):
-		if self.isvalid_qbits_gen(self.qbits) and self.isvalid_qbits_gen(self.cbits):
-			return True
-		else:
-			return False
+		retval = True
+		if len(self.qbits) != len(self.cbits):
+			retval = False
+		if not self.varqbit_args(1):
+			retval = False
+		if not self.varqbit_args(1,qbits_list=self.cbits):
+			retval = False
+		return retval
 
 	# INHERIT realign(self,newseq):
 	# INHERIT def realign(self,newseq):
