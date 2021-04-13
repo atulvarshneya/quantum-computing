@@ -74,3 +74,28 @@
 ## 
 ## Now, if we multiple these three operators as a_op = (rr x U x r) then the resulting 
 ## operator, calling it a_op, basically is the one that applies C on qubits 1 and 3 as intended.
+
+##
+## Qubits |x> and |y>, each is acted upon by 2x2 operators U1 and U2, respectively.
+## This is equivalent to the combined state of x and y, i.e., |xy> acted upon
+## by a single 4x4 operator U = np.kron(U1, U2) (see Umesh Vazirani course
+## on edx.org - Week 3: Quantum Circuits and Teleportation  
+## Lecture 5: Quantum Gates  Video: Two Qubit Gates and Tensor Products
+## https://www.youtube.com/watch?v=ISJYwzN-W20 )
+##
+##            +-------+
+##            |       |
+##            | +---+ |
+##            | |   | |
+## |x> -------+-|U1 |-+-------- U1|x>                  +-----+
+##            | |2x2| |                                |     |
+##            | +---+ |                                |     |
+##            |       |                   |xy> --------+  U  +------- U|xy>
+##            |       |                                |     |
+##            | +---+ |                                | 4x4 |
+##            | |   | |                                +-----+
+## |y> -------+-|U1 |-+-------- U2|y>
+##            | |2x2| |
+##            | +---+ |
+##            |       |
+##            +-------+
