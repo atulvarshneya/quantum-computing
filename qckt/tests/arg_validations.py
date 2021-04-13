@@ -2,6 +2,7 @@
 
 import qckt as q
 from qException import QCktException
+import numpy as np
 
 ck = q.QCkt(4)
 
@@ -173,3 +174,14 @@ try:
 except QCktException as e:
 	print(e)
 
+opmat = np.matrix([
+	[1,0,0,0],
+	[0,1,0,0],
+	[0,0,0,1],
+	[0,0,1,0]],dtype=complex)
+ck.custom_gate("CNOT",opmat)
+try:
+	ck.CNOT([0,1])
+	ck.CNOT([0,1,2])
+except QCktException as e:
+	print(e)

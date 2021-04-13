@@ -35,7 +35,7 @@ class QGate:
 		self.qckt = qckt
 		qckt.circuit.append(self)
 		if self.check_qbit_args() == False:
-			errmsg = "Error: qubit arguments incorrect. " + type(self).__name__ + str(self.qbits)
+			errmsg = "Error: qubit arguments incorrect. " + self.name + str(self.qbits)
 			raise QCktException(errmsg)
 
 	def realign(self,newseq):
