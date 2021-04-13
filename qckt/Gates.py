@@ -45,13 +45,25 @@ class QGate:
 			self.cbits = self._reorderlist(self.cbits,newseq)
 		return self
 
-	def exec(self,qc):
-		# print("exec qc.qgate(",str(self),")")
+	def exec(self,qsim):
+		# print("exec qsim.qgate(",str(self),")")
 		if type(self.qbits[0]) is list and len(self.qbits) == 1:
 			for q in self.qbits[0]:
-				qc.qgate([self.name,self.opMatrix], [q])
+				qsim.qgate([self.name,self.opMatrix], [q])
 		else:
-			qc.qgate([self.name,self.opMatrix], self.qbits)
+			qsim.qgate([self.name,self.opMatrix], self.qbits)
+
+	def to_fullmatrix(self):
+		(nqbits,_) = self.qckt.get_size()
+		oplist = []
+		if type(self.qbits[0]) is list and len(self.qbits) == 1:
+			for q in self.qbits[0]:
+				op = gutils.stretched_opmatrix(nqbits,self.opMatrix,[q])
+				oplist.append(op)
+			opmat = gutils.combine_seq(oplist)
+		else:
+			opmat = gutils.stretched_opmatrix(nqbits,self.opMatrix,self.qbits)
+		return opmat
 
 	def __str__(self):
 		stringify = self.name
@@ -378,6 +390,10 @@ class M(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+	def to_fullmatrix(self):
+		errmsg = "Measure gate cannot be converted to opmatrix."
+		raise QCktException(errmsg)
+
 	def exec(self,qc):
 		# print("exec qc.qmeasure(",str(self),")")
 		qc.qmeasure(self.qbits,cbit_list=self.cbits)
@@ -404,6 +420,9 @@ class Border(QGate):
 		pass
 
 	# INHERIT realign(self,newseq):
+
+	def to_fullmatrix(self):
+		return None
 
 	# OVERRIDE exec(self,qc) - nothing to execute
 	def exec(self,qc):
@@ -439,6 +458,9 @@ class Probe(QGate):
 		pass
 
 	# INHERIT realign(self,newseq):
+
+	def to_fullmatrix(self):
+		return None
 
 	# OVERRIDE exec(self,qc) - nothing to execute
 	def exec(self,qc):

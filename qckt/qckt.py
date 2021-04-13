@@ -2,6 +2,7 @@
 
 import Canvas as cnv
 import Gates as gts
+import GatesUtils as gutils
 import qsim
 import numpy as np
 from qException import QCktException
@@ -85,6 +86,15 @@ class QCkt:
 			galigned = g.realign(inpqubits)
 			galigned.addtoqckt(newckt)
 		return newckt
+
+	def to_opMatrix(self):
+		oplist = []
+		for q in self.circuit:
+			op = q.to_fullmatrix()
+			if op is not None: ## Border, Probe gates return None
+				oplist.append(op)
+		opmat = gutils.combine_seq(oplist)
+		return opmat
 
 	def get_size(self):
 		return self.nqubits, self.nclbits
