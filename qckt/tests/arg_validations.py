@@ -185,3 +185,12 @@ try:
 	ck.CNOT([0,1,2])
 except QCktException as e:
 	print(e)
+
+opmat = np.matrix([
+	[1,0,0,0],
+	[0,0,0,1],
+	[0,0,1,0]],dtype=complex)
+try:
+	ck.custom_gate("CTRLX",opmat)
+except QCktException as e:
+	print(e)
