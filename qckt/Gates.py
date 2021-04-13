@@ -2,6 +2,7 @@
 
 import numpy as np
 import random as rnd
+import GatesUtils as gutils
 from qException import QCktException
 
 class GateWrapper:
@@ -638,6 +639,9 @@ class CustomGateWrapper:
 	def __init__(self, qckt, name, opMatrix):
 		self.qckt = qckt
 		self.name = name
+		if not gutils.isunitary(opMatrix):
+			errmsg = "Custom gate, "+self.name+", operator matrix is not unitary."
+			raise QCktException(errmsg)
 		self.opMatrix = opMatrix
 	def addGate(self, qbits):
 		qbitsList = qbits
