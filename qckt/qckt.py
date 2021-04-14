@@ -6,6 +6,7 @@ import GatesUtils as gutils
 import qsim
 import numpy as np
 from qException import QCktException
+import time
 
 class QCkt:
 
@@ -42,10 +43,19 @@ class QCkt:
 		setattr(self,gatename,addgateHandle)
 
 	def custom_gate(self, gatename, opMatrix):
+		idstr = str(time.time())
+		self._add_custom_gate(gatename, idstr, opMatrix)
+
+	def _add_custom_gate(self, gatename, idstr, opMatrix):
 		if hasattr(self,gatename):
-			print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}.".format(gatename))
+			samegt = False
+			for gt in self.custom_redolog:
+				if gt[0] == gatename and gt[1] == idstr:
+					samegt = True
+			if not samegt:
+				print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}()".format(gatename))
 		else:
-			self.custom_redolog.append([gatename,opMatrix])
+			self.custom_redolog.append([gatename,idstr,opMatrix])
 			self._registerGate(gatename, gts.CustomGateWrapper(self,gatename,opMatrix).addGate)
 
 	def get_custom_redolog(self):
@@ -55,13 +65,13 @@ class QCkt:
 		# otherckt - the ckt to be appended
 		nq = max(self.nqubits, otherckt.nqubits)
 		nc = max(self.nclbits, otherckt.nclbits)
-		newckt = QCkt(nq,nc)
+		newckt = QCkt(nq,nc,name=self.name)
 
 		# register custom gates from these circuits to the new circuit
 		for cg in self.get_custom_redolog():
-			newckt.custom_gate(cg[0], cg[1])
+			newckt._add_custom_gate(cg[0], cg[1], cg[2])
 		for cg in otherckt.get_custom_redolog():
-			newckt.custom_gate(cg[0], cg[1])
+			newckt._add_custom_gate(cg[0], cg[1], cg[2])
 
 		# copy circuits over to the new circuit
 		for g in self.circuit:
@@ -78,10 +88,10 @@ class QCkt:
 		if self.nqubits != len(inpqubits):
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
 			raise QCktException(errmsg)
-		newckt = QCkt(newnq, newnc)
+		newckt = QCkt(newnq, newnc, name=self.name)
 		# register custom gates to the new circuit
 		for cg in self.get_custom_redolog():
-			newckt.custom_gate(cg[0], cg[1])
+			newckt._add_custom_gate(cg[0], cg[1], cg[2])
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
 			galigned.addtoqckt(newckt)

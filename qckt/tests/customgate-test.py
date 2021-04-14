@@ -8,6 +8,7 @@ opmat = np.matrix([
 	[0,0,0,1],
 	[0,0,1,0]],dtype=complex)
 ck.custom_gate("CNOT",opmat)
+ck.custom_gate("CNOT",opmat)
 
 
 ck.H(0)
@@ -20,6 +21,7 @@ ck.draw()
 
 ## by appending circuits, the custom gates definitions are inherited by the new circuit
 ckt = qckt.QCkt(6)
+ckt = ckt.append(ck)
 ckt = ckt.append(ck)
 ckt.CNOT([1,3])
 ckt.draw()
