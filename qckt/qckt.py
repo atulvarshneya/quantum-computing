@@ -6,9 +6,13 @@ import GatesUtils as gutils
 import qsim
 import numpy as np
 from qException import QCktException
-import time
 
 class QCkt:
+
+	custom_gate_id = 0
+	def getnew_custgateid():
+		QCkt.custom_gate_id += 1
+		return QCkt.custom_gate_id
 
 	def __init__(self, nqubits, nclbits=None, name=None):
 		# nq - number of quantum bits
@@ -43,19 +47,19 @@ class QCkt:
 		setattr(self,gatename,addgateHandle)
 
 	def custom_gate(self, gatename, opMatrix):
-		idstr = str(time.time())
-		self._add_custom_gate(gatename, idstr, opMatrix)
+		customgateid = QCkt.getnew_custgateid()
+		self._add_custom_gate(gatename, customgateid, opMatrix)
 
-	def _add_custom_gate(self, gatename, idstr, opMatrix):
+	def _add_custom_gate(self, gatename, customgateid, opMatrix):
 		if hasattr(self,gatename):
 			samegt = False
 			for gt in self.custom_redolog:
-				if gt[0] == gatename and gt[1] == idstr:
+				if gt[0] == gatename and gt[1] == customgateid:
 					samegt = True
 			if not samegt:
 				print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}()".format(gatename))
 		else:
-			self.custom_redolog.append([gatename,idstr,opMatrix])
+			self.custom_redolog.append([gatename,customgateid,opMatrix])
 			self._registerGate(gatename, gts.CustomGateWrapper(self,gatename,opMatrix).addGate)
 
 	def get_custom_redolog(self):
