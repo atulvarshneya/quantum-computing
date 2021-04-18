@@ -114,7 +114,6 @@ class Grover:
 			bk.run(verifyckt)
 			creg = bk.get_creg()
 			if creg.intvalue == 1:
-				print("CORRECT Result in ",m+1,"attempts")
 				solved = True
 				break
 		return solved,res.intvalue
