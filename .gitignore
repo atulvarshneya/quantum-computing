@@ -1,7 +1,0 @@
-qsim/tests/runlogs
-qckt/tests/runlogs
-qsim/__pycache__/
-qckt/__pycache__/
-qsim/playground/
-qckt/playground/
-.project_props
