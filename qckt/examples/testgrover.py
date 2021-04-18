@@ -8,7 +8,7 @@ import sys
 
 ### get the command line arguments
 if len(sys.argv) != 2:
-	print(f"Usage: {sys.argv[0]} nqubits")
+	print(f"Usage: {sys.argv[0]} in_register_size")
 	quit()
 ninreg = int(sys.argv[1])
 
