@@ -26,7 +26,7 @@ class QGate:
 		newseq = []
 		nqbits = len(nseq)
 		for i in oseq:
-			if type(i) is list:
+			if issubclass(type(i),list):
 				newseq.append(self._reorderlist(i,nseq))
 			else:
 				newseq.append(nseq[nqbits-i-1])
@@ -47,7 +47,7 @@ class QGate:
 
 	def exec(self,qsim):
 		# print("exec qsim.qgate(",str(self),")")
-		if type(self.qbits[0]) is list and len(self.qbits) == 1:
+		if issubclass(type(self.qbits[0]),list) and len(self.qbits) == 1:
 			for q in self.qbits[0]:
 				qsim.qgate([self.name,self.opMatrix], [q])
 		else:
@@ -56,7 +56,7 @@ class QGate:
 	def to_fullmatrix(self):
 		(nqbits,_) = self.qckt.get_size()
 		oplist = []
-		if type(self.qbits[0]) is list and len(self.qbits) == 1:
+		if issubclass(type(self.qbits[0]),list) and len(self.qbits) == 1:
 			for q in self.qbits[0]:
 				op = gutils.stretched_opmatrix(nqbits,self.opMatrix,[q])
 				oplist.append(op)
@@ -109,7 +109,7 @@ class QGate:
 			if type(qbits[0]) is int:
 				multiqbits = self.qbits
 				retval = None # just asserting that retval is None here
-			elif type(qbits[0]) is list:
+			elif issubclass(type(qbits[0]),list):
 				if len(qbits[0]) > 0:
 					retval = None # just asserting that retval is None here
 					for q in qbits[0]:
@@ -355,7 +355,7 @@ class M(QGate):
 		super().__init__()
 		if clbitslist is None:
 			clbitslist = qubitslist
-		if (type(qubitslist) != list) or (type(clbitslist) != list):
+		if (not issubclass(type(qubitslist),list)) or (not issubclass(type(clbitslist),list)):
 			errmsg = "Error: M gate requires a list of qubits and optionally a list of classical bits as arguments"
 			raise QCktException(errmsg)
 		self.qbits = qubitslist
@@ -496,7 +496,7 @@ class QFT(QGate):
 
 	def __init__(self, *allqbits):
 		super().__init__()
-		if len(allqbits) == 1 and type(allqbits[0]) is list:
+		if len(allqbits) == 1 and issubclass(type(allqbits[0]),list):
 			self.qbits = allqbits[0]
 		else:
 			self.qbits = list(allqbits)
