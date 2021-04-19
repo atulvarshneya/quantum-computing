@@ -38,8 +38,7 @@ if len(x_list) > 0:
 ### create a single gate representation of the Uf circuit, and replace the Uf circuit using that one gate
 uf_op = uf_ckt.to_opMatrix()
 uf_ckt = qckt.QCkt(nqbits,ncbits,name="Uf Circuit")
-uf_ckt.custom_gate("Uf",uf_op)
-uf_ckt.Uf(qplaced)
+uf_ckt.CUSTOM("Uf",uf_op,qplaced)
 # uf_ckt.draw()
 
 ginstance = grv.Grover(uf_ckt,inreg,outreg)

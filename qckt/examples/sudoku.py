@@ -26,8 +26,7 @@ for w,r in enumerate(rules):
 ### create a single gate representation of the sudoku circuit, and replace the Uf circuit using that one gate
 sudo_op = sudo.to_opMatrix()
 sudo = qckt.QCkt(nqbits,name="Sudoku Validator")
-sudo.custom_gate("Sudo",sudo_op)
-sudo.Sudo(qplaced)
+sudo.CUSTOM("Sudo",sudo_op,qplaced)
 # sudo.draw()
 
 ginstance = grv.Grover(sudo,inreg,outreg,nmarked=2)

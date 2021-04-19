@@ -1,5 +1,6 @@
 import qckt
 import numpy as np
+from qException import QCktException
 
 ck = qckt.QCkt(4)
 opmat = np.matrix([
@@ -7,12 +8,10 @@ opmat = np.matrix([
 	[0,1,0,0],
 	[0,0,0,1],
 	[0,0,1,0]],dtype=complex)
-ck.custom_gate("CNOT",opmat)
-ck.custom_gate("CNOT",opmat)
 
 
 ck.H(0)
-ck.CNOT([0,2])
+ck.CUSTOM("CNOT",opmat,[0,2])
 ck.draw()
 inpqubits = [3,1,2,0]
 ck = ck.realign(4,4,inpqubits)
@@ -23,7 +22,24 @@ ck.draw()
 ckt = qckt.QCkt(6)
 ckt = ckt.append(ck)
 ckt = ckt.append(ck)
-ckt.CNOT([1,3])
+ckt.CUSTOM("CNOT",opmat,[1,3])
+ckt.draw()
+bk = qckt.Backend()
+bk.run(ckt,qtrace=True)
+
+## by appending circuits, the custom gates definitions are inherited by the new circuit
+print("==Direct CUSTOM gate=======================")
+opmatx = np.matrix([
+	[2,0,0,0],
+	[0,2,0,0],
+	[0,0,0,1],
+	[0,0,1,0]],dtype=complex)
+ckt = qckt.QCkt(6)
+ckt.CUSTOM("CuCX",opmat,[1,3])
+try:
+	ckt.CUSTOM("CuCXx",opmatx,[1,3])
+except QCktException as e:
+	print(e)
 ckt.draw()
 bk = qckt.Backend()
 bk.run(ckt,qtrace=True)

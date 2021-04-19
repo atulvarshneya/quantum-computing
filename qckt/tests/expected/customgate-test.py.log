@@ -1,4 +1,3 @@
-WARNING: Ignored an attempt to overwrite existing QCkt.CNOT()
 q000 -[H]-[CNOT M]-
           |      | 
 q001 -----|------|-
@@ -68,4 +67,28 @@ CNOT Qubit[1, 3]
 000001    -0.50000000+0.00000000j
 001010    0.50000000+0.00000000j
 001011    0.50000000+0.00000000j
+CREGISTER: 000000
+==Direct CUSTOM gate=======================
+Custom gate, CuCXx, operator matrix is not unitary.
+q000 ----------
+               
+q001 -[CuCX M]-
+      |      | 
+q002 -|------|-
+      |      | 
+q003 -[CuCX L]-
+               
+q004 ----------
+               
+q005 ----------
+               
+creg ==========
+               
+
+Initial State
+000000    1.00000000+0.00000000j
+CREGISTER: 000000
+
+CuCX Qubit[1, 3]
+000000    1.00000000+0.00000000j
 CREGISTER: 000000
