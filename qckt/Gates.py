@@ -651,30 +651,14 @@ class CROTk(QGate):
 	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
-GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,Probe,QFT,RND,P,CP,UROTk,CROTk]
-
-###################################################
-### Support for Custom Gates
-###################################################
-
-class CustomGateWrapper:
-	def __init__(self, qckt, name, opMatrix):
-		self.qckt = qckt
-		self.name = name
-		if not gutils.isunitary(opMatrix):
-			errmsg = "Custom gate, "+self.name+", operator matrix is not unitary."
-			raise QCktException(errmsg)
-		self.opMatrix = opMatrix
-	def addGate(self, qbits):
-		qbitsList = qbits
-		gate = CustomGate(self.name, self.opMatrix, qbitsList)
-		gate.addtoqckt(self.qckt)
-
-class CustomGate(QGate):
+class CUSTOM(QGate):
 
 	def __init__(self, name, opMatrix, qbits):
 		super().__init__()
 		self.name = name
+		if not gutils.isunitary(opMatrix):
+			errmsg = "Custom gate, "+self.name+", operator matrix is not unitary."
+			raise QCktException(errmsg)
 		self.opMatrix = opMatrix
 		self.qbits = qbits
 
@@ -692,3 +676,5 @@ class CustomGate(QGate):
 	# INHERIT def __str__(self):
 	# INHERIT def exec(self,qc):
 
+
+GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,Probe,QFT,RND,P,CP,UROTk,CROTk,CUSTOM]

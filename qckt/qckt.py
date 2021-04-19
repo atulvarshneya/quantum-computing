@@ -9,11 +9,6 @@ from qException import QCktException
 
 class QCkt:
 
-	custom_gate_id = 0
-	def getnew_custgateid():
-		QCkt.custom_gate_id += 1
-		return QCkt.custom_gate_id
-
 	def __init__(self, nqubits, nclbits=None, name=None):
 		# nq - number of quantum bits
 		# nc - number of classical bits
@@ -25,7 +20,6 @@ class QCkt:
 		self.name = name
 		self.canvas = cnv.Canvas(self)
 
-		self.custom_redolog = []
 		for gclass in gts.GatesList:
 			self._registerGate(gclass.__name__, gts.GateWrapper(self,gclass).addGate)
 
@@ -46,36 +40,11 @@ class QCkt:
 	def _registerGate(self, gatename, addgateHandle):
 		setattr(self,gatename,addgateHandle)
 
-	def custom_gate(self, gatename, opMatrix):
-		customgateid = QCkt.getnew_custgateid()
-		self._add_custom_gate(gatename, customgateid, opMatrix)
-
-	def _add_custom_gate(self, gatename, customgateid, opMatrix):
-		if hasattr(self,gatename):
-			samegt = False
-			for gt in self.custom_redolog:
-				if gt[0] == gatename and gt[1] == customgateid:
-					samegt = True
-			if not samegt:
-				print("WARNING: Ignored an attempt to overwrite existing QCkt.{:s}()".format(gatename))
-		else:
-			self.custom_redolog.append([gatename,customgateid,opMatrix])
-			self._registerGate(gatename, gts.CustomGateWrapper(self,gatename,opMatrix).addGate)
-
-	def get_custom_redolog(self):
-		return self.custom_redolog
-
 	def append(self, otherckt):
 		# otherckt - the ckt to be appended
 		nq = max(self.nqubits, otherckt.nqubits)
 		nc = max(self.nclbits, otherckt.nclbits)
 		newckt = QCkt(nq,nc,name=self.name)
-
-		# register custom gates from these circuits to the new circuit
-		for cg in self.get_custom_redolog():
-			newckt._add_custom_gate(cg[0], cg[1], cg[2])
-		for cg in otherckt.get_custom_redolog():
-			newckt._add_custom_gate(cg[0], cg[1], cg[2])
 
 		# copy circuits over to the new circuit
 		for g in self.circuit:
@@ -93,9 +62,6 @@ class QCkt:
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
 			raise QCktException(errmsg)
 		newckt = QCkt(newnq, newnc, name=self.name)
-		# register custom gates to the new circuit
-		for cg in self.get_custom_redolog():
-			newckt._add_custom_gate(cg[0], cg[1], cg[2])
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
 			galigned.addtoqckt(newckt)
@@ -208,33 +174,4 @@ class Result:
 
 
 if __name__ == "__main__":
-	# for i in GatesList:
-	#	print(i.__name__)
-	import numpy as np
-	opMat = np.matrix([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],dtype=complex)
-
-	print("ck1 -----")
-	ck1 = QCkt(8)
-	ck1.custom_gate("ID",opMat)
-	ck1.ID([2,3])
-	ck1.draw()
-
-	print("ck2 -----")
-	ck2 = QCkt(8)
-	ck2.custom_gate("ID",opMat)
-	ck2.H(5)
-	ck2.draw()
-
-	print("ck3 -----")
-	ck3 = ck1.append(ck2)
-	ck3.ID([6,7])
-	ck3.draw()
-
-	print("ck  -----")
-	ck = ck3.realign(8,8,[5,4,7,6,3,2,1,0])
-	ck.ID([4,5])
-	ck.draw()
-
-	bk = Backend()
-	bk.run(ck,qtrace=True)
-
+	pass
