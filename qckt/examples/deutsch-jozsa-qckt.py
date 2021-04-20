@@ -28,37 +28,34 @@ def get_fxckt(nq):
 		fxckt.CX(1,0)
 	return fxckt
 
-try:
 
-	dj_ckt = qckt.QCkt(nqbits)
-	dj_ckt.X(0)
-	dj_ckt.H(0)
+dj_ckt = qckt.QCkt(nqbits)
+dj_ckt.X(0)
+dj_ckt.H(0)
 
-	for i in range(nqbits-1):
-		dj_ckt.H(i+1)
+for i in range(nqbits-1):
+	dj_ckt.H(i+1)
 
-	dj_ckt.Border()
-	fx_ckt = get_fxckt(nqbits)
-	dj_ckt = dj_ckt.append(fx_ckt)
-	dj_ckt.Border()
+dj_ckt.Border()
+fx_ckt = get_fxckt(nqbits)
+dj_ckt = dj_ckt.append(fx_ckt)
+dj_ckt.Border()
 
-	for i in range(nqbits-1):
-		dj_ckt.H(i+1)
+for i in range(nqbits-1):
+	dj_ckt.H(i+1)
 
-	qbits_list = list(range(nqbits-1,0,-1))
-	dj_ckt.M(qbits_list, qbits_list)
+qbits_list = list(range(nqbits-1,0,-1))
+dj_ckt.M(qbits_list, qbits_list)
 	
-	dj_ckt.draw()
+dj_ckt.draw()
 
-	bk = qckt.Backend()
-	bk.run(dj_ckt,qtrace=False)
-	res = bk.get_creg()
-	print(res)
+bk = qckt.Backend()
+bk.run(dj_ckt,qtrace=False)
+res = bk.get_creg()
+print(res)
 
-	if 1 in res.value[1:nqbits]:
-		print("Found fx is BALANCED")
-	else:
-		print("Found fx is CONSTANT")
+if 1 in res.value[1:nqbits]:
+	print("Found fx is BALANCED")
+else:
+	print("Found fx is CONSTANT")
 
-except qclib.QSimError as ex:
-	print(ex.args)
