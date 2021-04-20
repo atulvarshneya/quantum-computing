@@ -113,7 +113,7 @@ class QSimulator:
 	def qsnapshot(self):
 		return self.cregister, self.sys_state
 
-	def qmeasure(self, qbit_list, cbit_list=None, basis=None, qtrace=False):
+	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
 		##
 		if cbit_list is None:
 			cbit_list = qbit_list
@@ -122,28 +122,11 @@ class QSimulator:
 		if not self.__valid_qbit_list(qbit_list):
 			errmsg = "Error: the list of qubits is not valid."
 			raise QSimError(errmsg)
-		# check the validity of basis
-		if (not basis is None) and self.validation:
-			if not self.qisunitary(basis):
-				errmsg = "Error: basis {:s} is not Unitary".format(basis[0])
-				raise QSimError(errmsg)
-
-		# pick out the name and, if available, the matrix of this basis
-		bname = "STANDARD"
-		if not basis is None:
-			bname = basis[0]
-			bmat = basis[1]
 
 		# align the qbits-to-measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
 		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
 		self.sys_state = rmat * self.sys_state
-
-		# align with basis
-		if not basis is None:
-			# Convert the mentioned qbits in the state to the given basis
-			full_sz_basis_mat = np.kron(bmat, np.eye(2**(self.nqbits-len(qbit_list))))
-			self.sys_state = full_sz_basis_mat * self.sys_state
 
 		list_len = len(qbit_list)
 		qbitmask = 0
@@ -189,13 +172,6 @@ class QSimulator:
 			else:
 				self.sys_state[i] = 0
 
-		# align back with standard basis
-		if not basis is None:
-			# Convert the mentioned qbits in the state to the given basis
-			invbasis = np.conjugate(np.transpose(bmat))
-			full_sz_invbasis_mat = np.kron(invbasis, np.eye(2**(self.nqbits-len(qbit_list))))
-			self.sys_state = full_sz_invbasis_mat * self.sys_state
-
 		# align the qbits back to original
 		self.sys_state = rrmat * self.sys_state
 
@@ -210,7 +186,7 @@ class QSimulator:
 			self.cregister[self.nqbits - cbit_list[i]-1] = meas_val[i]
 
 		if qtrace or self.trace:
-			hdr = "MEASURED in basis "+bname+", Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
+			hdr = "MEASURED "+"Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
 			self.qreport(header=hdr)
 
 		return meas_val
