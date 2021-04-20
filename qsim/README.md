@@ -7,6 +7,7 @@
 Lets start with a simple example of using qsim, something like a 'hello world' --
 
 	import qsim
+	from qgates import *
 	qc = qsim.QSimulator(8)
 	qc.qgate(qc.H(),[0])
 	qc.qgate(qc.C(),[0,3])
@@ -41,7 +42,9 @@ The output emitted by the above code is the dump of the state right after the se
 Lets go line by line to understand the code --
 
 >>> import qsim
-This line imports the qsim. Fairly straight forward.
+>>> from qgates import *
+The first line imports the qsim. Fairly straight forward.
+The second line imports various standard gates definitions whcih csn be used in your programs.
 
 >>> qc = qsim.QSimulator(8)
 The main class in qsim is QSimulator. This line creates an instance of that class. As a convention in this document, qc is always used to represent an instance of the class QSimulator. The QSimulator class instance, qc, represents a quantum computer. The number 8 as the argument to the constructor of class QSimulator, specifies the number of qubits in that quantum computer.
@@ -64,6 +67,7 @@ This last qreport() function call outputs the state after the measurement of the
 Now, let us run the same code with trace turned on (therefore removed the qreport() calls). Turning trace ON, it outputs the state after init and each gate and measurement steps (see accompanying helloworld_traceON.py) --
 
 	import qsim
+	from qgates import *
 	qc = qsim.QSimulator(8, qtrace=True)
 	qc.qgate(qc.H(),[0])
 	qc.qgate(qc.C(),[0,3])
@@ -82,7 +86,7 @@ and, here is its output --
 	00000000    0.70710678+0.00000000j
 	00001001    0.70710678+0.00000000j
 
-	MEASURED in basis STANDARD, Qubit[0] = [0] with probality = 0.5
+	MEASURED Qubit[0] = [0] with probality = 0.5
 	00000000    1.00000000+0.00000000j
 
 1.2	PROGRAMMING MODEL
@@ -118,7 +122,7 @@ If qtrace=True, it causes each gate and measurement operation to emit the result
 
 If qzeros=True, prints even those whose amplitude is 0.
 
-If validation=True, every qgate() call validates the gate to be unitary, and every qmeasure() call validates the basis passed
+If validation=True, every qgate() call validates the gate to be unitary
 
 If visualize=True, the qreport() displays an additional bar graph showing the magnitude of the amplitudes of each state.
 
@@ -136,13 +140,13 @@ The function qgate() validates the number of bits passed in list_of_qubits again
 
 If qtrace is True, the resulting state is printed out.
 
-2.4	v = qmeasure(qubit_list, basis=None, qtrace=False)
+2.4	v = qmeasure(qubit_list, qtrace=False)
 --------
 Returns the measured values of the qubits in the qubit_list, each 0 or 1, as a list, in the same order as the qubits in the qubit_list.
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
 
-Argument 'basis' is to pass a basis matrix to measure in that basis. See the BASIS section below for more details. Note that only the measurement of the specified qubits is done in that basis, the system's state after the measurement continues to be represented in the 'standard' basis. This is, essentially, just a convinience. You could very well apply a corresponding gate, measure, and then apply the inverse of that gate, to achive the same result. the 'basis' option just makes it easier to do that. Note that you can just pass that gate, as is, in place of the basis! Gate and Basis both have exactly the same representation in the simulator.
+To measure in some basis, you can apply corresponding operation (gate) to the qbits in question, measure, and then apply the inverse of that operation to those qbits.
 
 Cleary, the computations can continue after the measurement operations. Just that the overall state will have the appropriately collapsed state of the measured qubits.
 
@@ -324,23 +328,8 @@ Since the gate is defined in form of a function, it can take arguments. For inst
  
 (Note: To see some change in the state, perform an X() or H() or some such on the qubit before the phase rotation.)
 
-6. PRE-DEFINED BASIS
---------------------------------------------------------------------------------
-	BELL_BASIS()	Bell Basis (for two qubits)
-	HDM_BASIS()	Hadamard Basis (for one qubits), |+> and |->
 
-7. CREATING USER DEFINED BASIS
---------------------------------------------------------------------------------
-Users can define a function which returns an np.matrix([[...],[...],...[...]],dtype=complex), with each row giving the vector for a basis vector each.
-Note, the row number (top row is row 0) is the value that will be measured for that basis vector. E.g., for Bell Basis, shown below, the rows represent, respectively |Phi+>, |Phi->, |Psi+>, |Psi->. So if a qubit-pair is in |Phi+> state, the measurement of the 2 qubits will be (0,0); if in |Psi+> they will be measured as (1,0).
-	                    -           -
-	|phi+>             /  1  0  0  1  \
-	|phi->   1/sqrt(2) |  1  0  0 -1  |
-	|psi+>             |  0  1  1  0  |
-	|psi->             \  0  1 -1  0  /
-	                    -           -
-
-8. ERROR HANDLING, EXCEPTIONS
+6. ERROR HANDLING, EXCEPTIONS
 --------------------------------------------------------------------------------
 Various function calls raise exceptions, mostly in cases where user passed arguments are incorrect. The exceptions are raised using class qsim.QClibError, having an argument of a text string describing the error encountered.
 
@@ -357,7 +346,7 @@ Following is the list of error messages with the name of the function, thrown in
 
 	(TBD with the latest list)
 
-9. PERFORMANCE
+7. PERFORMANCE
 --------------------------------------------------------------------------------
 On my laptop PC (1 core, 1GB RAM, Ubuntu), I could go upto 11 qubits. More Compute, more memory = more qubits.
 
