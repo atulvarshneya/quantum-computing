@@ -43,11 +43,6 @@ Create a CONTROLLED GATE for any given gate; add any number of control qubits.
 
 Allows easy addition of user-defined gates.
 
-BASIS
--------------------
-Common basis for measurement are included - Bell-Basis, |+>/|->.
-
-Allows addition of any user-defined bases.
 
 UTILITIES
 -------------------
