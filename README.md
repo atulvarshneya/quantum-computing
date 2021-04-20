@@ -37,4 +37,4 @@ A number of utility functions to manipulate gates - combine sequentially applied
 
 Easy to follow documentation with tutorial introduction - see qsim/README.md and qckt/README.md.
 
-Code for [automated] regression tests also serves as examples to quickly learn qsim.
+Code for [automated] regression tests also serves as examples to quickly learn qsim and qckt.
