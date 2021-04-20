@@ -8,6 +8,8 @@ Problem Statement:
 """)
 
 import qsim
+import qgates
+from qSimException import *
 import numpy as np
 
 nqbits = 8
@@ -29,7 +31,7 @@ try:
 	q = qsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
 
 	# Perform QFT
-	qftgate = q.QFT(nqbits)
+	qftgate = qgates.QFT(nqbits)
 	q.qgate(qftgate, list(reversed(range(nqbits))))
 
 except qsim.QSimError as ex:

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qsim
+import qgates as qgt
 import numpy as np
 import random as rnd
 
@@ -26,42 +27,44 @@ q = qsim.QSimulator(3,initstate=init)
 q.qreport(header="Initial State")
 
 # first put qbits 0 and 1 in bell state
-q.qgate(q.H(),[0])
-q.qgate(q.C(),[0,1])
+q.qgate(qgt.H(),[0])
+q.qgate(qgt.C(),[0,1])
 # q.qreport(header="0 and 1 in bell state")
 # qbit 1 is kept 'here' and qbit 0 is sent 'far away'; and we have the input qbit to be teleported, qbit 2, also 'here'.
 
 # at 'here' we measure the qbit to be teleported and qbit 1 in bell basis.
-mvals = q.qmeasure([2,1],basis=q.BELL_BASIS())
+q.qgate(qgt.BELL_BASIS(),[2,1])
+mvals = q.qmeasure([2,1])
+q.qgate(q.qinverse(qgt.BELL_BASIS()),[2,1])
 b0 = mvals[1]
 b1 = mvals[0]
 
 # now we send these classical bits b0 and b1 to 'far away' and apply appropriate gates to recover the input bit's state in qbit 1
 if b1 == 0 and b0 == 0:
-	q.qgate(q.C(),[2,1])
-	q.qgate(q.H(),[2])
+	q.qgate(qgt.C(),[2,1])
+	q.qgate(qgt.H(),[2])
 elif b1 == 0 and b0 == 1:
-	q.qgate(q.Z(),[0])
+	q.qgate(qgt.Z(),[0])
 
 	# reset the state of 2 and 1, for clarity
-	q.qgate(q.C(),[2,1])
-	q.qgate(q.H(),[2])
-	q.qgate(q.X(),[2])
+	q.qgate(qgt.C(),[2,1])
+	q.qgate(qgt.H(),[2])
+	q.qgate(qgt.X(),[2])
 elif b1 == 1 and b0 == 0:
-	q.qgate(q.X(),[0])
+	q.qgate(qgt.X(),[0])
 
 	# reset the state of 2 and 1, for clarity
-	q.qgate(q.C(),[2,1])
-	q.qgate(q.H(),[2])
-	q.qgate(q.X(),[1])
+	q.qgate(qgt.C(),[2,1])
+	q.qgate(qgt.H(),[2])
+	q.qgate(qgt.X(),[1])
 else:
-	q.qgate(q.X(),[0])
-	q.qgate(q.Z(),[0])
+	q.qgate(qgt.X(),[0])
+	q.qgate(qgt.Z(),[0])
 
 	# reset the state of 2 and 1, for clarity
-	q.qgate(q.C(),[2,1])
-	q.qgate(q.H(),[2])
-	q.qgate(q.X(),[2])
-	q.qgate(q.X(),[1])
+	q.qgate(qgt.C(),[2,1])
+	q.qgate(qgt.H(),[2])
+	q.qgate(qgt.X(),[2])
+	q.qgate(qgt.X(),[1])
 
 q.qreport(header="Final state")

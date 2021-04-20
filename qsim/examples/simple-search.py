@@ -3,27 +3,28 @@
 import random as rnd
 import numpy as np
 import qsim
+import qgates as qgt
 
 
 def fx(q):
 	toss = int(rnd.random()*4.0)
 	print("Selected fx is {:02b}".format(toss))
 	if toss == 0:
-		q.qgate(q.X(),[2])
-		q.qgate(q.X(),[1])
-		q.qgate(q.T(),[2,1,0])
-		q.qgate(q.X(),[1])
-		q.qgate(q.X(),[2])
+		q.qgate(qgt.X(),[2])
+		q.qgate(qgt.X(),[1])
+		q.qgate(qgt.T(),[2,1,0])
+		q.qgate(qgt.X(),[1])
+		q.qgate(qgt.X(),[2])
 	elif toss == 1:
-		q.qgate(q.X(),[2])
-		q.qgate(q.T(),[2,1,0])
-		q.qgate(q.X(),[2])
+		q.qgate(qgt.X(),[2])
+		q.qgate(qgt.T(),[2,1,0])
+		q.qgate(qgt.X(),[2])
 	elif toss == 2:
-		q.qgate(q.X(),[1])
-		q.qgate(q.T(),[2,1,0])
-		q.qgate(q.X(),[1])
+		q.qgate(qgt.X(),[1])
+		q.qgate(qgt.T(),[2,1,0])
+		q.qgate(qgt.X(),[1])
 	elif toss == 3:
-		q.qgate(q.T(),[2,1,0])
+		q.qgate(qgt.T(),[2,1,0])
 
 def U():
 	return ["U",np.matrix([
@@ -42,10 +43,10 @@ print("-------------------------------------------------------------------------
 print()
 
 q = qsim.QSimulator(3)
-q.qgate(q.X(),[0])
-q.qgate(q.H(),[0])
-q.qgate(q.H(),[2])
-q.qgate(q.H(),[1])
+q.qgate(qgt.X(),[0])
+q.qgate(qgt.H(),[0])
+q.qgate(qgt.H(),[2])
+q.qgate(qgt.H(),[1])
 fx(q)
 # q.qmeasure([0])
 q.qgate(U(),[2,1])

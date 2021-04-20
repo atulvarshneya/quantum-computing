@@ -3,6 +3,8 @@
 import random as rnd
 import numpy as np
 import qsim
+import qgates as qgt
+from qSimException import *
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -24,21 +26,21 @@ def fx(q):
 		print("fx is CONSTANT.")
 	elif toss == 1:
 		print("fx is BALANCED.")
-		q.qgate(q.C(),[1,0])
+		q.qgate(qgt.C(),[1,0])
 
 try:
 	q = qsim.QSimulator(nqbits)
-	q.qgate(q.X(),[0])
-	q.qgate(q.H(),[0])
+	q.qgate(qgt.X(),[0])
+	q.qgate(qgt.H(),[0])
 
 	for i in range(nqbits-1):
-		q.qgate(q.H(),[i+1])
+		q.qgate(qgt.H(),[i+1])
 
 	fx(q)
 	# q.qmeasure([0]) # measure it if you like, does not change anything
 
 	for i in range(nqbits-1):
-		q.qgate(q.H(),[i+1])
+		q.qgate(qgt.H(),[i+1])
 
 	v = q.qmeasure(list(range(nqbits-1,0,-1)),qtrace=False)
 	if 1 in v:
@@ -46,5 +48,5 @@ try:
 	else:
 		print("Found fx is CONSTANT")
 
-except qsim.QSimError as ex:
+except QSimError as ex:
 	print(ex.args)

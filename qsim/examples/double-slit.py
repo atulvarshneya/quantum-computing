@@ -72,6 +72,7 @@ does the measurement of the location of the electron (qubit 0).
 
 import numpy as np
 import qsim
+import qgates as qgt
 
 for e in range(11):
 	# 1. one-after-another create states of different entangelment with D
@@ -91,7 +92,7 @@ for e in range(11):
 	dist = [0]*2
 	for i in range(samples):
 		q.qreset()
-		q.qgate(q.H(),[0])
+		q.qgate(qgt.H(),[0])
 		m = q.qmeasure([0])
 		v = m[0]
 		dist[v] += 1

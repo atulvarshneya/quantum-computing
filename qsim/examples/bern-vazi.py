@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qsim
+import qgates as qgt
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -24,9 +25,9 @@ def get_fx(qc):
 	fx_oplist = []
 	for i in range(input_sz):
 		if secret_code & (0x1<<i):
-			sn_optep = qc.qstretch(qc.C(),[i,input_sz])
+			sn_optep = qc.qstretch(qgt.C(),[i,input_sz])
 			fx_oplist.append(sn_optep)
-	fx = qc.qcombine_seq("FX",fx_oplist)
+	fx = qgt.qcombine_seq("FX",fx_oplist)
 	return fx
 
 class bernvazi:
@@ -48,14 +49,14 @@ class bernvazi:
 
 		###########################################################################
 		# Step 0: Prepare the result bit |b> to |->
-		self.qc.qgate(self.qc.X(),[self.inputsz])
-		self.qc.qgate(self.qc.H(),[self.inputsz])
+		self.qc.qgate(qgt.X(),[self.inputsz])
+		self.qc.qgate(qgt.H(),[self.inputsz])
 		print("Step 0: Prepared |b> as |->")
 
 		###########################################################################
 		## Step 1: Apply H on all qbits of |x>
 		for i in range(self.inputsz):
-			self.qc.qgate(self.qc.H(),[i])
+			self.qc.qgate(qgt.H(),[i])
 		print("Step 1: Applied H to all |x> qbits")
 
 		###########################################################################
@@ -68,7 +69,7 @@ class bernvazi:
 		###########################################################################
 		## Step 3: Again apply H on all qbits of |x>
 		for i in range(self.inputsz):
-			self.qc.qgate(self.qc.H(),[i])
+			self.qc.qgate(qgt.H(),[i])
 		print("Step 3: Again Applied H to all |x> qbits")
 
 		###########################################################################

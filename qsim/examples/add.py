@@ -21,6 +21,7 @@ Need to copy the final carry-out bit into the highest order result bit, as shown
 
 
 import qsim
+import qgates as qgt
 
 q = qsim.QSimulator(10,qtrace=False)
 
@@ -29,27 +30,27 @@ c = [3, 4, 5]	# carry bits, scratch pad register - Junk bits
 b = [6, 7]	# input number B
 a = [8, 9]	# input number A
 
-H4 = q.qcombine_par("H4",[q.H(),q.H(),q.H(),q.H()])
+H4 = qgt.qcombine_par("H4",[qgt.H(),qgt.H(),qgt.H(),qgt.H()])
 q.qgate(H4,[a[0],a[1],b[0],b[1]])
 
 # run the addition 
 for i in range(2):
 	print("Processing bit", i)
-	q.qgate(q.C(),[a[i],s[i]])
-	q.qgate(q.C(),[b[i],s[i]])
-	q.qgate(q.C(),[c[i],s[i]])
-	q.qgate(q.T(),[a[i],b[i],c[i+1]])
-	q.qgate(q.X(),[s[i]])
-	q.qgate(q.T(),[s[i],c[i],c[i+1]])
-	q.qgate(q.X(),[s[i]])
-q.qgate(q.C(),[c[2],s[2]])
+	q.qgate(qgt.C(),[a[i],s[i]])
+	q.qgate(qgt.C(),[b[i],s[i]])
+	q.qgate(qgt.C(),[c[i],s[i]])
+	q.qgate(qgt.T(),[a[i],b[i],c[i+1]])
+	q.qgate(qgt.X(),[s[i]])
+	q.qgate(qgt.T(),[s[i],c[i],c[i+1]])
+	q.qgate(qgt.X(),[s[i]])
+q.qgate(qgt.C(),[c[2],s[2]])
 
 # Clean up the junk bits
 print("Cleaning up junk bits")
 for i in reversed(range(2)):
-	q.qgate(q.X(),[s[i]])
-	q.qgate(q.T(),[s[i],c[i],c[i+1]])
-	q.qgate(q.X(),[s[i]])
-	q.qgate(q.T(),[a[i],b[i],c[i+1]])
+	q.qgate(qgt.X(),[s[i]])
+	q.qgate(qgt.T(),[s[i],c[i],c[i+1]])
+	q.qgate(qgt.X(),[s[i]])
+	q.qgate(qgt.T(),[a[i],b[i],c[i+1]])
 
 q.qreport("Result")
