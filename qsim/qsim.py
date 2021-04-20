@@ -112,7 +112,7 @@ class QSimulator:
 			self.qreport(header=hdr)
 
 	def qsnapshot(self):
-		return self.cregister, self.sys_state
+		return self.cregister, np.squeeze(np.asarray(self.sys_state))
 
 	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
 		##
@@ -224,11 +224,6 @@ class QSimulator:
 		for i in range(self.ncbits): # cregister[0] is MSB
 			print("{0:01b}".format(self.cregister[i]),end="")
 		print()
-
-	def qstate(self):
-		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
-		state_array = np.squeeze(np.asarray(self.sys_state))
-		return state_array
 
 	def qsize(self):
 		return self.nqbits
@@ -426,7 +421,3 @@ if __name__ == "__main__":
 		q.qreport()
 	except QSimError as m:
 		print(m.args)
-
-	# st = q.qstate()
-	# for i in range(len(st)):
-	#	print '{:08b}'.format(i), st[i]
