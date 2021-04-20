@@ -24,22 +24,9 @@ An interactive commandline interface (qc-cli.py) to quickly check out operations
 
 GATES
 -------------------
-All commonly used gates included 
-* Hadamard
-* CNOT
-* SWAP
-* CSWAP
-* SQSWAP (square root of SWAP)
-* Toffoli
-* Pauli_x
-* Pauli_y
-* Pauli_z
-* Phase rotation by phi
-* Phase rotation by 2*pi/(2^k)
-* n-qubit QFT
-* n-qubit Hadamard
+All commonly used gates included.
 
-Create a CONTROLLED GATE for any given gate; add any number of control qubits.
+Can create CONTROLLED GATE for any given gate; add any number of control qubits.
 
 Allows easy addition of user-defined gates.
 
