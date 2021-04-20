@@ -61,10 +61,10 @@ if len(svec1.value) != len(svec2.value):
 	isequal = False
 else:
 	for i in range(len(svec1.value)):
-		amp1 = svec1.value[i][0]
-		amp2 = svec2.value[i][0]
+		amp1 = svec1.value[i]
+		amp2 = svec2.value[i]
 		if abs(amp1.real - amp2.real) > maxerr or abs(amp1.imag - amp2.imag) > maxerr :
-			print(f"i = {i:} is different", svec1.value[i][0], svec2.value[i][0])
+			print(f"i = {i:} is different", svec1.value[i], svec2.value[i])
 			isequal = False
 if isequal:
 	print("QFT and composed-QFT circuit are equivalent")
