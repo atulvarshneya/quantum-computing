@@ -17,6 +17,7 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 * Quantum Fourier Tramsform
 * Period-finding
 * Grover's algorithm
+* Sudoku using Grover's algorithm
 * ... more added every few days
 
 An interactive commandline interface (qc-cli.py) to quickly check out operations and sequences.
