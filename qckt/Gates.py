@@ -471,9 +471,9 @@ class Probe(QGate):
 			self.probeobject.analyze(creglist,sveclist)
 		print(self.header)
 		for i in range(len(sveclist)):
-			if (self.probestates is None and abs(sveclist[i].item(0)) > 0.0) \
+			if (self.probestates is None and abs(sveclist[i]) > 0.0) \
 					or (self.probestates is not None and i in self.probestates):
-				print(("{0:0"+str(nqbits)+"b}    {1:.8f}").format(i, sveclist[i].item(0)))
+				print(("{0:0"+str(nqbits)+"b}    {1:.8f}").format(i, sveclist[i]))
 		cregsz = len(creglist)
 		print("CREGISTER: ",end="")
 		for i in range(cregsz):

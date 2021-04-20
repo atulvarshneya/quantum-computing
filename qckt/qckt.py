@@ -106,7 +106,7 @@ class Backend():
 			g.exec(qc)
 		# fetch the last value of the cregister, state_vector
 		(creg, svec) = qc.qsnapshot()
-		(self.result.cregister.value, self.result.state_vector.value) = (creg,svec.tolist())
+		(self.result.cregister.value, self.result.state_vector.value) = (creg,svec)
 		self.result.cregister.intvalue = 0
 		for i in range(len(self.result.cregister.value)):
 			self.result.cregister.intvalue = 2 * self.result.cregister.intvalue
@@ -153,8 +153,8 @@ class _StateVector:
 		svec_str = ""
 		s = 0
 		for i in self.value:
-			if self.verbosity or np.absolute(i[0]) > 10**(-6):
-				svec_str = svec_str + statefmt.format(s) + "  " + "{:.8f}".format(i[0]) + "\n"
+			if self.verbosity or np.absolute(i) > 10**(-6):
+				svec_str = svec_str + statefmt.format(s) + "  " + "{:.8f}".format(i) + "\n"
 			s += 1
 		return svec_str
 
