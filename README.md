@@ -17,6 +17,7 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 * Quantum Fourier Tramsform
 * Period-finding
 * Grover's algorithm
+* Sudoku using Grover's algorithm
 * ... more added every few days
 
 An interactive commandline interface (qc-cli.py) to quickly check out operations and sequences.
@@ -24,30 +25,12 @@ An interactive commandline interface (qc-cli.py) to quickly check out operations
 
 GATES
 -------------------
-All commonly used gates included 
-* Hadamard
-* CNOT
-* SWAP
-* CSWAP
-* SQSWAP (square root of SWAP)
-* Toffoli
-* Pauli_x
-* Pauli_y
-* Pauli_z
-* Phase rotation by phi
-* Phase rotation by 2*pi/(2^k)
-* n-qubit QFT
-* n-qubit Hadamard
+All commonly used gates included.
 
-Create a CONTROLLED GATE for any given gate; add any number of control qubits.
+Can create CONTROLLED GATE for any given gate; add any number of control qubits.
 
 Allows easy addition of user-defined gates.
 
-BASIS
--------------------
-Common basis for measurement are included - Bell-Basis, |+>/|->.
-
-Allows addition of any user-defined bases.
 
 UTILITIES
 -------------------
@@ -55,4 +38,4 @@ A number of utility functions to manipulate gates - combine sequentially applied
 
 Easy to follow documentation with tutorial introduction - see qsim/README.md and qckt/README.md.
 
-Code for [automated] regression tests also serves as examples to quickly learn qsim.
+Code for [automated] regression tests also serves as examples to quickly learn qsim and qckt.
