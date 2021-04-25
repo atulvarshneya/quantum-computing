@@ -12,6 +12,7 @@ class GateWrapper:
 	def addGate(self, *args, **kwargs):
 		gate = self.GateCls(*args, **kwargs)
 		gate.addtoqckt(self.qckt)
+		return self.qckt
 
 class QGate:
 	def __init__(self):
