@@ -31,7 +31,7 @@ class Canvas:
 		return self
 
 	def _add_simple(self,qbit,symbol):
-		if type(qbit) is list:
+		if issubclass(type(qbit),list):
 			return self._add_multiple(qbit,symbol)
 		else:
 			ncols = len(symbol) + 2
