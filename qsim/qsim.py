@@ -96,7 +96,7 @@ class QSimulator:
 	def qgate(self, oper, qbit_list, qtrace=False):
 		##
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		if not self.__valid_qbit_list(qbit_list):
+		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
 			raise QSimError(errmsg)
 		if self.validation:
@@ -115,13 +115,20 @@ class QSimulator:
 		return self.cregister, np.squeeze(np.asarray(self.sys_state))
 
 	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
+		if not self.__valid_bit_list(qbit_list,self.nqbits):
+			errmsg = "Error: the list of qubits is not valid."
+			raise QSimError(errmsg)
 		##
 		if cbit_list is None:
 			cbit_list = qbit_list
-		## TODO: check cbit_list has all entries unique and within the cbit register
-		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		if not self.__valid_qbit_list(qbit_list):
-			errmsg = "Error: the list of qubits is not valid."
+		# check the validity of the cbit_list (reapeated cbits, all cbits within self.ncbits)
+		if not self.__valid_bit_list(cbit_list,self.ncbits):
+			errmsg = "Error: the list of cubits is not valid."
+			raise QSimError(errmsg)
+		# check if equal number of qbits and cbits are passed
+		if len(qbit_list) != len(cbit_list):
+			errmsg = "Error: number of qbits and cbits passed are unequal."
 			raise QSimError(errmsg)
 
 		# align the qbits-to-measure to the MSB
@@ -165,7 +172,7 @@ class QSimulator:
 			else:
 				meas_val.append(1)
 
-		# now, collapse to the selected state (all other amplitudes = 0, and normlize the amplitudes
+		# now, collapse to the selected state (all other amplitudes = 0), and normlize the amplitudes
 		to_match = sel << shift_bits
 		for i in range(len(self.sys_state)):
 			if (i & qbitmask) == to_match:
@@ -177,14 +184,11 @@ class QSimulator:
 		self.sys_state = rrmat * self.sys_state
 
 		# finally update classical bits register with the measurement
-		if len(qbit_list) != len(cbit_list):
-			errmsg = "Error: list of classical bits is not valid"
-			raise QSimError(errmsg)
 		# print("meas_val = ", meas_val)
 		# print("qbit_list = ", qbit_list)
 		# print("cbit_list = ", cbit_list)
 		for i in range(len(cbit_list)):
-			self.cregister[self.nqbits - cbit_list[i]-1] = meas_val[i]
+			self.cregister[self.ncbits - cbit_list[i]-1] = meas_val[i]
 
 		if qtrace or self.trace:
 			hdr = "MEASURED "+"Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
@@ -241,13 +245,13 @@ class QSimulator:
 	## Utility functions ###############################################################################
 	####################################################################################################
 
-	def __valid_qbit_list(self,qbit_list):
-		if len(qbit_list) > self.nqbits:
+	def __valid_bit_list(self,bit_list,nbits):
+		if len(bit_list) > nbits:
 			return False
-		for i in qbit_list:
-			if i >= self.nqbits:
+		for i in bit_list:
+			if i >= nbits:
 				return False
-			if qbit_list.count(i) != 1:
+			if bit_list.count(i) != 1:
 				return False
 		return True
 
