@@ -96,3 +96,8 @@ def isunitary(mat):
 					return False
 	return True
 
+
+def opmat_dagger(opMat):
+	mat = opMat[:]
+	invmat = np.conjugate(np.transpose(mat))
+	return invmat
