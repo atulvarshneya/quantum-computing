@@ -96,8 +96,18 @@ def isunitary(mat):
 					return False
 	return True
 
-
 def opmat_dagger(opMat):
 	mat = opMat[:]
 	invmat = np.conjugate(np.transpose(mat))
 	return invmat
+
+## Utility function to add control bit
+def CTL(opMatrix):
+	(r,c) = opMatrix.shape
+	oparr = np.array(opMatrix)
+	coparr = np.eye(r*2,dtype=complex)
+	for i in range(r,r*2):
+		for j in range(r,r*2):
+			coparr[i][j] = oparr[i-r][j-r]
+	return np.matrix(coparr,dtype=complex)
+

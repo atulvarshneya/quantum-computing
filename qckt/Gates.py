@@ -82,16 +82,6 @@ class QGate:
 		return stringify
 		# return self.name+":"+str(self.qbits)
 
-	## Utility function to add control bit
-	def CTL(self,opMatrix):
-		(r,c) = opMatrix.shape
-		oparr = np.array(opMatrix)
-		coparr = np.eye(r*2,dtype=complex)
-		for i in range(r,r*2):
-			for j in range(r,r*2):
-				coparr[i][j] = oparr[i-r][j-r]
-		return np.matrix(coparr,dtype=complex)
-
 	##############################################################################
 	## Args validation methods
 	##############################################################################
@@ -256,7 +246,7 @@ class CX(QGate):
 		self.name = "CX"
 		self.opMatrix = np.matrix([[0,1],[1,0]],dtype=complex)
 		for i in range(len(self.qbits)-1):
-			self.opMatrix = self.CTL(self.opMatrix)
+			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["X"])
@@ -277,7 +267,7 @@ class CY(QGate):
 		self.name = "CY"
 		self.opMatrix = np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)
 		for i in range(len(self.qbits)-1):
-			self.opMatrix = self.CTL(self.opMatrix)
+			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Y"])
@@ -298,7 +288,7 @@ class CZ(QGate):
 		self.name = "CZ"
 		self.opMatrix = np.matrix([[1,0],[0,-1]],dtype=complex)
 		for i in range(len(self.qbits)-1):
-			self.opMatrix = self.CTL(self.opMatrix)
+			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Z"])
@@ -318,7 +308,7 @@ class CCX(QGate):
 		super().__init__()
 		self.qbits = [control1, control2, target]
 		self.name = "CCX"
-		self.opMatrix = self.CTL(self.CTL(np.matrix([[0,1],[1,0]],dtype=complex)))
+		self.opMatrix = gutils.CTL(gutils.CTL(np.matrix([[0,1],[1,0]],dtype=complex)))
 
 	def addtocanvas(self,canvas):
 		canvas._add_connected(self.qbits,[".",".","X"])
@@ -590,7 +580,7 @@ class CP(QGate):
 		sphi = np.sin(phi)
 		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
 		for q in range(len(self.qbits)-1):
-			self.opMatrix = self.CTL(self.opMatrix)
+			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["P"])
@@ -638,7 +628,7 @@ class CROTk(QGate):
 		sk = np.sin(2*np.pi/(2**k))
 		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
 		for i in range(len(self.qbits)-1):
-			self.opMatrix = self.CTL(self.opMatrix)
+			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
 		# canvas._add_simple(self.qbits,[".","UROTk"])
