@@ -4,7 +4,7 @@ import qckt as q
 from qException import QCktException
 import numpy as np
 
-ck = q.QCkt(4)
+ck = q.QCkt(4,4)
 
 try:
 	ck.X(8)

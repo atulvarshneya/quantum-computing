@@ -12,8 +12,8 @@ STATE VECTOR READ OUT
 0001  0.70710678+0.00000000j
 0111  0.70710678+0.00000000j
 
-CREGISTER READ OUT
-0000
+CREGISTER READ OUT: 
+
 q000 -[X]-------------
                       
 q001 -----[H]-----[.]-
@@ -30,8 +30,8 @@ STATE VECTOR READ OUT
 0101  0.50000000+0.00000000j
 1111  0.50000000+0.00000000j
 
-CREGISTER READ OUT
-0000
+CREGISTER READ OUT: 
+
 q000 -[X]---------[X]-----------------[M]-
                                        |  
 q001 -----[X]---------[Y]---------[M]--|--
@@ -45,7 +45,7 @@ creg ==========================v===v===v==
 STATE VECTOR READ OUT
 0100  0.00000000+1.00000000j
 
-CREGISTER READ OUT
+CREGISTER READ OUT: 
 0100
 q000 -[X]---------[P]---------
                               
@@ -64,8 +64,8 @@ creg =========================
 STATE VECTOR READ OUT
 010011  0.00000000+1.00000000j
 
-CREGISTER READ OUT
-000000
+CREGISTER READ OUT: 
+
 q000 -[X]-[UROTk]-[*]-
                    |  
 q001 --------------|--
@@ -83,8 +83,8 @@ creg =================
 STATE VECTOR READ OUT
 010000  0.70710678+0.70710678j
 
-CREGISTER READ OUT
-000000
+CREGISTER READ OUT: 
+
 q000 -[X]----------#-[QFT L]--#-
                    # |     |  # 
 q001 --------------#-[QFT  ]--#-
@@ -133,5 +133,5 @@ STATE VECTOR READ OUT
 011110  -0.06764951-0.16332037j
 011111  -0.09821187+0.14698445j
 
-CREGISTER READ OUT
-000000
+CREGISTER READ OUT: 
+

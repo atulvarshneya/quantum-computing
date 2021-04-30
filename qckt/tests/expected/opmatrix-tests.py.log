@@ -11,7 +11,7 @@ creg ==============================v=
 PROBE: Expanded Circuit
 0010    0.70710678+0.00000000j
 1111    -0.00056309-0.70710656j
-CREGISTER: 0000
+CREGISTER: 
 ====================================
 q000 -[CKT L]--v-
       |     |  V 
@@ -26,7 +26,7 @@ creg ==========v=
 PROBE: Circuit to_opMatrix()
 0010    0.70710678+0.00000000j
 1111    -0.00056309-0.70710656j
-CREGISTER: 0000
+CREGISTER: 
 
 ===================
 BOTH SVECS ARE SAME

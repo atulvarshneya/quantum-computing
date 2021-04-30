@@ -26,7 +26,7 @@ qckt2.draw()
 qckt2.list()
 
 print("fragment of the final circuit-------------------")
-qckt3 = qckt.QCkt(4,name="ckt03")
+qckt3 = qckt.QCkt(4,4,name="ckt03")
 qckt3.M([2,3])
 qckt3.Border()
 qckt3.draw()
