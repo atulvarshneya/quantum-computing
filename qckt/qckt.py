@@ -21,11 +21,7 @@ class GateWrapper:
 
 class QCkt:
 
-	def __init__(self, nqubits, nclbits=None, name=None):
-		# nq - number of quantum bits
-		# nc - number of classical bits
-		if (nclbits is None):
-			nclbits = nqubits
+	def __init__(self, nqubits, nclbits=0, name=None):
 		self.nqubits = nqubits
 		self.nclbits = nclbits
 		self.circuit = []

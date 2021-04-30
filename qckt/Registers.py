@@ -23,8 +23,8 @@ class CRegister(Register):
 def placement(*regs):
 	qbitplaced = QRegister(0).placeMSB(0) # trick to mark the register 'placed'
 	cbitplaced = CRegister(0).placeMSB(0) # trick to mark the register 'placed'
-	qbitsz = None
-	cbitsz = None
+	qbitsz = 0
+	cbitsz = 0
 	for r in reversed(regs):
 		if type(r) is QRegister:
 			if r.placed: raise QCktException("Attempt to place already placed QRegister")
