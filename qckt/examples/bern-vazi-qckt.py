@@ -33,6 +33,7 @@ def get_fxckt(nq):
 class bernvazi:
 	def __init__(self, qsimsz):
 		self.nqubits = qsimsz
+		self.nclbits = qsimsz
 
 	def gen_bv_ckt(self):
 		print("Getting the secret function box...")
@@ -47,7 +48,7 @@ class bernvazi:
 
 		###########################################################################
 		# Step 0: Prepare the result bit |b> to |->
-		bv_ckt = qckt.QCkt(self.nqubits)
+		bv_ckt = qckt.QCkt(self.nqubits, self.nclbits)
 		bv_ckt.X(self.nqubits-1)
 		bv_ckt.H(self.nqubits-1)
 		print("Step 0: Prepared |b> as |->")

@@ -42,7 +42,7 @@ ampckt.H([i for i in range(nqubits)])
 # print("===AMPLIFY======")
 # ampckt.draw()
 
-fullckt = qckt.QCkt(nqubits)
+fullckt = qckt.QCkt(nqubits,nqubits)
 fullckt = fullckt.append(initckt)
 numitrs = int((np.pi/4.0)*(2.0**(nqubits/2.0))) # optimal # iter, less or more dont work
 print("INVERT(Uf)-AMPLIFY iterations = ",numitrs)

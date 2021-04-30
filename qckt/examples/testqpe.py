@@ -8,16 +8,19 @@ import libqpe as qpe
 n_counting_qubits = 4
 
 measurement_qubits = regs.QRegister(n_counting_qubits)
+gap1 = regs.QRegister(1)
 target_qubit = regs.QRegister(1)
-nqubits,_,qplaced,_ = regs.placement(target_qubit, measurement_qubits)
+gap2 = regs.QRegister(1)
+measurement_clbits = regs.CRegister(n_counting_qubits)
+nqubits,nclbits,qplaced,_ = regs.placement(gap1, target_qubit, measurement_qubits, gap2, measurement_clbits)
 
 theta = 6.0/8.0
 uop = qckt.QCkt(1).P(2*np.pi*theta,0).to_opMatrix()
-# mycircuit = qpe_program(n, theta)
-mycircuit = qckt.QCkt(nqubits)
+mycircuit = qckt.QCkt(nqubits,nclbits)
 mycircuit.X(target_qubit)
 qpeckt = qpe.QPE(uop, target_qubit, measurement_qubits).getckt()
 mycircuit = mycircuit.append(qpeckt)
+mycircuit.M(measurement_qubits, measurement_clbits)
 mycircuit.draw()
 
 ####

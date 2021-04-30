@@ -10,21 +10,26 @@ class QPE:
 		self.measurement_qubits = measurement_qubits
 		self.uop_qubits = uop_qubits
 		self.uop = uop
-		self.nqubits = len(measurement_qubits) + len(uop_qubits)
+		self.nqubits = max(measurement_qubits + uop_qubits) + 1
 		self.qpe_circuit = None
 
-		qc = qckt.QCkt(self.nqubits)
+		compact_measqubits = regs.QRegister(len(self.measurement_qubits))
+		compact_uopqubits = regs.QRegister(len(self.uop_qubits))
+		compact_cregister = regs.CRegister(len(compact_measqubits))
+		compact_nqubits,compact_nclbits,_,_ = regs.placement(compact_uopqubits,compact_measqubits, compact_cregister)
+
+		qc = qckt.QCkt(compact_nqubits)
 
 		# Initialize the qubits, all counting qubits H
-		qc.H(measurement_qubits)
+		qc.H(compact_measqubits)
 
 		# Apply the controlled unitary operators in sequence
 		cuop = gutils.CTL(self.uop)
-		len_measq = len(measurement_qubits)
+		len_measq = len(compact_measqubits)
 		repetitions = 1
 		for ctrl_qubit in range(len_measq):
 			for r in range(repetitions):
-				qc.CUSTOM("UOP", cuop, ([self.measurement_qubits[len_measq-ctrl_qubit-1]] + self.uop_qubits))
+				qc.CUSTOM("UOP", cuop, ([compact_measqubits[len_measq-ctrl_qubit-1]] + compact_uopqubits))
 			repetitions *= 2
 
 		# Apply the inverse quantum Fourier transform
@@ -32,12 +37,11 @@ class QPE:
 		nq,_,_,_ = regs.placement(qftckt_qubits)
 		QFTinvOp = gutils.opmat_dagger(qckt.QCkt(nq).QFT(qftckt_qubits).to_opMatrix())
 
-		qc.CUSTOM("QFTinv", QFTinvOp, measurement_qubits)
-		qc.M(measurement_qubits)
-		self.qpe_circuit = qc
+		qc.CUSTOM("QFTinv", QFTinvOp, compact_measqubits)
+		qc = qc.realign(self.nqubits, 0, self.uop_qubits+self.measurement_qubits)
 
+		self.qpe_circuit = qc
 
 	def getckt(self):
 		return self.qpe_circuit
-
 

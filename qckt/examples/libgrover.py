@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+import Registers as regs
 import numpy as np
 import random as rnd
 from qException import QCktException
@@ -27,13 +28,13 @@ class Grover:
 		# compute the sizes of the in,out and the overall circuit
 		inreg_len = len(self.uf_inreg)
 		outreg_len = len(self.uf_outreg)
-		totreg_len = inreg_len + outreg_len
 
 		###
-		# Start building the basic grover circuit, sized appropritely ofr the in and out registers
+		# Start building the basic grover circuit, sized appropritely for the in and out registers
 		###
-		self.compact_inreg  = [i for i in reversed(range(inreg_len))]
-		self.compact_outreg = [i+inreg_len for i in reversed(range(outreg_len))]
+		self.compact_inreg  = regs.QRegister(inreg_len)
+		self.compact_outreg = regs.QRegister(outreg_len)
+		totreg_len,_,_,_ = regs.placement(self.compact_outreg,self.compact_inreg)
 
 		#### 1. Initialization circuit
 		init_ckt = qckt.QCkt(totreg_len,name="Initialize")
@@ -61,7 +62,7 @@ class Grover:
 		###
 		# Now assemble all the componet circuits into the overall full circuit
 		###
-		fullckt = qckt.QCkt(totreg_len,name="Full Grover's Circuit")
+		fullckt = qckt.QCkt(self.fullnqbits,self.fullncbits,name="Full Grover's Circuit")
 		#### 1. align init_ckt and amp_ckt to the actual qubits assigned in the provided uf_ckt
 		init_ckt = init_ckt.realign(self.fullnqbits,self.fullncbits,self.uf_outreg+self.uf_inreg)
 		amp_ckt = amp_ckt.realign(self.fullnqbits,self.fullncbits,self.uf_outreg+self.uf_inreg)
@@ -78,8 +79,6 @@ class Grover:
 			if self.probestates is not None:
 				fullckt.Probe("after iteration "+str(itr+1), probestates=self.probestates)
 			fullckt.Border()
-		#### 2.3 Finally measure the inreg qubits
-		fullckt.M(self.uf_inreg)
 		# print("### Grover's Circuit ################################")
 		# fullckt.draw()
 		self.groverckt = fullckt
@@ -87,36 +86,6 @@ class Grover:
 	def getckt(self):
 		return self.groverckt
 
-	def solve(self,shots):
-		maxattempts = shots
-		solved = False
-		for m in range(maxattempts):  # Look for best of all attempts
-			bk = qckt.Backend()
-			bk.run(self.groverckt, qtrace=False)
-			res = bk.get_creg()
-
-			### Verify if the result is correct
-			totreg_len = len(self.uf_inreg) + len(self.uf_outreg)
-			verifyckt = qckt.QCkt(self.fullnqbits,name="Verify")
-			x_list = []
-			for i in range(self.fullnqbits):
-				if (res.intvalue & (0b1<<i)) != 0:
-					x_list.append(i)
-			if len(x_list) > 0:
-				verifyckt.X(x_list)
-			# verifyckt = verifyckt.realign(self.fullnqbits, self.fullncbits,self.uf_outreg+self.uf_inreg)
-			verifyckt = verifyckt.append(self.uf_ckt)
-			verifyckt.M(self.uf_outreg,[0])
-			# print("### Verification Circuit ################################")
-			# verifyckt.draw()
-
-			bk = qckt.Backend()
-			bk.run(verifyckt)
-			creg = bk.get_creg()
-			if creg.intvalue == 1:
-				solved = True
-				break
-		return solved,res.intvalue
-
 if __name__ == "__main__":
+
 	pass

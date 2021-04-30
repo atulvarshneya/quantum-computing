@@ -29,7 +29,7 @@ def get_fxckt(nq):
 	return fxckt
 
 
-dj_ckt = qckt.QCkt(nqbits)
+dj_ckt = qckt.QCkt(nqbits,nqbits)
 dj_ckt.X(0)
 dj_ckt.H(0)
 

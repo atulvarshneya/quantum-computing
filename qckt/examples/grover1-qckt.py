@@ -41,7 +41,7 @@ init_ckt.X(nqbits-1)
 init_ckt.H(nqbits-1)
 # init_ckt.draw()
 
-fullckt = qckt.QCkt(nqbits,name="Full Grover's Circuit")
+fullckt = qckt.QCkt(nqbits,nqbits,name="Full Grover's Circuit")
 fullckt = fullckt.append(init_ckt)
 fullckt.Probe("after initialization", probestates=[marker])
 numitrs = int((np.pi/4.0) * (2.0**((nqbits-1.0)/2.0))) # optimal # iter, less or more dont work
@@ -63,7 +63,7 @@ for m in range(maxattempts):  # Look for best of all attempts
 	print()
 
 	### Verify if the resultis correct
-	verifyckt = qckt.QCkt(nqbits,name="Verify")
+	verifyckt = qckt.QCkt(nqbits,nqbits,name="Verify")
 	x_list = []
 	for i in range(nqbits-1):
 		if (res.intvalue & (0b1<<i)) != 0:
