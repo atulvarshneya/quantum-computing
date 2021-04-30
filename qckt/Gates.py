@@ -5,18 +5,8 @@ import random as rnd
 import GatesUtils as gutils
 from qException import QCktException
 
-class GateWrapper:
-	def __init__(self, qckt, gateCls):
-		self.qckt = qckt
-		self.GateCls = gateCls
-	def addGate(self, *args, **kwargs):
-		gate = self.GateCls(*args, **kwargs)
-		gate.addtoqckt(self.qckt)
-		return self.qckt
-
 class QGate:
 	def __init__(self):
-		self.qckt = None
 		self.qbits = None
 		self.cbits = None
 		self.gateparams = []
@@ -33,13 +23,6 @@ class QGate:
 				newseq.append(nseq[nqbits-i-1])
 		return newseq
 
-	def addtoqckt(self, qckt):
-		self.qckt = qckt
-		qckt.circuit.append(self)
-		if self.check_qbit_args() == False:
-			errmsg = "Error: qubit arguments incorrect. " + self.name + str(self.qbits)
-			raise QCktException(errmsg)
-
 	def realign(self,newseq):
 		self.qbits = self._reorderlist(self.qbits,newseq)
 		if self.cbits is not None:
@@ -54,8 +37,7 @@ class QGate:
 		else:
 			qsim.qgate([self.name,self.opMatrix], self.qbits)
 
-	def to_fullmatrix(self):
-		(nqbits,_) = self.qckt.get_size()
+	def to_fullmatrix(self,nqbits):
 		oplist = []
 		if issubclass(type(self.qbits[0]),list) and len(self.qbits) == 1:
 			for q in self.qbits[0]:
@@ -80,17 +62,16 @@ class QGate:
 		if self.cbits is not None:
 			stringify = stringify + ":"+str(self.cbits)
 		return stringify
-		# return self.name+":"+str(self.qbits)
 
 	##############################################################################
 	## Args validation methods
 	##############################################################################
 
-	def check_qbit_args(self):
+	def check_qbit_args(self,nqbits):
 		## to be overridden by individual gates
-		print("TODO: Arcgs validation missing for ",type(self).__name__)
+		print("TODO: Args validation missing for ",type(self).__name__)
 
-	def oneqbit_args(self,qbits_list=None):
+	def oneqbit_args(self,nqbits,qbits_list=None):
 		multiqbits = []
 		retval = None
 		qbits = self.qbits
@@ -115,16 +96,16 @@ class QGate:
 		else:
 			retval = False
 		if retval is None:
-			retval = self.isvalid_qbits_gen(multiqbits)
+			retval = self.isvalid_qbits_gen(nqbits,multiqbits)
 		return retval
 
-	def fixedqbit_args(self,nq,qbits_list=None):
+	def fixedqbit_args(self,nqbits,nfixedq,qbits_list=None):
 		multiqbits = []
 		retval = None
 		qbits = self.qbits
 		if qbits_list is not None:
 			qbits = qbits_list
-		if len(qbits) == nq:
+		if len(qbits) == nfixedq:
 			for q in qbits:
 				if type(q) is int:
 					multiqbits.append(q)
@@ -133,10 +114,10 @@ class QGate:
 		else:
 			retval = False
 		if retval is None:
-			retval = self.isvalid_qbits_gen(multiqbits)
+			retval = self.isvalid_qbits_gen(nqbits,multiqbits)
 		return retval
 
-	def varqbit_args(self, minnq, qbits_list=None):
+	def varqbit_args(self, nqbits, minnq, qbits_list=None):
 		multiqbits = []
 		retval = None
 		qbits = self.qbits
@@ -151,11 +132,10 @@ class QGate:
 		else:
 			retval = False
 		if retval is None:
-			retval = self.isvalid_qbits_gen(multiqbits)
+			retval = self.isvalid_qbits_gen(nqbits, multiqbits)
 		return retval
 
-	def isvalid_qbits_gen(self,qbit_list):
-		nqbits,_ = self.qckt.get_size()
+	def isvalid_qbits_gen(self,nqbits,qbit_list):
 		if len(qbit_list) > nqbits:
 			return False
 		for i in qbit_list:
@@ -176,8 +156,8 @@ class X(QGate):
 		canvas._add_simple(self.qbits[0],"X")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -194,8 +174,8 @@ class Y(QGate):
 		canvas._add_simple(self.qbits[0],"Y")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -212,8 +192,8 @@ class Z(QGate):
 		canvas._add_simple(self.qbits[0],"Z")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -231,8 +211,8 @@ class H(QGate):
 		canvas._add_simple(self.qbits[0],"H")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -252,8 +232,8 @@ class CX(QGate):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["X"])
 		return self
 
-	def check_qbit_args(self):
-		return self.varqbit_args(2)
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -273,8 +253,8 @@ class CY(QGate):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Y"])
 		return self
 
-	def check_qbit_args(self):
-		return self.varqbit_args(2)
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -294,8 +274,8 @@ class CZ(QGate):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Z"])
 		return self
 
-	def check_qbit_args(self):
-		return self.varqbit_args(2)
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -314,8 +294,8 @@ class CCX(QGate):
 		canvas._add_connected(self.qbits,[".",".","X"])
 		return self
 
-	def check_qbit_args(self):
-		return self.fixedqbit_args(3)
+	def check_qbit_args(self,nqbits):
+		return self.fixedqbit_args(nqbits,3)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -333,8 +313,8 @@ class SWAP(QGate):
 		canvas._add_connected(self.qbits,["*","*"])
 		return self
 
-	def check_qbit_args(self):
-		return self.fixedqbit_args(2)
+	def check_qbit_args(self,nqbits):
+		return self.fixedqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -367,13 +347,13 @@ class M(QGate):
 			canvas._extend()
 		return self
 
-	def check_qbit_args(self):
+	def check_qbit_args(self,nqbits):
 		retval = True
 		if len(self.qbits) != len(self.cbits):
 			retval = False
-		if not self.varqbit_args(1):
+		if not self.varqbit_args(nqbits,1):
 			retval = False
-		if not self.varqbit_args(1,qbits_list=self.cbits):
+		if not self.varqbit_args(nqbits,1,qbits_list=self.cbits):
 			retval = False
 		return retval
 
@@ -381,7 +361,7 @@ class M(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
-	def to_fullmatrix(self):
+	def to_fullmatrix(self,nqbits):
 		errmsg = "Measure gate cannot be converted to opmatrix."
 		raise QCktException(errmsg)
 
@@ -407,12 +387,12 @@ class Border(QGate):
 		canvas._extend()
 		return self
 
-	def check_qbit_args(self):
+	def check_qbit_args(self,nqbits):
 		pass
 
 	# INHERIT realign(self,newseq):
 
-	def to_fullmatrix(self):
+	def to_fullmatrix(self,nqbits):
 		return None
 
 	# OVERRIDE exec(self,qc) - nothing to execute
@@ -445,12 +425,12 @@ class Probe(QGate):
 		canvas._extend()
 		return self
 
-	def check_qbit_args(self):
+	def check_qbit_args(self,nqbits):
 		pass
 
 	# INHERIT realign(self,newseq):
 
-	def to_fullmatrix(self):
+	def to_fullmatrix(self,nqbits):
 		return None
 
 	# OVERRIDE exec(self,qc) - nothing to execute
@@ -510,8 +490,8 @@ class QFT(QGate):
 		canvas._add_boxed(self.qbits,"QFT")
 		return self
 
-	def check_qbit_args(self):
-		return self.varqbit_args(1)
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -537,8 +517,8 @@ class RND(QGate):
 		canvas._add_simple(self.qbits[0],"RND")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -560,8 +540,8 @@ class P(QGate):
 		canvas._add_simple(self.qbits[0],"P")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -586,8 +566,8 @@ class CP(QGate):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["P"])
 		return self
 
-	def check_qbit_args(self):
-		return self.varqbit_args(2)
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -609,8 +589,8 @@ class UROTk(QGate):
 		canvas._add_simple(self.qbits[0],"UROTk")
 		return self
 
-	def check_qbit_args(self):
-		return self.oneqbit_args()
+	def check_qbit_args(self,nqbits):
+		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -635,8 +615,8 @@ class CROTk(QGate):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["UROTk"])
 		return self
 
-	def check_qbit_args(self):
-		return self.varqbit_args(2)
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def exec(self,qc):
@@ -657,11 +637,11 @@ class CUSTOM(QGate):
 		canvas._add_boxed(self.qbits,self.name)
 		return self
 
-	def check_qbit_args(self):
+	def check_qbit_args(self,nqbits):
 		r,c = self.opMatrix.shape
 		if 2**len(self.qbits) != r:
 			return False
-		return self.varqbit_args(1)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):

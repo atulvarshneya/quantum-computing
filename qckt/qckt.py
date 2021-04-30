@@ -7,6 +7,18 @@ import qsim
 import numpy as np
 from qException import QCktException
 
+class GateWrapper:
+	def __init__(self, qckt, gateCls):
+		self.qckt = qckt
+		self.GateCls = gateCls
+	def addGate(self, *args, **kwargs):
+		gate = self.GateCls(*args, **kwargs)
+		self.qckt.circuit.append(gate)
+		if gate.check_qbit_args(self.qckt.nqubits) == False:
+			errmsg = "Error: qubit arguments incorrect. " + gate.name + str(gate.qbits)
+			raise QCktException(errmsg)
+		return self.qckt
+
 class QCkt:
 
 	def __init__(self, nqubits, nclbits=None, name=None):
@@ -21,7 +33,7 @@ class QCkt:
 		self.canvas = cnv.Canvas(self)
 
 		for gclass in gts.GatesList:
-			self._registerGate(gclass.__name__, gts.GateWrapper(self,gclass).addGate)
+			self._registerGate(gclass.__name__, GateWrapper(self,gclass).addGate)
 
 		self.idx = 0 # for iterations
 
@@ -48,9 +60,9 @@ class QCkt:
 
 		# copy circuits over to the new circuit
 		for g in self.circuit:
-			g.addtoqckt(newckt)
+			newckt.circuit.append(g)
 		for g in otherckt.circuit:
-			g.addtoqckt(newckt)
+			newckt.circuit.append(g)
 
 		return newckt
 
@@ -64,13 +76,13 @@ class QCkt:
 		newckt = QCkt(newnq, newnc, name=self.name)
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
-			galigned.addtoqckt(newckt)
+			newckt.circuit.append(galigned)
 		return newckt
 
 	def to_opMatrix(self):
 		oplist = []
 		for q in self.circuit:
-			op = q.to_fullmatrix()
+			op = q.to_fullmatrix(self.nqubits)
 			if op is not None: ## Border, Probe gates return None
 				oplist.append(op)
 		opmat = gutils.combine_seq(oplist)
@@ -87,10 +99,6 @@ class QCkt:
 			print(self.name)
 		for g in self.circuit:
 			print(g)
-		
-######################################################################
-## Backend classes ###################################################
-######################################################################
 
 class Backend():
 
