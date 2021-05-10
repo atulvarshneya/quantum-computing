@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 import numpy as np
 
 def qft_rotations(circuit, n):
@@ -36,7 +37,7 @@ qft(ck,nqubits)
 ck.Border()
 ck.draw()
 ck.list()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck)
 svec1 = bk.get_svec()
 print(svec1)
@@ -49,7 +50,7 @@ ck.QFT(*[5,4,3,2,1,0])
 ck.Border()
 ck.draw()
 ck.list()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck)
 svec2 = bk.get_svec()
 print(svec2)

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 import random as rand
 
 print("""
@@ -93,6 +94,6 @@ if __name__ == "__main__":
 	nqubits = 8
 	bv = bernvazi(nqubits)
 	bv_ckt = bv.gen_bv_ckt()
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(bv_ckt,qtrace=False)
 	print(bk.get_creg())

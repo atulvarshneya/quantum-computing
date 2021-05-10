@@ -1,4 +1,5 @@
 import qckt
+from QSystems import *
 
 ck1 = qckt.QCkt(4)
 ck1.X([0,1])
@@ -11,7 +12,7 @@ ck1.Probe("Expanded Circuit")
 ck1.draw()
 op = ck1.to_opMatrix()
 
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck1)
 svec1 = bk.get_svec()
 
@@ -22,7 +23,7 @@ ck2.CUSTOM("CKT",op,[3,2,1,0])
 ck2.Probe("Circuit to_opMatrix()")
 ck2.draw()
 
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck2)
 svec2 = bk.get_svec()
 

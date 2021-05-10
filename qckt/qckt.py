@@ -75,6 +75,12 @@ class QCkt:
 			newckt.circuit.append(galigned)
 		return newckt
 
+	def assemble(self):
+		assembled = []
+		for gt in self.circuit:
+			assembled.append(gt.assemble())
+		return assembled
+
 	def to_opMatrix(self):
 		oplist = []
 		for q in self.circuit:
@@ -95,87 +101,6 @@ class QCkt:
 			print(self.name)
 		for g in self.circuit:
 			print(g)
-
-class Backend():
-
-	def __init__(self):
-		self.circuit = None
-		self.result = Result()
-
-	def run(self, circuit, initstate=None, prepqubits=None, qtrace=False):
-		self.circuit = circuit
-		qc = qsim.QSimulator(self.circuit.nqubits, ncbits=self.circuit.nclbits, initstate=initstate, prepqubits=prepqubits, qtrace=qtrace)
-		### run through the circuit
-		for g in self.circuit:
-			g.exec(qc)
-		# fetch the last value of the cregister, state_vector
-		(creg, svec) = qc.qsnapshot()
-		(self.result.cregister.value, self.result.state_vector.value) = (creg,svec)
-		self.result.cregister.intvalue = 0
-		for i in range(len(self.result.cregister.value)):
-			self.result.cregister.intvalue = 2 * self.result.cregister.intvalue
-			self.result.cregister.intvalue += self.result.cregister.value[i]
-
-		return self
-
-	def get_svec(self):
-		return self.result.state_vector
-
-	def get_creg(self):
-		return self.result.cregister
-
-
-class _Cregister:
-
-	def __init__(self):
-		self.value = None
-		self.intvalue = None
-
-	def __str__(self):
-		creg_str = ""
-		for i in (range(len(self.value))): # creg[0] is MSB
-			creg_str = creg_str + "{0:01b}".format(self.value[i])
-		# creg_str = creg_str + "\n"
-		return creg_str
-
-
-class _StateVector:
-
-	def __init__(self):
-		self.value = None
-		self.verbosity = False
-
-	def __str__(self):
-		### wonky way to find number of qubits
-		nq = 0
-		n = len(self.value) - 1
-		while n > 0:
-			nq = nq + 1
-			n = n >> 1
-
-		statefmt = "{0:"+"0{0:d}b".format(nq)+"}"
-		svec_str = ""
-		s = 0
-		for i in self.value:
-			if self.verbosity or np.absolute(i) > 10**(-6):
-				svec_str = svec_str + statefmt.format(s) + "  " + "{:.8f}".format(i) + "\n"
-			s += 1
-		return svec_str
-
-	def verbose(self,v):
-		if v is True:
-			self.verbosity = True
-		else:
-			self.verbosity = False
-		return self
-
-
-class Result:
-
-	def __init__(self):
-		self.cregister = _Cregister()
-		self.state_vector = _StateVector()
-
 
 if __name__ == "__main__":
 	pass

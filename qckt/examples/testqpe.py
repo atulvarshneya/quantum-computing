@@ -2,6 +2,7 @@
 
 import numpy as np
 import qckt
+from QSystems import *
 import Registers as regs
 import libqpe as qpe
 
@@ -32,7 +33,7 @@ readouts = {}
 maxreads = 0
 resvalue = None
 for i in range(100):
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(mycircuit)
 
 	readval = bk.get_creg().intvalue

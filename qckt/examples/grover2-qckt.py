@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 import random as rnd
 import numpy as np
 
@@ -57,7 +58,7 @@ fullckt.M([i for i in range(nqubits)])
 nattempts = 5
 stats = {}
 for _ in range(nattempts):
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(fullckt)
 	creg = bk.get_creg()
 	svec = bk.get_svec()

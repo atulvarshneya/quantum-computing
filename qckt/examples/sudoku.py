@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 from qException import QCktException
 import Registers as regs
 import libgrover as grv
@@ -36,7 +37,7 @@ grv_ckt.draw()
 
 maxattempts = 10
 for m in range(maxattempts):  # Look for best of all attempts
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(grv_ckt, qtrace=False)
 	res = bk.get_creg()
 	value = res.intvalue

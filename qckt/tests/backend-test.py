@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 
 #test 02
 nq = 6
@@ -13,7 +14,7 @@ qc.Y(5)
 qc.M([4,5])
 qc.draw()
 
-bk = qckt.Backend()
+bk = Backend()
 bk.run(qc,qtrace=False)
 
 svec = bk.get_svec()
@@ -44,7 +45,7 @@ ck.UROTk(2,[2,3,4,5,6,7])
 ck.list()
 ck.draw()
 
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck,qtrace=True)
 
 svec = bk.get_svec()

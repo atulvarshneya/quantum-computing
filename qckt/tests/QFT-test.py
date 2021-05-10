@@ -2,6 +2,7 @@
 
 import qckt
 import numpy as np
+from QSystems import *
 
 nqbits = 8 # per the definition of f(x) below, must be >= 4
 M = 2**(nqbits-2)
@@ -17,7 +18,7 @@ ckt = ckt.append(cktf)
 ckt.QFT(*(range(nqbits-1,1,-1)))
 ckt.draw()
 
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ckt,qtrace=False)
 
 svec = bk.get_svec()

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 import numpy as np
 from fractions import gcd
 import math
@@ -17,7 +18,7 @@ fx.Border()
 print("Psst ... f(x) defined as having period of 4\n")
 
 # QFT(x) - F(x) - QFT(x) - Measure
-ckt = qckt.QCkt(nqbits)
+ckt = qckt.QCkt(nqbits,nqbits)
 ckt.QFT(list(range(nqbits-1,1,-1)))
 ckt = ckt.append(fx)
 # actually you would expect to measure output of fx now
@@ -33,7 +34,7 @@ idx = 0
 vals = [0,0]
 while idx < 2:
 	# run the circuit
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(ckt,qtrace=False)
 	mbyrarr = bk.get_creg().value
 	print("CREGISTER = ",bk.get_creg())

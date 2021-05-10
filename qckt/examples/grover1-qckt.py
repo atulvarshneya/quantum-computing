@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 import numpy as np
 import random as rnd
 
@@ -56,7 +57,7 @@ fullckt.M([i for i in range(nqbits-1)])
 
 maxattempts = 5
 for m in range(maxattempts):  # Look for best of all attempts
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(fullckt)
 	res = bk.get_creg()
 	print("Result = ",res.intvalue)
@@ -74,7 +75,7 @@ for m in range(maxattempts):  # Look for best of all attempts
 	# print("### Verification Circuit ################################")
 	# verifyckt.draw()
 
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(verifyckt)
 	creg = bk.get_creg()
 	if creg.intvalue == 1:

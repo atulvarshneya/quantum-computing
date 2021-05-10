@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import qckt
+from QSystems import *
 import Registers as regs
 import libgrover as grv
 import random as rnd
@@ -50,7 +51,7 @@ grv_ckt.draw()
 maxattempts = 5
 solved = False
 for m in range(maxattempts):  # Look for best of all attempts
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(grv_ckt, qtrace=False)
 	res = bk.get_creg()
 	value = res.intvalue
@@ -69,7 +70,7 @@ for m in range(maxattempts):  # Look for best of all attempts
 	# print("### Verification Circuit ################################")
 	# verifyckt.draw()
 
-	bk = qckt.Backend()
+	bk = Backend()
 	bk.run(verifyckt)
 	creg = bk.get_creg()
 	if creg.intvalue == 1:

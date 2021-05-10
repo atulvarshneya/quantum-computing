@@ -3,6 +3,7 @@
 import random as rnd
 import numpy as np
 import qckt
+from QSystems import *
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ dj_ckt.M(qbits_list, qbits_list)
 	
 dj_ckt.draw()
 
-bk = qckt.Backend()
+bk = Backend()
 bk.run(dj_ckt,qtrace=False)
 res = bk.get_creg()
 print(res)

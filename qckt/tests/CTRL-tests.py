@@ -1,5 +1,6 @@
 import qckt
 import numpy as np
+from QSystems import *
 
 
 # CX
@@ -10,7 +11,7 @@ ck.X([4,5,6])
 ck.CX(6,5,4,3)
 ck.list()
 ck.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck,qtrace=True)
 
 # CY
@@ -21,7 +22,7 @@ ck.X([4,5,6])
 ck.CY(6,5,4,3)
 ck.list()
 ck.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck,qtrace=True)
 
 # CZ
@@ -32,7 +33,7 @@ ck.X([3,4,5,6])
 ck.CZ(6,5,4,3)
 ck.list()
 ck.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck,qtrace=True)
 
 # CP
@@ -43,7 +44,7 @@ ck.X([4,5,6,3])
 ck.CP(np.pi/4,6,5,4,3)
 ck.list()
 ck.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck,qtrace=True)
 
 
@@ -55,5 +56,5 @@ ck.X([4,5,6,3])
 ck.CROTk(3,6,5,4,3)
 ck.list()
 ck.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ck,qtrace=True)

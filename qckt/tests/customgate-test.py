@@ -1,6 +1,7 @@
 import qckt
 import numpy as np
 from qException import QCktException
+from QSystems import *
 
 ck = qckt.QCkt(4)
 opmat = np.matrix([
@@ -24,7 +25,7 @@ ckt = ckt.append(ck)
 ckt = ckt.append(ck)
 ckt.CUSTOM("CNOT",opmat,[1,3])
 ckt.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ckt,qtrace=True)
 
 ## by appending circuits, the custom gates definitions are inherited by the new circuit
@@ -41,5 +42,5 @@ try:
 except QCktException as e:
 	print(e)
 ckt.draw()
-bk = qckt.Backend()
+bk = Backend()
 bk.run(ckt,qtrace=True)

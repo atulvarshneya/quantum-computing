@@ -29,13 +29,8 @@ class QGate:
 			self.cbits = self._reorderlist(self.cbits,newseq)
 		return self
 
-	def exec(self,qsim):
-		# print("exec qsim.qgate(",str(self),")")
-		if issubclass(type(self.qbits[0]),list) and len(self.qbits) == 1:
-			for q in self.qbits[0]:
-				qsim.qgate([self.name,self.opMatrix], [q])
-		else:
-			qsim.qgate([self.name,self.opMatrix], self.qbits)
+	def assemble(self):
+		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits}
 
 	def to_fullmatrix(self,nqbits):
 		oplist = []
@@ -160,7 +155,6 @@ class X(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class Y(QGate):
@@ -178,7 +172,6 @@ class Y(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class Z(QGate):
@@ -196,7 +189,6 @@ class Z(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class H(QGate):
@@ -215,7 +207,6 @@ class H(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class CX(QGate):
@@ -236,7 +227,6 @@ class CX(QGate):
 		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class CY(QGate):
@@ -257,7 +247,6 @@ class CY(QGate):
 		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class CZ(QGate):
@@ -278,7 +267,6 @@ class CZ(QGate):
 		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 
@@ -298,7 +286,6 @@ class CCX(QGate):
 		return self.fixedqbit_args(nqbits,3)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class SWAP(QGate):
@@ -317,7 +304,6 @@ class SWAP(QGate):
 		return self.fixedqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class M(QGate):
@@ -365,9 +351,8 @@ class M(QGate):
 		errmsg = "Measure gate cannot be converted to opmatrix."
 		raise QCktException(errmsg)
 
-	def exec(self,qc):
-		# print("exec qc.qmeasure(",str(self),")")
-		qc.qmeasure(self.qbits,cbit_list=self.cbits)
+	def assemble(self):
+		return {"op":"measure", "qubits":self.qbits, "clbits":self.cbits}
 
 class Border(QGate):
 
@@ -395,10 +380,8 @@ class Border(QGate):
 	def to_fullmatrix(self,nqbits):
 		return None
 
-	# OVERRIDE exec(self,qc) - nothing to execute
-	def exec(self,qc):
-		# print("exec qc.qgate(",str(self),")")
-		pass
+	def assemble(self):
+		return {"op":"noop"}
 
 	# OVERRIDE __str__(self) - no [qbits]
 	def __str__(self):
@@ -433,23 +416,8 @@ class Probe(QGate):
 	def to_fullmatrix(self,nqbits):
 		return None
 
-	# OVERRIDE exec(self,qc) - nothing to execute
-	def exec(self,qc):
-		# print("exec qc.qgate(",str(self),")")
-		nqbits = qc.qsize()
-		(creglist, sveclist) = qc.qsnapshot()
-		if self.probeobject is not None:
-			self.probeobject.analyze(creglist,sveclist)
-		print(self.header)
-		for i in range(len(sveclist)):
-			if (self.probestates is None and abs(sveclist[i]) > 0.0) \
-					or (self.probestates is not None and i in self.probestates):
-				print(("{0:0"+str(nqbits)+"b}    {1:.8f}").format(i, sveclist[i]))
-		cregsz = len(creglist)
-		print("CREGISTER: ",end="")
-		for i in range(cregsz):
-			print("{:01b}".format(creglist[i]),end="")
-		print()
+	def assemble(self):
+		return {"op":"probe","header":self.header,"probestates":self.probestates}
 
 	# OVERRIDE __str__(self) - no [qbits]
 	def __str__(self):
@@ -494,7 +462,6 @@ class QFT(QGate):
 		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class RND(QGate):
@@ -521,7 +488,6 @@ class RND(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class P(QGate):
@@ -544,7 +510,6 @@ class P(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class CP(QGate):
@@ -570,7 +535,6 @@ class CP(QGate):
 		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class UROTk(QGate):
@@ -593,7 +557,6 @@ class UROTk(QGate):
 		return self.oneqbit_args(nqbits)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class CROTk(QGate):
@@ -619,7 +582,6 @@ class CROTk(QGate):
 		return self.varqbit_args(nqbits,2)
 
 	# INHERIT def realign(self,newseq):
-	# INHERIT def exec(self,qc):
 	# INHERIT def __str__(self):
 
 class CUSTOM(QGate):
@@ -645,7 +607,6 @@ class CUSTOM(QGate):
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
-	# INHERIT def exec(self,qc):
 
 
 GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,Probe,QFT,RND,P,CP,UROTk,CROTk,CUSTOM]
