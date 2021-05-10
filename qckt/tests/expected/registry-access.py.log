@@ -1,0 +1,35 @@
+Services available
+QSystems : qsim simulator from Quantum Systems
+-------------------------
+
+Using service: QSystems
+-------------------------
+
+Instances available:
+qsim
+local
+-------------------------
+
+Using instance: local
+-------------------------
+
+q000 -[H]-[.]--#------#--v-
+           |   #      #  V 
+q001 -----[X]--#------#--v-
+               #      #  V 
+q002 ----------#-[X]--#--v-
+               #      #  V 
+q003 ----------#-[X]--#--v-
+               #      #  V 
+creg ==========#======#==v=
+               #      #  V 
+PROBE: point 1
+1100    0.70710678+0.00000000j
+1111    0.70710678+0.00000000j
+CREGISTER: 0000
+-------------------------------
+printing results
+1100  0.70710678+0.00000000j
+1111  0.70710678+0.00000000j
+
+0000

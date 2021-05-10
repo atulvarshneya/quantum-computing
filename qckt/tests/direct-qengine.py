@@ -10,7 +10,7 @@ ck.CX(0,1)
 ck.Border()
 ck.X([2,3])
 ck.Border()
-ck.M([1,0],[1,0])
+# ck.M([1,0],[1,0])
 ck.Probe("point 1")
 ck.draw()
 
