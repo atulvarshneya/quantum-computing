@@ -1,5 +1,6 @@
 import qckt
 from QSystems import *
+from Job import Job
 
 ck1 = qckt.QCkt(4)
 ck1.X([0,1])
@@ -12,9 +13,10 @@ ck1.Probe("Expanded Circuit")
 ck1.draw()
 op = ck1.to_opMatrix()
 
-bk = Backend()
-bk.run(ck1)
-svec1 = bk.get_svec()
+job1 = Job(ck1)
+bk = Qdeb()
+bk.runjob(job1)
+svec1 = job1.get_svec()
 
 print("====================================")
 
@@ -23,9 +25,10 @@ ck2.CUSTOM("CKT",op,[3,2,1,0])
 ck2.Probe("Circuit to_opMatrix()")
 ck2.draw()
 
-bk = Backend()
-bk.run(ck2)
-svec2 = bk.get_svec()
+job2 = Job(ck2)
+bk = Qdeb()
+bk.runjob(job2)
+svec2 = job2.get_svec()
 
 
 ### compare the two svecs

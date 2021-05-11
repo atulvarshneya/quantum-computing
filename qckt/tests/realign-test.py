@@ -1,5 +1,6 @@
 import qckt
 from QSystems import *
+from Job import Job
 
 ck = qckt.QCkt(4)
 ck.X(0)
@@ -10,10 +11,12 @@ inpqubits = [4,5,2,3]
 ck = ck.realign(6,6,inpqubits)
 print("Realigned with:",inpqubits)
 ck.draw()
-bk = Backend()
-bk.run(ck,qtrace=True)
+
+job = Job(ck,qtrace=True)
+bk = Qdeb()
+bk.runjob(job)
 print("STATE VECTOR READ OUT")
-print(bk.get_svec())
+print(job.get_svec())
 print("CREGISTER READ OUT")
-print(bk.get_creg())
+print(job.get_creg()[0])
 

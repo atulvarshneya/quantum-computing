@@ -2,6 +2,7 @@
 
 import qckt
 from QSystems import *
+from Job import Job
 
 #test 02
 nq = 6
@@ -14,10 +15,11 @@ qc.Y(5)
 qc.M([4,5])
 qc.draw()
 
-bk = Backend()
-bk.run(qc,qtrace=False)
+job = Job(qc,qtrace=False)
+bk = Qdeb()
+bk.runjob(job)
 
-svec = bk.get_svec()
+svec = job.get_svec()
 print("READ OUT STATE VECTOR: ")
 print(svec)
 print("READ OUT STATE VECTOR (verbose): ")
@@ -26,7 +28,7 @@ print(svec)
 
 # print cregister in proper MSB to LSB order
 print("READ OUT CREGISTER: ",end="")
-creg = bk.get_creg()
+creg = job.get_creg()[0]
 print(creg)
 
 #### multiple qbits inputs for single qubit gates draw and list
@@ -45,10 +47,11 @@ ck.UROTk(2,[2,3,4,5,6,7])
 ck.list()
 ck.draw()
 
-bk = Backend()
-bk.run(ck,qtrace=True)
+job = Job(ck,qtrace=True)
+bk = Qdeb()
+bk.runjob(job)
 
-svec = bk.get_svec()
+svec = job.get_svec()
 print("READ OUT STATE VECTOR: ")
 print(svec)
 print("READ OUT STATE VECTOR (verbose): ")

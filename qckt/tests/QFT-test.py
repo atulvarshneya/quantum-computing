@@ -3,6 +3,7 @@
 import qckt
 import numpy as np
 from QSystems import *
+from Job import Job
 
 nqbits = 8 # per the definition of f(x) below, must be >= 4
 M = 2**(nqbits-2)
@@ -18,13 +19,14 @@ ckt = ckt.append(cktf)
 ckt.QFT(*(range(nqbits-1,1,-1)))
 ckt.draw()
 
-bk = Backend()
-bk.run(ckt,qtrace=False)
+job = Job(ckt,qtrace=False)
+bk = Qdeb()
+bk.runjob(job)
 
-svec = bk.get_svec()
+svec = job.get_svec()
 print("READ OUT STATE VECTOR: ")
 print(svec)
 
 print("READ OUT CREGISTER: ",end="")
-creg = bk.get_creg()
+creg = job.get_creg()[0]
 print(creg)

@@ -1,6 +1,7 @@
 import qckt
 import numpy as np
 from QSystems import *
+from Job import Job
 
 
 # CX
@@ -11,8 +12,8 @@ ck.X([4,5,6])
 ck.CX(6,5,4,3)
 ck.list()
 ck.draw()
-bk = Backend()
-bk.run(ck,qtrace=True)
+job = Job(ck, qtrace=True)
+Qdeb().runjob(job)
 
 # CY
 print("CY ---------------------------------------")
@@ -22,8 +23,8 @@ ck.X([4,5,6])
 ck.CY(6,5,4,3)
 ck.list()
 ck.draw()
-bk = Backend()
-bk.run(ck,qtrace=True)
+job = Job(ck, qtrace=True)
+Qdeb().runjob(job)
 
 # CZ
 print("CZ ---------------------------------------")
@@ -33,8 +34,8 @@ ck.X([3,4,5,6])
 ck.CZ(6,5,4,3)
 ck.list()
 ck.draw()
-bk = Backend()
-bk.run(ck,qtrace=True)
+job = Job(ck, qtrace=True)
+Qdeb().runjob(job)
 
 # CP
 print("CP ---------------------------------------")
@@ -44,8 +45,8 @@ ck.X([4,5,6,3])
 ck.CP(np.pi/4,6,5,4,3)
 ck.list()
 ck.draw()
-bk = Backend()
-bk.run(ck,qtrace=True)
+job = Job(ck, qtrace=True)
+Qdeb().runjob(job)
 
 
 # CROTx
@@ -56,5 +57,5 @@ ck.X([4,5,6,3])
 ck.CROTk(3,6,5,4,3)
 ck.list()
 ck.draw()
-bk = Backend()
-bk.run(ck,qtrace=True)
+job = Job(ck, qtrace=True)
+Qdeb().runjob(job)

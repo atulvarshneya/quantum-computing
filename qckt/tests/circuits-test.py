@@ -2,6 +2,7 @@
 
 import qckt as qk
 from QSystems import *
+from Job import Job
 
 ckt1 = qk.QCkt(4,4)
 
@@ -25,10 +26,11 @@ ckt3.M([3,4,5],[3,4,5])
 
 ckt3.draw()
 
-bk = Backend()
-bk.run(ckt3, qtrace=False)
+job = Job(ckt3, qtrace=False)
+bk = Qdeb()
+bk.runjob(job)
 print("READ OUT STATE VECTOR: ")
-print(bk.get_svec())
-res = bk.get_creg()
+print(job.get_svec())
+res = job.get_creg()[0]
 print("READ OUT CREGISTER: ", end="")
 print(res)
