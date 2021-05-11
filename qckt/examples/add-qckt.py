@@ -59,10 +59,11 @@ for i in reversed(range(2)):
 
 addckt.draw()
 
-bk = Backend()
-bk.run(addckt,qtrace=True)
+job = Job(addckt,qtrace=True)
+bk = Qdeb()
+bk.runjob(job)
 print()
 print("READ OUT STATE VECTOR: ")
-print(bk.get_svec())
+print(job.get_svec())
 print("READ OUT CREGISTER: ", end="")
-print( bk.get_creg())
+print( job.get_creg()[0])

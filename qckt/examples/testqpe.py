@@ -3,6 +3,7 @@
 import numpy as np
 import qckt
 from QSystems import *
+from Job import Job
 import Registers as regs
 import libqpe as qpe
 
@@ -33,10 +34,11 @@ readouts = {}
 maxreads = 0
 resvalue = None
 for i in range(100):
-	bk = Backend()
-	bk.run(mycircuit)
+	job = Job(mycircuit)
+	bk = Qdeb()
+	bk.runjob(job)
 
-	readval = bk.get_creg().intvalue
+	readval = (job.get_creg()[0]).intvalue
 	if readval in readouts.keys():
 		readouts[readval] += 1
 	else:

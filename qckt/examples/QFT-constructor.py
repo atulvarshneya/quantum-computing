@@ -2,6 +2,7 @@
 
 import qckt
 from QSystems import *
+from Job import Job
 import numpy as np
 
 def qft_rotations(circuit, n):
@@ -37,9 +38,11 @@ qft(ck,nqubits)
 ck.Border()
 ck.draw()
 ck.list()
-bk = Backend()
-bk.run(ck)
-svec1 = bk.get_svec()
+
+job = Job(ck)
+bk = Qdeb()
+bk.runjob(job)
+svec1 = job.get_svec()
 print(svec1)
 
 ck = qckt.QCkt(nqubits)
@@ -50,9 +53,11 @@ ck.QFT(*[5,4,3,2,1,0])
 ck.Border()
 ck.draw()
 ck.list()
-bk = Backend()
-bk.run(ck)
-svec2 = bk.get_svec()
+
+job = Job(ck)
+bk = Qdeb()
+bk.runjob(job)
+svec2 = job.get_svec()
 print(svec2)
 
 ### compare the two svecs

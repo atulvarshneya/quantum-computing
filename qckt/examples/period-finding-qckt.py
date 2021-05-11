@@ -2,6 +2,7 @@
 
 import qckt
 from QSystems import *
+from Job import Job
 import numpy as np
 from fractions import gcd
 import math
@@ -34,10 +35,11 @@ idx = 0
 vals = [0,0]
 while idx < 2:
 	# run the circuit
-	bk = Backend()
-	bk.run(ckt,qtrace=False)
-	mbyrarr = bk.get_creg().value
-	print("CREGISTER = ",bk.get_creg())
+	job = Job(ckt, qtrace=False)
+	bk = Qdeb()
+	bk.runjob(job)
+	mbyrarr = (job.get_creg()[0]).value
+	print("CREGISTER = ",job.get_creg()[0])
 
 	# convert to integer the measured values of the x register
 	# remember the Cregister holds *all* classical bits, not just the ones measured

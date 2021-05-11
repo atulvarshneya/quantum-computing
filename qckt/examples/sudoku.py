@@ -5,6 +5,7 @@ from QSystems import *
 from qException import QCktException
 import Registers as regs
 import libgrover as grv
+from Job import *
 
 
 inreg = regs.QRegister(4)
@@ -35,10 +36,10 @@ grv_ckt = grv.Grover(sudockt,inreg,outreg,nmarked=2).getckt()
 grv_ckt.M(inreg,rclreg)
 grv_ckt.draw()
 
-maxattempts = 10
-for m in range(maxattempts):  # Look for best of all attempts
-	bk = Backend()
-	bk.run(grv_ckt, qtrace=False)
-	res = bk.get_creg()
-	value = res.intvalue
-	print(("Solution: {0:d} ({0:0"+str(len(inreg))+"b})").format(value))
+job = Job(grv_ckt,shots=40)
+q = Qeng()
+q.runjob(job)
+counts = job.get_counts()
+for i,c in enumerate(counts):
+	if c > 0:
+		print("{0:04b} ({0:2d})    {1:d}".format(i,c))

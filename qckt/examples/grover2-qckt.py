@@ -2,6 +2,7 @@
 
 import qckt
 from QSystems import *
+from Job import Job
 import random as rnd
 import numpy as np
 
@@ -58,10 +59,11 @@ fullckt.M([i for i in range(nqubits)])
 nattempts = 5
 stats = {}
 for _ in range(nattempts):
-	bk = Backend()
-	bk.run(fullckt)
-	creg = bk.get_creg()
-	svec = bk.get_svec()
+	job = Job(fullckt)
+	bk = Qdeb()
+	bk.runjob(job)
+	creg = job.get_creg()[0]
+	svec = job.get_svec()
 	# print(svec.value[marked][0])
 	print("Search result = ",creg)
 	if str(creg) in stats.keys():

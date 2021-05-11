@@ -2,6 +2,7 @@
 
 import qckt
 from QSystems import *
+from Job import Job
 import random as rand
 
 print("""
@@ -24,6 +25,7 @@ def get_fxckt(nq):
 	secret_code = rand.randint(0,2**(nqubits-1)-1)
 	code_fmt = "{:0"+"{:d}".format(nqubits-1)+"b}"
 	print("Pssst... the secret code is ",code_fmt.format(secret_code))
+
 	fxckt = qckt.QCkt(nqubits)
 	for i in range(nqubits-1):
 		if secret_code & (0x1<<i):
@@ -65,10 +67,6 @@ class bernvazi:
 		###########################################################################
 		## Step 2: Now apply the secret function f()
 		bv_ckt.Border()
-		### not sure why this code was there at all
-		### as realign() was defined at that time, these two lines is basically a NOOP
-		### qbit_list = list(range(self.nqubits))
-		### fxckt = fxckt.realign(self.nqubits,self.nqubits,qbit_list)
 		bv_ckt = bv_ckt.append(fxckt)
 		bv_ckt.Border()
 		print("Step 2: Applied FX to |b>|x>")
@@ -94,6 +92,6 @@ if __name__ == "__main__":
 	nqubits = 8
 	bv = bernvazi(nqubits)
 	bv_ckt = bv.gen_bv_ckt()
-	bk = Backend()
-	bk.run(bv_ckt,qtrace=False)
-	print(bk.get_creg())
+	job = Job(bv_ckt,qtrace=False)
+	Qdeb().runjob(job)
+	print(job.get_creg()[0])

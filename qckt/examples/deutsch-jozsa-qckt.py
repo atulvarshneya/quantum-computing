@@ -4,6 +4,7 @@ import random as rnd
 import numpy as np
 import qckt
 from QSystems import *
+from Job import Job
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -50,9 +51,10 @@ dj_ckt.M(qbits_list, qbits_list)
 	
 dj_ckt.draw()
 
-bk = Backend()
-bk.run(dj_ckt,qtrace=False)
-res = bk.get_creg()
+job = Job(dj_ckt,initstate=None, prepqubits=None, qtrace=False, shots=1)
+bk = Qdeb()
+bk.runjob(job)
+res = job.get_creg()[0]
 print(res)
 
 if 1 in res.value[1:nqbits]:
