@@ -16,7 +16,7 @@ nqbits,ncbits,allqreg,allcreg = regs.placement(outreg,work,inreg,rclreg)
 
 ### Sudoku validation circuit
 sudo = qckt.QCkt(nqbits,name="Sudoku Validator")
-rules = [[0,1],[1,3],[3,2],[2,0]]
+rules = [[0,1],[1,3],[3,2],[2,0]] # rule is that the qubits in a tuple cannot be equal
 for w,r in enumerate(rules):
 	sudo.CX(inreg[r[0]],work[w])
 	sudo.CX(inreg[r[1]],work[w])

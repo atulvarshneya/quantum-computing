@@ -22,6 +22,7 @@ Need to copy the final carry-out bit into the highest order result bit, as shown
 
 import qckt
 from QSystems import *
+from Job import Job
 
 nq = 10
 
