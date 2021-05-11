@@ -80,25 +80,6 @@ class Qdeb:
 		job.result = Result(cregvals=cregres_list,svecvals=statevec)
 		return self
 
-## For backward compatibility
-## Backend() is the default backend engine, same as Qdeb
-from Job import *
-class Backend:
-	def __init__(self):
-		self.circuit = None
-		self.job = None
-	def run(self, ckt, initstate=None, prepqubits=None,qtrace=False):
-		self.circuit = ckt
-		self.job = Job(ckt,initstate,prepqubits,qtrace=qtrace,shots=1)
-		Qdeb().runjob(self.job)
-		return self
-
-	def get_svec(self):
-		return self.job.result.state_vector
-
-	def get_creg(self):
-		return self.job.result.cregister[0]
-
 
 class qsimSvc(BackendSvc):
 	def __init__(self,connectionToken=None):
