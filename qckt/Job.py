@@ -20,6 +20,9 @@ class Job:
 		return self.result.cregister
 
 	def get_counts(self):
-		pass
+		counts = [0]*(2**self.nclbits)
+		for r in self.result.cregister:
+			counts[r.intvalue] += 1
+		return counts
 
 
