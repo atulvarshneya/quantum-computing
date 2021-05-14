@@ -27,32 +27,32 @@ At the end of the day, both the registers are subclasses of list data type. So, 
 
 Example usesof registers:
 
-import Registers as regs
-inpreg = regs.QRegister(4)
-outreg = regs.QRegister(2)
-wrkreg = regs.QRegister(4)
-clmeas = regs.CRegister(6)
-# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them. For that we use placement()
-nq,nc,placedqu,placedcl = regs.placement(inpreg,outreg,wrkreg,clmeas)
+	import Registers as regs
+	inpreg = regs.QRegister(4)
+	outreg = regs.QRegister(2)
+	wrkreg = regs.QRegister(4)
+	clmeas = regs.CRegister(6)
+	# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them. For that we use placement()
+	nq,nc,placedqu,placedcl = regs.placement(inpreg,outreg,wrkreg,clmeas)
 
 The above code declares registers and then assigned actual qubits and clbits to them (does the placement of the registers). The way the placement has been done above, the inpreg qubits occupy the MSB locations in the overall number of qubits in the circuit. Followed by outreg and then wrkreg. Since thereis only 1 classical register, it occupies the only number of classical bits in the circuit. Each register has bits assigned in the MSB to LSB order per the convention. So, the order in which the QRegiter objects appear in the placement() arguments, the qubits are assigned in accordance to that. Same for CRegister objects.
 
-inpreg      outreg   wrkreg
-|9 8 7 6|   |5 4|    |3 2 1 0|
+	inpreg      outreg   wrkreg
+	|9 8 7 6|   |5 4|    |3 2 1 0|
 
-clmeas
-|5 4 3 2 1 0|
+	clmeas
+	|5 4 3 2 1 0|
 
 placement() returns 4 values: the first one (nq in the example above) is the total number of qubits required in the circuit; second (nc in the example) is the total number of classical bits required in the circuit. Next two, placedqu and placedcl in the example, are registers containing all qubits and all clbits respectively.
 
-placedqu
-|9 8 7 6 5 4 3 2 1 0|
+	placedqu
+	|9 8 7 6 5 4 3 2 1 0|
 
-placedcl
-|5 4 3 2 1 0|
+	placedcl
+	|5 4 3 2 1 0|
 
 the nq and nc should be used while creating the circuit --
-circuit = qckt.QCkt(nq,nc)
+	circuit = qckt.QCkt(nq,nc)
 
 API Documentation
 ---
