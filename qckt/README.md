@@ -2,10 +2,11 @@
 
 Convention for arguments for quantum gates API
 ---
-* All single qubit gates, such as, X, Y, Z, H, P, UROTk, RND, accept a list of qubits as argument, e.g., circuit.H([3,2,1]) applies hadamard gate to each of these qubits. As a shortcut a single integer can also be provided as input argument to apply the gate to that sigle qubit.
-* parameterized quantum gates such as phase-rotation gate P, takes teh frst argument the phase value, and teh second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., circuit.P(numpy.pi/4,[3,2,1,0]), circuit.P(numpy.pi,3), circuit.UROTk(4,[7,6,5,4])
+* All single qubit gates, such as, X, Y, Z, H, P, UROTk, RND, accept a list of qubits as argument, e.g., circuit.H([3,2,1]) applies hadamard gate to each of these qubits individually. As a shortcut a single integer can also be provided as input argument to apply the gate to that sigle qubit.
+* parameterized quantum gates such as phase-rotation gate P, takes the frst argument the phase value, and the second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., circuit.P(numpy.pi/4,[3,2,1,0]), circuit.P(numpy.pi,3), circuit.UROTk(4,[7,6,5,4])
+* Gates that inherently take variable number of qubits as arguments, such as QFT, inputs to those are provided as multiple input arguments, e.g., circuit.QFT(7,6,5,4,3,2,1,0). QFT also accepts a list of qubits as the one argument, e.g., circuit.QFT([i for i in range(8)])
 * All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the last one is the target qubit and all other preceding ones are control qubits. E.g., circuit.CX(ctrl1, ctrl2, ctrl3, target), circuit.CP(numpy.pi/8,control, target).
-* Gates that inherently take variable number of qubits as arguments, such as QFT, inputs to those are provided as multiple input arguments, e.g., circuit.QFT(7,6,5,4,3,2,1,0). As a shortcut, QFT also accepts a list of qubits as the one argument, e.g., circuit.QFT([i for i in range(8)])
+* Please note the following about control gates. GateUtils allow addition of a control qubit (MSB) to a gate. Note the original gate can be a multi-qubit gate. So it is more accurate to say that all control gates use as many MSBs as control qubits as is per their operation.
 
 
 A note about MSB - LSB ordering
@@ -13,6 +14,45 @@ A note about MSB - LSB ordering
 qckt as well as qsim follow the convention that when providing arguments to any of the functions the list argument representing qubits or clbits is ordered as [MSB, ...., LSB]. Yes, :-), the [0] element is MSB!
 
 Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target), or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT it very much *does* matter.
+
+Using Registers
+---
+The use of Registers simplifies, and can help in generalizing the quantum circuit.
+When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program.
+While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it somewhat more streamlined.
+
+There are two classes of registers - QRegister and CRegister. the former for quantum bits, and the latter for classical bits. The distiction is for assigning the actual qubits and clbits to these registers.
+
+At the end of the day, both the registers are subclasses of list data type. So, operations as indexing (qreg[2]), concatenating (qreg1 + qreg2), etc., can be freely performed on the registers. Just note that the result turns out to be of list data type (not the original QRegister or CRegister type, *this needs to be fixed in subsequent releases*). The assignment of qubits and clbits to the registers follows the MSB...LSB convention as mentioned in the section above.
+
+Example usesof registers:
+
+import Registers as regs
+inpreg = regs.QRegister(4)
+outreg = regs.QRegister(2)
+wrkreg = regs.QRegister(4)
+clmeas = regs.CRegister(6)
+# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them. For that we use placement()
+nq,nc,placedqu,placedcl = regs.placement(inpreg,outreg,wrkreg,clmeas)
+
+The above code declares registers and then assigned actual qubits and clbits to them (does the placement of the registers). The way the placement has been done above, the inpreg qubits occupy the MSB locations in the overall number of qubits in the circuit. Followed by outreg and then wrkreg. Since thereis only 1 classical register, it occupies the only number of classical bits in the circuit. Each register has bits assigned in the MSB to LSB order per the convention. So, the order in which the QRegiter objects appear in the placement() arguments, the qubits are assigned in accordance to that. Same for CRegister objects.
+
+inpreg      outreg   wrkreg
+|9 8 7 6|   |5 4|    |3 2 1 0|
+
+clmeas
+|5 4 3 2 1 0|
+
+placement() returns 4 values: the first one (nq in the example above) is the total number of qubits required in the circuit; second (nc in the example) is the total number of classical bits required in the circuit. Next two, placedqu and placedcl in the example, are registers containing all qubits and all clbits respectively.
+
+placedqu
+|9 8 7 6 5 4 3 2 1 0|
+
+placedcl
+|5 4 3 2 1 0|
+
+the nq and nc should be used while creating the circuit --
+circuit = qckt.QCkt(nq,nc)
 
 API Documentation
 ---
@@ -86,22 +126,75 @@ QCkt
 	draw()
 		Draws a text drawing of the circuit
 
-Backend
+Backend framework
 ---
-	Backend()
-		Returns a handle object to a backend execution environment (a local qc simulator)
-	run(circuit, initstate=None, prepqubits=None, qtrace=False)
-		Runs the given circuit on the backend execution environment
-		Initial state can be passed inform of state-vector, or list of prepared qubits
-		The results of the execution are stored in the environment handle object
-		Returns the same backend environment handle object
-	get_svec()
-		returns the result state-vector object
-		The state-vector array can be accessed through the .value field of the returned object
-		The returned object supports conversion to string representation for pretty printing
-		The returned object also supports a method svec.verbose(boolean), which affects the string conversion in that 
-		it includes all states even those with an amplitude of 0. Svec.verbose(boolean) returns the same state-vector object
-	get_creg()
-		returns the result classical bits register object
+
+	Backend Services Registry
+		This is an API for accessing the registry of Quantum Computing Services registered at your installation's configuration.
+		The examples of services that could be registered are IBM quantum computing, Ionq quantum computing, local qsim simulator
+		listSvc() returns a list of tuples (name, description) of all services available (i.e. registered in the installation's configuration)
+		getSvc(svcName) returns handle to the named backend service
+		Example usage:
+			import svcReg
+			reg = svcReg.Registry()
+			svcTuples = reg.listSvc()
+			svc = reg.getSvc("QSystems")
+
+	Backend Service
+		Backend service class implments the methods to connect with the quantum computing service, using the required authentication/authorization.
+		The service provides methods to discover backend engines under that service, and get the handles to them to run the quantum computing circuits/programs.
+		listInstances() returns a list of tuples (name, description) of all instances (quamtum computer) available at this service
+		getInstance(name) returns an object representation of the named instance (quantum computer)
+		Example usage: Going through the Registry
+			import svcReg
+			reg = svcReg.Registry()
+			svcTuples = reg.listSvc()
+			svc = reg.getSvc("QSystems")
+			engine_list = svc.listInstances()
+			bk_engine = svc.getInstance("local")
+		Example usage: Directly accessing the QSystems engines
+			import QSystems as qsys
+			bk_debugging_engine = qsys.Qdeb() # same as svc.getInstance("local")
+			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim")
+
+	Backend engines
+		The adaptor for the backend needs to interpret the operations sequence in the qckt representation.
+		At the end of the job execution (all the shots), the backend adaptor populates the results in the job object, as mentioned above.
+		runjob(job) this is the only function impleented by the backend adaptor. It runs the given job on the backend execution engine. Returns the backend adaptor object itself.
+		Example usage: Directly accessing the QSystems engines
+			import QSystems as qsys
+			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim")
+			job = Job(somecircuit, initstate=somestate, shots=100)
+			bk_engine.runjob(job)
+
+	Job class
+		Packages the job to be executed on a backend engine.
+		Job object converts the circuit to an array of implementation neutral, fully-specified operations (gates, measurement, and probes (for simulator backends))
+		Once executed, the backend engine populates the results in the job object.
+		Job.get_creg() returns an array of Cregister objects from all runs/shots.
+		Job.get_counts() returns the frequencies of different Cregister values in the results.
+		Job.get_svec(), only useful for simulator backends, this returns the state-vector at the end of the execution. For simulator backends, shots must be only 1.
+		Example Usage:
+			import QSystems as qsys
+			import Job
+			job = Job.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=100)
+			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim")
+			bk_engine.runjob(job)
+			print(job.get_creg()[0]) # print the cregister value from the first execution of the circuit
+			counts = job.get_counts()
+			for i,c in enumerate(counts):
+				if c > 0: # lets print only the important ones
+					print("{0:04b} ({0:2d})    {1:d}".format(i,c))
+
+	Cregister class
+		An object of this class holds the classical register value got from the measurement operation.
+		It provides method to convert that to pretty printable string, e.g., str(cregister), print(cregister).
 		The classical bits array can be accessed through the .value field and its integer value through .intvalue field of the returned object
-		The returned object supports conversion to string representation for pretty printing
+
+	StateVector class
+		An object of this class holds the statevector value from the simulator backend engine.
+		It provides methods to convert that to pretty printable string, e.g., str(statevector), print(statevector).
+		The state-vector array can be accessed through the .value field of the object
+		The returned object also supports a method StateVector.verbose(boolean), which affects the string conversion such that 
+		it includes all states even those with an amplitude of 0. Svec.verbose(boolean) returns the same state-vector object
+
