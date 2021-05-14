@@ -52,6 +52,7 @@ placement() returns 4 values: the first one (nq in the example above) is the tot
 	|5 4 3 2 1 0|
 
 the nq and nc should be used while creating the circuit --
+
 	circuit = qckt.QCkt(nq,nc)
 
 API Documentation
