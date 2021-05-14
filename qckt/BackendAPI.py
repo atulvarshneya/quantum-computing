@@ -12,8 +12,8 @@ class BackendSvc:
 	def listInstances(self):
 		'provides a list of tuples (name, description) of all instances (quamtum computer) available at this service'
 		pass
-	def getInstance(self):
-		'returns an object representation of that instance(quantum computer)'
+	def getInstance(self, name):
+		'returns an object representation of the named instance(quantum computer)'
 		pass
 
 class Cregister:
