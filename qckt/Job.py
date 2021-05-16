@@ -1,3 +1,4 @@
+import sys
 
 class Job:
 	'just a packet of all job attributes. Is a qckt concept, so is '
@@ -25,4 +26,33 @@ class Job:
 			counts[r.intvalue] += 1
 		return counts
 
+	def plot_counts(self,verbose=False):
+		counts = self.get_counts()
+		lc = len(counts)
+		nbits = 0
+		while 2**nbits < lc: nbits += 1
+		if 'ipykernel' in sys.modules:
+			lbl = []
+			vals = []
+			for i,c in enumerate(counts):
+				if verbose or c > 0:
+					binlbl = ('[{0:0'+str(nbits)+'b}]').format(i)
+					lbl.append(str(i)+"\n"+binlbl)
+					vals.append(c)
+			import matplotlib.pyplot as plt
+			fig = plt.bar(lbl,vals)
+			for i in range(len(vals)):
+				plt.annotate(str(vals[i]), xy=(lbl[i],vals[i]), ha='center', va='bottom')
+			plt.show()
+		else:
+			maxc = max(counts)
+			cwid = len(str(maxc))
+			scale = 1 if maxc < 50 else 50.0/maxc
+			for i,c in enumerate(counts):
+				if verbose or c > 0:
+					print(('{0:4d} [{0:0'+str(nbits)+'b}]  {1:'+str(cwid)+'d} |').format(i,c),end="")
+					for j in range(int(c * scale)):
+						print("*",end="")
+					print()
+		return counts
 
