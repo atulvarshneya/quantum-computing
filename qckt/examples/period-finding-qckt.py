@@ -8,8 +8,8 @@ import numpy as np
 from fractions import gcd
 import math
 
-fxinpsz = 5
-fxoutsz = 3
+fxinpsz = 6
+fxoutsz = 2
 inpreg = regs.QRegister(fxinpsz)
 outreg = regs.QRegister(fxoutsz)
 clmeas = regs.CRegister(fxinpsz)
@@ -22,9 +22,8 @@ fx = qckt.QCkt(nqbits)
 fx.Border()
 fx.CX(inpreg[-1],outreg[-1])
 fx.CX(inpreg[-2],outreg[-2])
-fx.CX(inpreg[-3],outreg[-3])
 fx.Border()
-print("Psst ... f(x) defined as having period of 8\n")
+print("Psst ... f(x) defined as having period of 4\n")
 
 # QFT(x) - F(x) - QFT(x) - Measure
 ckt = qckt.QCkt(nqbits,ncbits)
