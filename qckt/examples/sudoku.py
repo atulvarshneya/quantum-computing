@@ -39,7 +39,4 @@ grv_ckt.draw()
 job = Job(grv_ckt,shots=40)
 q = Qeng()
 q.runjob(job)
-counts = job.get_counts()
-for i,c in enumerate(counts):
-	if c > 0:
-		print("{0:04b} ({0:2d})    {1:d}".format(i,c))
+job.plot_counts()

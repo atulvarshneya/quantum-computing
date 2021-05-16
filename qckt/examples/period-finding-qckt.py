@@ -43,6 +43,7 @@ bk.runjob(job)
 
 # pick the top two results other than 0  (picking top 2 will eliminate the noise)
 counts = job.get_counts()
+job.plot_counts()
 countkv = []
 for i,c in enumerate(counts): countkv.append([c,i])
 for i in range(2):
