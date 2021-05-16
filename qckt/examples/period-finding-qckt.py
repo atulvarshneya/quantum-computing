@@ -3,63 +3,64 @@
 import qckt
 from QSystems import *
 from Job import Job
+import Registers as regs
 import numpy as np
 from fractions import gcd
 import math
 
-nqbits = 8 # per the definition of f(x) below, must be >= 4
-M = 2**(nqbits-2)
+fxinpsz = 5
+fxoutsz = 3
+inpreg = regs.QRegister(fxinpsz)
+outreg = regs.QRegister(fxoutsz)
+clmeas = regs.CRegister(fxinpsz)
+nqbits,ncbits,_,_ = regs.placement(inpreg, outreg, clmeas)
+
+M = 2**fxinpsz
 
 # setup the periodic function
 fx = qckt.QCkt(nqbits)
 fx.Border()
-fx.CX(2,0)
-fx.CX(3,1)
+fx.CX(inpreg[-1],outreg[-1])
+fx.CX(inpreg[-2],outreg[-2])
+fx.CX(inpreg[-3],outreg[-3])
 fx.Border()
-print("Psst ... f(x) defined as having period of 4\n")
+print("Psst ... f(x) defined as having period of 8\n")
 
 # QFT(x) - F(x) - QFT(x) - Measure
-ckt = qckt.QCkt(nqbits,nqbits)
-ckt.QFT(list(range(nqbits-1,1,-1)))
+ckt = qckt.QCkt(nqbits,ncbits)
+ckt.QFT(inpreg)
 ckt = ckt.append(fx)
 # actually you would expect to measure output of fx now
 # ckt.M([0,1])
 # but due to principle of defered measurement, it is not necessary
-ckt.QFT(list(range(nqbits-1,1,-1)))
-ckt.M(list(range(nqbits-1,1,-1)))
+ckt.QFT(inpreg)
+ckt.M(inpreg,clmeas)
 ckt.draw()
 
-# Now loop to repeatedly find values of multiples of M/r by
-# running the circuit repeatedly and reading the outputs
-idx = 0
-vals = [0,0]
-while idx < 2:
-	# run the circuit
-	job = Job(ckt, qtrace=False)
-	bk = Qdeb()
-	bk.runjob(job)
-	mbyrarr = (job.get_creg()[0]).value
-	print("CREGISTER = ",job.get_creg()[0])
+# run the circuit many times
+job = Job(ckt, qtrace=False, shots=100)
+bk = Qeng()
+bk.runjob(job)
 
-	# convert to integer the measured values of the x register
-	# remember the Cregister holds *all* classical bits, not just the ones measured
-	# and remember the bits ordering [MSB, ..., LSB]
-	mbyr = 0
-	for i in range(0,nqbits-2):
-		if mbyrarr[i] == 1:
-			pow_of_2 = nqbits - 2 - i - 1 
-			mbyr += 2**pow_of_2
-
-	# Look for two distinc non-zero values
-	print("A multiple of M/r = ", mbyr)
-	if mbyr != 0:
-		vals[idx] = int(mbyr)
-		if (vals[0] != vals[1]):
-			idx += 1
+# pick the top two results other than 0  (picking top 2 will eliminate the noise)
+counts = job.get_counts()
+countkv = []
+for i,c in enumerate(counts): countkv.append([c,i])
+for i in range(2):
+	maxc = 0
+	for j in range(len(counts)-i):
+		if countkv[j][1] !=0 and countkv[j][0] > maxc:
+			maxc = countkv[j][0]
+			maxi = countkv[j][1]
+	# swap
+	t = countkv[len(counts)-i-1]
+	countkv[len(counts)-i-1] = [maxc,maxi]
+	countkv[maxi] = t
 
 # find the GCD of the two values read to get M/r, and compute r, as M is known
-mbyr = int(math.gcd(vals[0], vals[1]))
-print("GCD of values of M/r = {:d}\n".format(mbyr))
+print("Top two measurements (other than 0)",countkv[-1][1], countkv[-2][1])
+mbyr = int(math.gcd(countkv[-1][1], countkv[-2][1]))
+print("GCD of values of multiples of M/r = {:d}".format(mbyr))
 print("But, M =", M)
 r = int(M / mbyr)
 print("Therefore, the period, r = ",r)

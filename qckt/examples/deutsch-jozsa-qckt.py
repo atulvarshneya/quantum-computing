@@ -5,6 +5,7 @@ import numpy as np
 import qckt
 from QSystems import *
 from Job import Job
+import Registers as regs
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -18,37 +19,35 @@ determines which one it is.
 -------------------------------------------------------------------------------------------------------
 """)
 
-nqbits = 8
-
-def get_fxckt(nq):
-	fxckt = qckt.QCkt(nq)
+def get_fxckt(inpreg, outreg):
+	fxckt = qckt.QCkt(len(inpreg+outreg))
 	toss = int(rnd.random()*2.0)
 	if toss == 0:
 		print("fx is CONSTANT.")
 	elif toss == 1:
 		print("fx is BALANCED.")
-		fxckt.CX(1,0)
+		fxckt.CX(inpreg[-1],outreg[0])
 	return fxckt
 
 
-dj_ckt = qckt.QCkt(nqbits,nqbits)
-dj_ckt.X(0)
-dj_ckt.H(0)
+fxsize = 7
+inpreg = regs.QRegister(fxsize)
+outreg = regs.QRegister(1)
+clmeas = regs.CRegister(fxsize)
+nqbits,ncbits,_,_ = regs.placement(inpreg,outreg,clmeas)
 
-for i in range(nqbits-1):
-	dj_ckt.H(i+1)
+dj_ckt = qckt.QCkt(nqbits,ncbits)
 
+dj_ckt.X(outreg)
+dj_ckt.H(outreg)
+dj_ckt.H(inpreg)
 dj_ckt.Border()
-fx_ckt = get_fxckt(nqbits)
+fx_ckt = get_fxckt(inpreg, outreg)
 dj_ckt = dj_ckt.append(fx_ckt)
 dj_ckt.Border()
+dj_ckt.H(inpreg)
+dj_ckt.M(inpreg,clmeas)
 
-for i in range(nqbits-1):
-	dj_ckt.H(i+1)
-
-qbits_list = list(range(nqbits-1,0,-1))
-dj_ckt.M(qbits_list, qbits_list)
-	
 dj_ckt.draw()
 
 job = Job(dj_ckt,initstate=None, prepqubits=None, qtrace=False, shots=1)
