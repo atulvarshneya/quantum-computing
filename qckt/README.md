@@ -1,7 +1,6 @@
 # Reference
 
-Convention for arguments for quantum gates API
----
+## Convention for arguments for quantum gates API
 * All single qubit gates, such as, X, Y, Z, H, P, UROTk, RND, accept a list of qubits as argument, e.g., circuit.H([3,2,1]) applies hadamard gate to each of these qubits individually. As a shortcut a single integer can also be provided as input argument to apply the gate to that sigle qubit.
 * parameterized quantum gates such as phase-rotation gate P, takes the frst argument the phase value, and the second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., circuit.P(numpy.pi/4,[3,2,1,0]), circuit.P(numpy.pi,3), circuit.UROTk(4,[7,6,5,4])
 * Gates that inherently take variable number of qubits as arguments, such as QFT, inputs to those are provided as multiple input arguments, e.g., circuit.QFT(7,6,5,4,3,2,1,0). QFT also accepts a list of qubits as the one argument, e.g., circuit.QFT([i for i in range(8)])
@@ -9,14 +8,12 @@ Convention for arguments for quantum gates API
 * Please note the following about control gates. GateUtils allow addition of a control qubit (MSB) to a gate. Note the original gate can be a multi-qubit gate. So it is more accurate to say that all control gates use as many MSBs as control qubits as is per their operation.
 
 
-A note about MSB - LSB ordering
----
+## A note about MSB - LSB ordering
 qckt as well as qsim follow the convention that when providing arguments to any of the functions the list argument representing qubits or clbits is ordered as [MSB, ...., LSB]. Yes, :-), the [0] element is MSB!
 
 Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target), or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT it very much *does* matter.
 
-Using Registers
----
+## Using Registers
 The use of Registers simplifies, and can help in generalizing the quantum circuit.
 When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program.
 While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it somewhat more streamlined.
@@ -55,10 +52,8 @@ the nq and nc should be used while creating the circuit --
 
 	circuit = qckt.QCkt(nq,nc)
 
-API Documentation
----
-QCkt
----
+# API Documentation
+## QCkt
 	QCkt(nqubits, nclbits=None, name="QCkt")
 		Returns an empty quantum circuit
 	CX(control, target)
@@ -127,8 +122,7 @@ QCkt
 	draw()
 		Draws a text drawing of the circuit
 
-Backend framework
----
+# Backend framework
 
 	Backend Services Registry
 		This is an API for accessing the registry of Quantum Computing Services registered at your installation's configuration.
