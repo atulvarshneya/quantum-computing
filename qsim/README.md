@@ -1,5 +1,4 @@
-1. QUICK START
---------------------------------------------------------------------------------
+# 1. QUICK START
 
 1.2	TUTORIAL INTRODUCTION
 --------
@@ -14,7 +13,7 @@ Lets start with a simple example of using qsim, something like a 'hello world' -
 	qc.qreport()
 	qc.qmeasure([0])
 	qc.qreport()
- 
+
 When run, the above code generates the following output (since measuring randomly collapses to some state per its probability, there is 50% chance you might see the final state as 00000000) --
 
 	State
@@ -23,7 +22,7 @@ When run, the above code generates the following output (since measuring randoml
 
 	State
 	00001001    1.00000000+0.00000000j
- 
+
 With respect to the functionality, the above code starts with an 8-qubit system, and then sets up qubits 3 and 0 entangled in bell state |Phi+>. And then measures qubit 0. This is depicted in the diagram below --
 
 	7 -------------------------
@@ -41,27 +40,27 @@ The output emitted by the above code is the dump of the state right after the se
 
 Lets go line by line to understand the code --
 
->>> import qsim
->>> from qgates import *
+	import qsim
+	from qgates import *
 The first line imports the qsim. Fairly straight forward.
 The second line imports various standard gates definitions whcih csn be used in your programs.
 
->>> qc = qsim.QSimulator(8)
+	qc = qsim.QSimulator(8)
 The main class in qsim is QSimulator. This line creates an instance of that class. As a convention in this document, qc is always used to represent an instance of the class QSimulator. The QSimulator class instance, qc, represents a quantum computer. The number 8 as the argument to the constructor of class QSimulator, specifies the number of qubits in that quantum computer.
 
->>> qc.qgate(H(),[0])
+	qc.qgate(H(),[0])
 qgate() is the function that applies a quantum gate on a given set of qubits in the system. In the above line of code, it applies the hadamard gate (H()), to qubit 0. See the documentation below for the gates available.
 
->>> qc.qgate(C(),[0,3])
+	qc.qgate(C(),[0,3])
 Here a CNOT gate (C()) is applied on bits 0 and 3, with qubit 0 being the control qubit. In QSimulator the C gate is defined to take the first qubit as the control qubit.
 
->>> qc.qreport()
+	qc.qreport()
 The function qreport() outputs the current superposition state. The first batch of lines is that output.
 
->>> qc.qmeasure([0])
+	qc.qmeasure([0])
 The qmeasure() function measures qubit 0.
 
->>> qc.qreport()
+	qc.qreport()
 This last qreport() function call outputs the state after the measurement of the qubit 0.
  
 Now, let us run the same code with trace turned on (therefore removed the qreport() calls). Turning trace ON, it outputs the state after init and each gate and measurement steps (see accompanying helloworld_traceON.py) --
@@ -105,11 +104,10 @@ Users write the algorithms on a front-end classical computer using standard prog
 	  ---------          |                +---|          |                |
 	                     +--------------------+          +----------------+
 
-2. CORE FUNCTIONS
---------------------------------------------------------------------------------
+# 2. CORE FUNCTIONS
 
-2.1	qsim.QSimulator(nqubits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False)
---------
+2.1	**qsim.QSimulator(nqubits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False)**
+
 First argument specifies the number of qubits in the system. If ncbits is provided it specifies the number of classical bits, if not provide, it defaults to same as the number of qubits. If neither initstate or prepqubits is provided, prepares all qubits to |0>.
 
 Argument 'prepqubits' can be provided to initialize the initial state by providing the states of all individual qubits in the system. The structure to use is a list, example [[a,b],[c,d], ... [x,y]]. Note that [a,b] is the MSB.
@@ -126,12 +124,12 @@ If validation=True, every qgate() call validates the gate to be unitary
 
 If visualize=True, the qreport() displays an additional bar graph showing the magnitude of the amplitudes of each state.
 
-2.2	qreset()
---------
+2.2	**qreset()**
+
 Brings the simulator to the same state as after QSimulator() call - initial state, qtrace, qzeros, ... everything.
 
-2.3	qgate(gate_function, list_of_qubits, qtrace=False)
---------
+2.3	**qgate(gate_function, list_of_qubits, qtrace=False)**
+
 qgate() is used to perform quantum gate operations on a set of qubits.
 
 There are a number of gates pre-created within the qgates module, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, SWAP gate, etc.) then the list in the second argument (list_of_qubits) must contain that many qubits.
@@ -140,8 +138,8 @@ The function qgate() validates the number of bits passed in list_of_qubits again
 
 If qtrace is True, the resulting state is printed out.
 
-2.4	v = qmeasure(qbit_list, cbit_list=None, qtrace=False)
---------
+2.4	**v = qmeasure(qbit_list, cbit_list=None, qtrace=False)**
+
 Returns the measured values of the qubits in the qubit_list, each 0 or 1, as a list, in the same order as the qubits in the qubit_list. The measured qubits are also read into the corresponding classical bits in the cbit_list. if cbit_list is not specified it defaults to the same list as the qbit_list.
 
 If the bits are in a superposition, the measurement operation will cause the state to randomly collapse to one or the other with the appropriate probability. In this simulator, the Python random.random() function is used to generate the randomness to decide which state to collapse into.
@@ -152,36 +150,37 @@ Cleary, the computations can continue after the measurement operations. Just tha
 
 If qtrace is True, the resulting state is printed out.
 
-2.5	qreport(state=None, header="State", probestates=False)
---------
+2.5	**qreport(state=None, header="State", probestates=False)**
+
 Prints the current state of the system. if state argument is provided with a column numpy.matrix, it prints that state instead.
 The argument header provides the text to be printed above the state information.
 The argument probestates is used to limit the dumping of states information, it gets limited to only the states listed, e.g., probestates=[0,1,2,3]
 
-2.6	st = qsnapshot()
---------
+2.6	**st = qsnapshot()**
+
 Returns the a python array of all the classical bits and a python array of complex amplitudes of superposition states of the qubits in the system.
 
-2.7	n = qsize()
---------
+2.7	**n = qsize()**
+
 Returns the number of qubits in the system.
 
-2.8	qtraceON(boolean)
---------
+2.8	**qtraceON(boolean)**
+
 Turns ON or OFF printing of state after each qgate() and qmeasure() function call.
 
-2.9	qzerosON(boolean)
---------
+2.9	**qzerosON(boolean)**
+
 Turns ON or OFF printing of zero amplitude states in trace outputs and qreport() outputs.
 
 
-3. OPERATOR UTILITY FUNCTIONS
---------------------------------------------------------------------------------
-3.1	newgate = qstretch(gate_function, list_of_qubits)
---------
+# 3. OPERATOR UTILITY FUNCTIONS
+
+3.1	**newgate = qstretch(gate_function, list_of_qubits)**
+
 qstretch takes a gate and an ordered list of qubits on which it would operate and "stretches" it to handle *all* qubits in the system. Basically, the resulting newgate takes as input all the qubits in the system provided as [msb,...,lsb], but performs the original operation only on the given list_of_qubits, and passes through all the other qubits unaffected.
 
 For instance, lets assume we created a 4 qubit system (qsim.QSimulator(4)), and in that we use C gate on qubits 3 and 0 (qgate(C(),[3,0])). Shown on the left side of the figure below. qstretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
+
 	                         +---+
 	3 ---.-----          3 --| . |--
              |                   | | |
@@ -191,40 +190,40 @@ For instance, lets assume we created a 4 qubit system (qsim.QSimulator(4)), and 
              |                   | | |
 	0 ---O-----          0 --| O |--
 	                         +---+
+
     qc.qgate(C(),[3,0])   ng = qc.qstretch(C(),[3,0])
 	                     qc.qgate(ng,[3,2,1,0])
 
 qstretch() is useful in cases where you want to make a 'blackbox' function which does an equivalent of a series of operations in one go (see the accompanying bern_vazy.py). To do that you would typically use qcombine_seq()'s and qcombine_par()'s in conjunction with qstretch()'s.
 
-3.2	invop = qinverse(op,name=None)
---------
+3.2	**invop = qinverse(op,name=None)**
+
 Returns the inverse of the operator. If name argument is not provided, it generates a name by prefixing the name of the provided operator with "INV-"
 
-3.3	u = qisunitary(op)
---------
+3.3	**u = qisunitary(op)**
+
 Checks if the provided operator is unitary opperator or not. Returns boolean value (True or False).
 
-4. qgates MODULE
---------------------------------------------------------------------------------
+# 4. qgates MODULE
 
 4.1	PRE-DEFINED GATES
 --------
 A number of gates are pre-defined in the QSimulator class. The following is the list --
 
-H()		Hadamard gate
-X()		Pauli_x gate
-Y()		Pauli_y gate
-Z()		Pauli_z gate
-R(phi)		Phase rotation by phi
-Rk(k)		Phase rotation by 2*pi/(2**k), useful in QFT algorithm
-C()		CNOT gate
-SWAP()		SWAP gate
-CSWAP()		Controlled-SWAP gate
-SQSWAP()	Square root of SWAP gate
-T()		TOFFOLI gate
-Hn(n)		Hadamard gates applied on n qubits, added since it is commonly used
-QFT(n)		QFT gate for n qubits
-RND()		Randomizes the qubit - useful for testing some cases
+	H()		Hadamard gate
+	X()		Pauli_x gate
+	Y()		Pauli_y gate
+	Z()		Pauli_z gate
+	R(phi)		Phase rotation by phi
+	Rk(k)		Phase rotation by 2*pi/(2**k), useful in QFT algorithm
+	C()		CNOT gate
+	SWAP()		SWAP gate
+	CSWAP()		Controlled-SWAP gate
+	SQSWAP()	Square root of SWAP gate
+	T()		TOFFOLI gate
+	Hn(n)		Hadamard gates applied on n qubits, added since it is commonly used
+	QFT(n)		QFT gate for n qubits
+	RND()		Randomizes the qubit - useful for testing some cases
 
 4.2	CONTROLLED GATES
 --------
@@ -232,14 +231,14 @@ CTL(op,name=None)
 	Build a controlled gate from any gate, MSB position as control bit. Can apply CTL() multiple times e.g., CTL(CTL(op)), to add multiple control qubits.
 
 Examples:
-C() is the same as CTL(X(),name="CNOT")
-T() is the same as CTL(CTL(X()),name="TOFFOLI")
+	C() is the same as CTL(X(),name="CNOT")
+	T() is the same as CTL(CTL(X()),name="TOFFOLI")
 
 4.3 OPERATOR UTILITY FUNCTIONS
 --------
 
-4.3.1 comb_op = qcombine_seq(name, op_list)
---------
+4.3.1 **comb_op = qcombine_seq(name, op_list)**
+
 Combines a sequential application of gates into one equivalent gate. The argument name is the name of the resulting gate. Argument op_list is a list of gates each of the structure [name,matrix].
 
 	--[A]--[B]--[C]--[D]--    ==>   --[G]--
@@ -252,8 +251,8 @@ and to use it, for instance to apply it on qubit 2
  
 	qc.qgate(G,[2])
 
-4.3.2 comb_op = qcombine_par(name, op_list)
---------
+4.3.2 **comb_op = qcombine_par(name, op_list)**
+
 Combines a parallel application of gates into one equivalent gate. The argument name is the name of the resulting gate. Argument op_list is a list of gates.
 	                         +-+
 	3 --[A]----          3 --| |--
@@ -271,13 +270,14 @@ and to use it, for example to apply it on qubits 7,5,3,1
 	qc.qgate(G,[7,5,3,1])
  
 An illustrative example is 
+
 	                         +--+
 	1 --[H]----          1 --|  |--
 	                         |H2|
 	0 --[H]----          0 --|  |--
 	                         +--+
-	H2 = qc.qcombine_par("H2",[qc.H(),qc.H()])
- 
+	H2 = qc.qcombine_par("H2",[H(),H()])
+
 	                         +--+
 	3 ---.-----          3 --|  |--
 	     |                   |  |
@@ -287,16 +287,16 @@ An illustrative example is
 	     |                   |  |
 	0 ---O-----          0 --|  |--
 	                         +--+
-	C2 = qc.qcombine_par("C2",[qc.C(),qc.C()])
- 
+	C2 = qc.qcombine_par("C2",[C(),C()])
+
 Create 2 entangled |Phi+> bell states, between quits 7,6 and 5,4 using these --
 
 	qc.qgate(H2,[7,5])
 	qc.qgate(C2,[7,6,5,4])
 
 
-5. CREATING USER DEFINED GATES
---------------------------------------------------------------------------------
+# 5. CREATING USER DEFINED GATES
+
 (see accompanying user_def_gates.py)
 
 Qcsim allows using user defined gates. A user defined gate would be written as a function that returns a Python array with two elements [name_string, unitary_matrix]. The element unitary_matrix is the matrix that specifies the gate. It should be created using numpy.matrix([...],dtype=complex), or equivalent. The element name_string is a string that is a user-friendly name of that gate that is used in logs and debug traces.
@@ -332,8 +332,8 @@ Since the gate is defined in form of a function, it can take arguments. For inst
 (Note: To see some change in the state, perform an X() or H() or some such on the qubit before the phase rotation.)
 
 
-6. ERROR HANDLING, EXCEPTIONS
---------------------------------------------------------------------------------
+# 6. ERROR HANDLING, EXCEPTIONS
+
 Various function calls raise exceptions, mostly in cases where user passed arguments are incorrect. The exceptions are raised using class qsim.QClibError, having an argument of a text string describing the error encountered.
 
 Following is an example shows how these exceptions are handled --
@@ -352,8 +352,8 @@ Following is the list of error messages with the name of the function, thrown in
 
 	(TBD with the latest list)
 
-7. PERFORMANCE
---------------------------------------------------------------------------------
+# 7. PERFORMANCE
+
 On my laptop PC (1 core, 1GB RAM, Ubuntu), I could go upto 11 qubits. More Compute, more memory = more qubits.
 
 Up until 8 qubits the simulator runs pretty fast. Beyond that the speed starts slowing down. At 11 qubits the simulator takes several seconds to apply 1 gate. At 12 qubits I get Memory Error.
