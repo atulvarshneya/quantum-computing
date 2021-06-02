@@ -21,8 +21,8 @@ for i in svcinsts:
 	print(i)
 print("-------------------------")
 print()
-print('Using instance:','local')
-engine = svc.getInstance('local')
+print('Using instance:','qsim-deb')
+engine = svc.getInstance('qsim-deb')
 print("-------------------------")
 print()
 

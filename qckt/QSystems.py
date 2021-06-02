@@ -95,5 +95,5 @@ class qsimSvc(BackendSvc):
 		else:
 			raise QCktException("No such quantum computing instance "+str(instkey))
 	# in our case since the list of instances is fixed we have simply statically initialized it
-	instances = {"qsim":Qeng,"local":Qdeb}
+	instances = {"qsim-eng":Qeng,"qsim-deb":Qdeb}
 

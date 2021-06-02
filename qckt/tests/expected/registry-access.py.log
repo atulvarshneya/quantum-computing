@@ -6,11 +6,11 @@ Using service: QSystems
 -------------------------
 
 Instances available:
-qsim
-local
+qsim-eng
+qsim-deb
 -------------------------
 
-Using instance: local
+Using instance: qsim-deb
 -------------------------
 
 q000 -[H]-[.]--#------#--v-
