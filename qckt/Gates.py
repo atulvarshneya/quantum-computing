@@ -140,6 +140,13 @@ class QGate:
 				return False
 		return True
 
+# Decorator to regiter the gate class in the GatesList list
+GatesList = []
+def registerGate(gateclass):
+	GatesList.append(gateclass)
+	return gateclass
+
+@registerGate
 class X(QGate):
 	def __init__(self, qbit):
 		super().__init__()
@@ -157,6 +164,7 @@ class X(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class Y(QGate):
 	def __init__(self, qbit):
 		super().__init__()
@@ -174,6 +182,7 @@ class Y(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class Z(QGate):
 	def __init__(self, qbit):
 		super().__init__()
@@ -191,6 +200,7 @@ class Z(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class H(QGate):
 	def __init__(self, qbit):
 		super().__init__()
@@ -209,6 +219,7 @@ class H(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CX(QGate):
 
 	def __init__(self, *allqbits):
@@ -229,6 +240,7 @@ class CX(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CY(QGate):
 
 	def __init__(self, *allqbits):
@@ -249,6 +261,7 @@ class CY(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CZ(QGate):
 
 	def __init__(self, *allqbits):
@@ -270,6 +283,7 @@ class CZ(QGate):
 	# INHERIT def __str__(self):
 
 
+@registerGate
 class CCX(QGate):
 
 	def __init__(self, control1, control2, target):
@@ -288,6 +302,7 @@ class CCX(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class SWAP(QGate):
 
 	def __init__(self, qbit1, qbit2):
@@ -306,6 +321,7 @@ class SWAP(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class M(QGate):
 
 	def __init__(self, qubitslist, clbitslist=None):
@@ -354,6 +370,7 @@ class M(QGate):
 	def assemble(self):
 		return {"op":"measure", "qubits":self.qbits, "clbits":self.cbits}
 
+@registerGate
 class Border(QGate):
 
 	def __init__(self):
@@ -387,6 +404,7 @@ class Border(QGate):
 	def __str__(self):
 		return "BORDER"
 
+@registerGate
 class Probe(QGate):
 
 	def __init__(self, header="",probestates=None,probeobject=None):
@@ -431,6 +449,7 @@ class ProbeAnalyzer:
 		pass
 
 
+@registerGate
 class QFT(QGate):
 
 	def __init__(self, *allqbits):
@@ -464,6 +483,7 @@ class QFT(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class RND(QGate):
 	def __init__(self, qbit):
 		super().__init__()
@@ -490,6 +510,7 @@ class RND(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class P(QGate):
 	def __init__(self, rotphi, qbit):
 		super().__init__()
@@ -512,6 +533,7 @@ class P(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CP(QGate):
 
 	def __init__(self, rotphi, *allqbits):
@@ -537,6 +559,7 @@ class CP(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class UROTk(QGate):
 	def __init__(self, rotk, qbit):
 		super().__init__()
@@ -559,6 +582,7 @@ class UROTk(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CROTk(QGate):
 	def __init__(self, rotk, *allqbits):
 		super().__init__()
@@ -584,6 +608,7 @@ class CROTk(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class Rx(QGate):
 	def __init__(self, theta, qbit):
 		super().__init__()
@@ -606,6 +631,7 @@ class Rx(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CRx(QGate):
 	def __init__(self, theta, *allqbits):
 		super().__init__()
@@ -632,6 +658,7 @@ class CRx(QGate):
 	# INHERIT def __str__(self):
 
 
+@registerGate
 class Ry(QGate):
 	def __init__(self, theta, qbit):
 		super().__init__()
@@ -654,6 +681,7 @@ class Ry(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CRy(QGate):
 	def __init__(self, theta, *allqbits):
 		super().__init__()
@@ -680,6 +708,7 @@ class CRy(QGate):
 	# INHERIT def __str__(self):
 
 
+@registerGate
 class Rz(QGate):
 	def __init__(self, theta, qbit):
 		super().__init__()
@@ -702,6 +731,7 @@ class Rz(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
+@registerGate
 class CRz(QGate):
 	def __init__(self, theta, *allqbits):
 		super().__init__()
@@ -728,6 +758,7 @@ class CRz(QGate):
 	# INHERIT def __str__(self):
 
 
+@registerGate
 class CUSTOM(QGate):
 
 	def __init__(self, name, opMatrix, qbits):
@@ -752,5 +783,3 @@ class CUSTOM(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
-
-GatesList = [X,Y,Z,H,CX,CY,CZ,CCX,SWAP,M,Border,Probe,QFT,RND,P,CP,UROTk,CROTk,Rx,CRx,Ry,CRy,Rz,CRz,CUSTOM]
