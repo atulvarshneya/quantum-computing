@@ -11,11 +11,11 @@ class GateWrapper:
 	def __init__(self, qckt, gateCls):
 		self.qckt = qckt
 		self.GateCls = gateCls
-	def addGate(self, *args, **kwargs):
-		gate = self.GateCls(*args, **kwargs)
-		self.qckt.circuit.append(gate)
-		if gate.check_qbit_args(self.qckt.nqubits) == False:
-			errmsg = "Error: qubit arguments incorrect. " + gate.name + str(gate.qbits)
+	def __call__(self, *args, **kwargs):
+		gateObj = self.GateCls(*args, **kwargs)
+		self.qckt.circuit.append(gateObj)
+		if gateObj.check_qbit_args(self.qckt.nqubits) == False:
+			errmsg = "Error: qubit arguments incorrect. " + gateObj.name + str(gateObj.qbits)
 			raise QCktException(errmsg)
 		return self.qckt
 
@@ -29,7 +29,7 @@ class QCkt:
 		self.canvas = cnv.Canvas(self)
 
 		for gclass in gts.GatesList:
-			self._registerGate(gclass.__name__, GateWrapper(self,gclass).addGate)
+			self._registerGate(gclass.__name__, GateWrapper(self,gclass))
 
 		self.idx = 0 # for iterations
 
@@ -45,8 +45,8 @@ class QCkt:
 			self.idx = 0
 			raise StopIteration  # Done iterating.
 
-	def _registerGate(self, gatename, addgateHandle):
-		setattr(self,gatename,addgateHandle)
+	def _registerGate(self, gatename, addgateObj):
+		setattr(self,gatename,addgateObj)
 
 	def append(self, otherckt):
 		# otherckt - the ckt to be appended
