@@ -142,7 +142,9 @@ def HDM_BASIS():
 	sq2 = np.sqrt(2)
 	return ["HDM_BASIS",np.matrix([[1,1],[1,-1]], dtype=complex)/np.sqrt(2)]
 
-
+## qcombine_seq(name,op_list):
+##
+## Just multiply the operation matrices
 def qcombine_seq(name,op_list):
 	d = ((op_list[0])[1]).shape[0]
 	res = np.matrix(np.eye(d),dtype=complex)
@@ -151,10 +153,10 @@ def qcombine_seq(name,op_list):
 		r = op.shape[0]
 		c = op.shape[1]
 		if r != c:
-			errmsg = "Opearion is not a square matrix."
+			errmsg = "Operation is not a square matrix."
 			raise QSimError(errmsg)
 		if r != d:
-			errmsg = "Opearion matrices not the same size."
+			errmsg = "Operation matrices not the same size."
 			raise QSimError(errmsg)
 		res = op*res # remember order of multiplication is opposite of the visual order
 	return [name,res]

@@ -400,23 +400,24 @@ class QSimulator:
 
 if __name__ == "__main__":
 
+	import qgates as qgt
 	try:
 		q = QSimulator(2,qtrace=True, visualize=True)
-		q.qgate(q.H(),[1])
-		q.qgate(q.C(), [1,0])
+		q.qgate(qgt.H(),[1])
+		q.qgate(qgt.C(), [1,0])
 
 		quit()
 
 		q = QSimulator(8,qtrace=True)
 
 		print("Entangling 4 bits -------------------------")
-		q.qgate(q.H(),[3])
+		q.qgate(qgt.H(),[3])
 		for i in range(3):
-			q.qgate(q.CTL(),[3,i])
+			q.qgate(qgt.CTL(),[3,i])
 		print("-------------------------------------------")
 		for i in range(4):
-			q.qgate(q.X(),[i+4])
-		q.qgate(q.Rphi(q.pi/2),[7])
+			q.qgate(qgt.X(),[i+4])
+		q.qgate(qgt.Rphi(q.pi/2),[7])
 		print("-------------------------------------------")
 		v = q.qmeasure([2])
 		print("Qubit 2 value measured = ",v)
