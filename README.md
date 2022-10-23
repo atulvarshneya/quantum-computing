@@ -1,6 +1,6 @@
 # quantum-computing
 
-A functionally complete simulator for Universal Quantum Computer in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM). More compute+memory, more qubits.
+A functionally complete simulator for Universal Quantum Computer in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM).
 
 Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement quantum computing programs using Quantum Circuits with qsim as a backed to execute the quantum circuits
 
@@ -18,9 +18,9 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 * Period-finding
 * Grover's algorithm
 * Sudoku using Grover's algorithm
-* ... more added every few days
+* ... will add more as I get a chance
 
-An interactive commandline interface (qc-cli.py) to quickly check out operations and sequences.
+An interactive commandline interface (qcli.py) to quickly check out operations and sequences.
 
 
 GATES
