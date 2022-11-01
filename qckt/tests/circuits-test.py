@@ -1,4 +1,4 @@
-#!/usr/lib/python3
+#!/usr/bin/env python
 
 import qckt as qk
 from QSystems import *

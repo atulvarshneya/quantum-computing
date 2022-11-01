@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 '''
 This is a program to simulate an experiment similar to two-slit experiment.
