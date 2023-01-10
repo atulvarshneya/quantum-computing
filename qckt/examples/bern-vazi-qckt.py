@@ -66,6 +66,7 @@ bv_ckt.M(fxin, rdout)
 
 bv_ckt.draw()
 
-job = Job(bv_ckt,qtrace=False)
-Qdeb().runjob(job)
+job = Job(bv_ckt,qtrace=False, verbose=False)
+# Qdeb().runjob(job)
+NISQdeb().runjob(job)
 print(job.get_creg()[0])

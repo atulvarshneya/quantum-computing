@@ -18,19 +18,17 @@ from qSimException import QSimError
 
 class QSimulator:
 
-	def __init__(self, nq, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
+	def __init__(self, nqbits, ncbits=None, qtrace=False, qzeros=False, verbose=False, validation=False):
 		# record input variables for reset
-		self.nqbits = nq
+		self.nqbits = nqbits
 		self.ncbits = ncbits
 		if self.ncbits is None:
-			self.ncbits = nq
-		self.initstate = initstate
-		self.prepqubits = prepqubits
+			self.ncbits = nqbits
+		self.sys_state = None
 		self.traceINP = qtrace
 		self.disp_zerosINP = qzeros
 		self.verbose = verbose
 		self.validation = validation
-		self.visualize = visualize
 
 		# Useful constants
 		self.pi = np.pi
@@ -50,47 +48,16 @@ class QSimulator:
 		self.cregister = [0]*self.ncbits
 
 		# Initial State
-		if not self.initstate is None:
-			# check if the state is np.matrix type
-			if not type(self.initstate) is np.matrixlib.defmatrix.matrix:
-				errmsg = "User Error. Wrong type. Initstate must be a numpy.matrix."
-				raise QSimError(errmsg)
-			# check if the size of the passed state is 2**nqbits
-			(rows,cols) = self.initstate.shape
-			if rows != 2**self.nqbits or cols != 1:
-				errmsg = "User Error. wrong dimensions. Initstate shape must be (2^nqbits,1)."
-				raise QSimError(errmsg)
-			# check if normalized
-			p = 0
-			for i in range(2**self.nqbits):
-				p += np.absolute(self.initstate[i].item(0))**2
-			if np.absolute(p-1.0) > self.maxerr:
-				errmsg = "User Error. Initial state not normalized."
-				raise QSimError(errmsg)
-			self.sys_state = deepcopy(self.initstate)
-		elif not self.prepqubits is None:
-			if len(self.prepqubits) != self.nqbits:
-				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
-				raise QSimError(errmsg)
-			pqbit = np.transpose(np.matrix(self.prepqubits[self.nqbits-1],dtype=complex))
-			prepstate = pqbit
-			for i in reversed(range(self.nqbits-1)):
-				pqbit = np.transpose(np.matrix(self.prepqubits[i],dtype=complex))
-				prepstate = np.kron(pqbit,prepstate)
-			p = 0
-			for i in range(len(prepstate)):
-				p += np.absolute(prepstate[i].item(0))**2
-			prepstate = prepstate/np.sqrt(p)
-			self.sys_state = prepstate
-		else:
-			# initialize the qbits to |0>
-			qbit = [None]*self.nqbits
-			for i in range(self.nqbits):
-				qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
-			# Now create the state as a tensor product of the qbits (MSB to the left)
-			self.sys_state = qbit[self.nqbits-1]
-			for i in reversed(range(self.nqbits-1)):
-				self.sys_state = np.kron(qbit[i],self.sys_state)
+		# initialize the qbits to |0>
+		qbit = [None]*self.nqbits
+		for i in range(self.nqbits):
+			qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
+		# Now create the state as a tensor product of the qbits (MSB to the left)
+		self.sys_state = qbit[self.nqbits-1]
+		for i in reversed(range(self.nqbits-1)):
+			self.sys_state = np.kron(qbit[i],self.sys_state)
+		# Now convert the state vector to density matrix
+		self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
 		if self.trace:
 			self.qreport(header="Initial State")
 
@@ -105,7 +72,7 @@ class QSimulator:
 				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
 				raise QSimError(errmsg)
 		a_op = self.__stretched_mat(oper,qbit_list)
-		self.sys_state = a_op * self.sys_state
+		self.sys_state = a_op * self.sys_state * np.transpose(np.conjugate(a_op))
 		if qtrace or self.trace:
 			opname = oper[0]
 			opargs = str(qbit_list)
@@ -115,12 +82,23 @@ class QSimulator:
 	def qsnapshot(self):
 		return self.cregister, np.squeeze(np.asarray(self.sys_state))
 
+	def densmat_realign_test(self, qbit_list):
+		qbit_reorder = self.__qbit_realign_list(qbit_list)
+		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
+		test_state = self.sys_state
+		rflip_sys_state = rmat * test_state
+		cflip_sys_state = np.transpose(rmat * np.transpose(rflip_sys_state))
+		self.qreport(header='Flipped state', state=cflip_sys_state)
+		crest_sys_state = np.transpose(rrmat * np.transpose(cflip_sys_state))
+		rrest_sys_state = rrmat * crest_sys_state
+		self.qreport('Restored state', state = rrest_sys_state)
+
 	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
 			raise QSimError(errmsg)
-		##
+
 		if cbit_list is None:
 			cbit_list = qbit_list
 		# check the validity of the cbit_list (reapeated cbits, all cbits within self.ncbits)
@@ -135,7 +113,9 @@ class QSimulator:
 		# align the qbits-to-measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
 		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
+		# we have density amtrix, so alignment for rows as well as columns
 		self.sys_state = rmat * self.sys_state
+		self.sys_state = np.transpose(rmat * np.transpose(self.sys_state))
 
 		list_len = len(qbit_list)
 		qbitmask = 0
@@ -143,18 +123,19 @@ class QSimulator:
 			qbitmask |= 0x1 << (self.nqbits-b-1)
 		shift_bits = self.nqbits - list_len
 
-		# add up the probability of the various combinations of the qbits to measure
-		prob = [0]*(2**list_len)
-		for i in range(len(self.sys_state)):
-			prob_idx = (i & qbitmask) >> shift_bits # Hmmm, could have kept the opposite bit order; too late now!!
-			prob[prob_idx] += np.absolute(self.sys_state[i].item(0))**2
-		# ... and verify the total probability adds up to 1.0, within the acceptable margin
-		totprob = 0
-		for p in prob:
-			totprob += p
-		if np.absolute(totprob - 1.0) > self.maxproberr:
-			errmsg = "Internal error, total probability != 1  (total prob = {:f}".format(totprob)
-			raise QSimError(errmsg)
+		# construct a M matrix for each possible value of qubits being measured.
+		# E.g., if qbits 0,1 are being measured, create M00, M01, M02, M03.
+		n_Mmats = 2**len(qbit_list)
+		Mmats = [None] * n_Mmats
+		prob = [0.0] * n_Mmats # later we will store the probabilities of each M observable
+		for i in range(n_Mmats):
+			Mmats[i] = np.matrix(np.zeros(self.sys_state.shape), dtype=complex)
+		for i in range(2 ** self.nqbits):
+			Mmat_idx = (i & qbitmask) >> shift_bits # Hmmm, could have kept the opposite bit order; too late now!!
+			Mmats[Mmat_idx][i,i] = 1.0
+		for i in range(n_Mmats):
+			eta = Mmats[i] * self.sys_state * Mmats[i]
+			prob[i] = np.trace(eta)
 
 		# OK, now see which one should be selected
 		toss = rnd.random()
@@ -165,7 +146,7 @@ class QSimulator:
 			if toss > cumprob and toss <= (cumprob + prob[i]):
 				sel = i
 			cumprob += prob[i]
-		prob_val = prob[sel]
+		prob_val = np.absolute(prob[sel])
 		meas_val = []
 		for i in reversed(range(list_len)):
 			if (sel & (0x1<<i)) == 0:
@@ -173,21 +154,15 @@ class QSimulator:
 			else:
 				meas_val.append(1)
 
-		# now, collapse to the selected state (all other amplitudes = 0), and normlize the amplitudes
-		to_match = sel << shift_bits
-		for i in range(len(self.sys_state)):
-			if (i & qbitmask) == to_match:
-				self.sys_state[i] = self.sys_state[i] / np.sqrt(prob_val)
-			else:
-				self.sys_state[i] = 0
+		# now, collapse to the selected state density matrix
+		eta = Mmats[sel] * self.sys_state * Mmats[sel]
+		self.sys_state = eta/prob_val
 
-		# align the qbits back to original
+		# restore the alignment of sys_state
+		self.sys_state = np.transpose(rrmat * np.transpose(self.sys_state))
 		self.sys_state = rrmat * self.sys_state
 
 		# finally update classical bits register with the measurement
-		# print("meas_val = ", meas_val)
-		# print("qbit_list = ", qbit_list)
-		# print("cbit_list = ", cbit_list)
 		for i in range(len(cbit_list)):
 			self.cregister[self.ncbits - cbit_list[i]-1] = meas_val[i]
 
@@ -197,34 +172,39 @@ class QSimulator:
 
 		return meas_val
 
-
-	def qreport(self, header="State", state=None, probestates=False, visualize=False):
+	def qreport(self, header="State", state=None):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		if state is None:
 			state = self.sys_state
-		if probestates is not False:
-			header = header + " - Probestates: "+str(probestates)
-		print()
+		# print('state type', type(state))
+		st_diag = np.diagonal(state)
+		# identify rows and columns to print
+		# assume self.disp_zeros is False
+		(nrows,ncols) = state.shape
+		pr_row = [False]*nrows
+		pr_col = [False]*nrows
+		for i in range(nrows):
+			for j in range(ncols):
+				if np.absolute(state[i,j]) > self.maxerr:
+					pr_row[i] = True
+					pr_col[j] = True
 		print(header)
-		for i in range(len(state)):
-			if self.disp_zeros or np.absolute(state[i]) > self.maxerr:
-				barlen = 20
-				barstr = ""
-				if self.visualize or visualize:
-					barstr = "	x"
-					amp = np.absolute(state[i].item(0))*barlen
-					intamp = int(amp)
-					if amp > self.maxerr:
-						barstr = "	|"
-						for b in range(barlen):
-							if b <= intamp:
-								barstr = barstr+"*"
+		if not self.verbose:
+			print('-Density matrix DIAGONAL-')
+		for i,row in enumerate(np.array(state)):
+			if pr_row[i]:
+				print(('{:0'+str(self.nqbits)+'b}    ').format(i), end='')
+				if self.verbose:
+					for j,v in enumerate(row):
+						if pr_col[j]:
+							if np.absolute(v) < self.maxerr:
+								print('  0.0+0.0j ', end='')
 							else:
-								barstr = barstr + "."
-				ststr = ("{:0"+str(self.nqbits)+"b}    ").format(i)
-				ampstr = "{:.8f}".format(np.around(state[i].item(0),8))
-				if probestates is False or i in probestates:
-					print(ststr + ampstr + barstr)
+								print(f'{v:.2f} ', end='')
+				if np.absolute(st_diag[i]) < self.maxerr:
+					print(' |   0.0000+0.0000j')
+				else:
+					print(f' | {st_diag[i]:.4f}')
 		print("CREGISTER: ", end="")
 		for i in range(self.ncbits): # cregister[0] is MSB
 			print("{0:01b}".format(self.cregister[i]),end="")
@@ -271,9 +251,9 @@ class QSimulator:
 		# this is the counting with the given bit ordering
 		rr = self.__shuffled_count(qbit_reorder)
 		## create the rmat and rrmat
-		imat = np.matrix(np.eye(2**self.nqbits))
-		rmat = np.matrix(np.eye(2**self.nqbits))
-		rrmat = np.matrix(np.eye(2**self.nqbits))
+		imat = np.array(np.eye(2**self.nqbits))
+		rmat = np.array(np.eye(2**self.nqbits))
+		rrmat = np.array(np.eye(2**self.nqbits))
 		for i in range(2**self.nqbits):
 			s = rr[i]
 			rmat[i] = imat[s]
@@ -403,27 +383,31 @@ if __name__ == "__main__":
 
 	import qgates as qgt
 	try:
-		q = QSimulator(2,qtrace=True, visualize=True)
-		q.qgate(qgt.H(),[1])
-		q.qgate(qgt.C(), [1,0])
+		q = QSimulator(3,qtrace=True, verbose=False)
+		q.qgate(qgt.H(),[2])
+		q.qgate(qgt.C(),[2,1])
+		# q.qgate(qgt.H(),[1])
+		q.qreport('Final state')
+		q.qmeasure([2,1])
+		# q.densmat_realign_test([0])
 
 		quit()
 
-		q = QSimulator(8,qtrace=True)
+		q = QSimulator(4,qtrace=True)
 
-		print("Entangling 4 bits -------------------------")
-		q.qgate(qgt.H(),[3])
-		for i in range(3):
-			q.qgate(qgt.CTL(),[3,i])
+		print("Entangling 2 bits -------------------------")
+		q.qgate(qgt.H(),[1])
+		for i in range(1):
+			q.qgate(qgt.C(),[1,i])
 		print("-------------------------------------------")
-		for i in range(4):
-			q.qgate(qgt.X(),[i+4])
-		q.qgate(qgt.Rphi(q.pi/2),[7])
+		for i in range(1):
+			q.qgate(qgt.X(),[i+2])
+		# q.qgate(qgt.Rphi(q.pi/2),[7])
 		print("-------------------------------------------")
-		v = q.qmeasure([2])
-		print("Qubit 2 value measured = ",v)
-		v = q.qmeasure([1])
-		print("Qubit 1 value measured = ",v)
-		q.qreport()
+		# v = q.qmeasure([2])
+		# print("Qubit 2 value measured = ",v)
+		# v = q.qmeasure([1])
+		# print("Qubit 1 value measured = ",v)
+		# q.qreport()
 	except QSimError as m:
 		print(m.args)

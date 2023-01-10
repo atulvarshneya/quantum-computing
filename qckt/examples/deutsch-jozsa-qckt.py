@@ -50,7 +50,7 @@ dj_ckt.M(inpreg,clmeas)
 
 dj_ckt.draw()
 
-job = Job(dj_ckt,initstate=None, prepqubits=None, qtrace=False, shots=1)
+job = Job(dj_ckt,qtrace=False, shots=1)
 bk = Qdeb()
 bk.runjob(job)
 res = job.get_creg()[0]

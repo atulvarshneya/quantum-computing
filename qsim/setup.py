@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='qsim',
-    version='1.0',
+    version='1.1',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',
@@ -11,5 +11,6 @@ setup(
     keywords='qsystems quantum computing',
     install_requires=[
         'numpy'
-        ]
+        ],
+    scripts=['qcli.py']
     )

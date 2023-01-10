@@ -60,7 +60,7 @@ for i in reversed(range(2)):
 
 addckt.draw()
 
-job = Job(addckt,qtrace=True)
+job = Job(addckt,qtrace=True, verbose=False)
 bk = Qdeb()
 bk.runjob(job)
 print()
