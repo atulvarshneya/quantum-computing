@@ -189,8 +189,6 @@ class QSimulator:
 					pr_row[i] = True
 					pr_col[j] = True
 		print(header)
-		if not self.verbose:
-			print('-Density matrix DIAGONAL-')
 		for i,row in enumerate(np.array(state)):
 			if pr_row[i]:
 				print(('{:0'+str(self.nqbits)+'b}    ').format(i), end='')
@@ -201,13 +199,18 @@ class QSimulator:
 								print('  0.0+0.0j ', end='')
 							else:
 								print(f'{v:.2f} ', end='')
+				else:
+					print('...', end='')
 				if np.absolute(st_diag[i]) < self.maxerr:
 					print(' |   0.0000+0.0000j')
 				else:
 					print(f' | {st_diag[i]:.4f}')
+		purity = np.trace(self.sys_state * self.sys_state).real
+		print(f'Mixed State Purity: {purity:.4f}')
 		print("CREGISTER: ", end="")
 		for i in range(self.ncbits): # cregister[0] is MSB
 			print("{0:01b}".format(self.cregister[i]),end="")
+		print()
 		print()
 
 	def qsize(self):
