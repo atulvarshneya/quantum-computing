@@ -30,9 +30,9 @@ class NISQdeb:
 				(creglist, sveclist) = qc.qsnapshot()
 				print(op["header"])
 				for i in range(len(sveclist)):
-					if (op["probestates"] is None and abs(sveclist[i]) > 0.0) \
+					if (op["probestates"] is None and abs(sveclist[i][i]) > 0.0) \
 							or (op["probestates"] is not None and i in op["probestates"]):
-						print(("{0:0"+str(nqbits)+"b}    {1:.8f}").format(i, sveclist[i]))
+						print(("{0:0"+str(nqbits)+"b}    ... | {1:.8f}").format(i, sveclist[i][i]))
 				cregsz = len(creglist)
 				print("CREGISTER: ",end="")
 				for i in range(cregsz):

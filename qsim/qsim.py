@@ -18,14 +18,15 @@ from qSimException import QSimError
 
 class QSimulator:
 
-	def __init__(self, nq, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
+	def __init__(self, nqbits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
 		# record input variables for reset
-		self.nqbits = nq
+		self.nqbits = nqbits
 		self.ncbits = ncbits
 		if self.ncbits is None:
-			self.ncbits = nq
+			self.ncbits = nqbits
 		self.initstate = initstate
 		self.prepqubits = prepqubits
+		self.sys_state = None
 		self.traceINP = qtrace
 		self.disp_zerosINP = qzeros
 		self.verbose = verbose

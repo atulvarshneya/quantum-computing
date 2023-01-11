@@ -18,17 +18,20 @@ from qSimException import QSimError
 
 class QSimulator:
 
-	def __init__(self, nqbits, ncbits=None, qtrace=False, qzeros=False, verbose=False, validation=False):
+	def __init__(self, nqbits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
 		# record input variables for reset
 		self.nqbits = nqbits
 		self.ncbits = ncbits
 		if self.ncbits is None:
 			self.ncbits = nqbits
+		self.initstate = initstate
+		self.prepqubits = prepqubits
 		self.sys_state = None
 		self.traceINP = qtrace
 		self.disp_zerosINP = qzeros
 		self.verbose = verbose
 		self.validation = validation
+		self.visualize = visualize
 
 		# Useful constants
 		self.pi = np.pi
@@ -43,21 +46,60 @@ class QSimulator:
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
+		if self.disp_zeros:
+			self.verbose = False # cannot print columns of sys density matrix if also displaying zeros
 
 		# Clear the classical bits register
 		self.cregister = [0]*self.ncbits
 
 		# Initial State
-		# initialize the qbits to |0>
-		qbit = [None]*self.nqbits
-		for i in range(self.nqbits):
-			qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
-		# Now create the state as a tensor product of the qbits (MSB to the left)
-		self.sys_state = qbit[self.nqbits-1]
-		for i in reversed(range(self.nqbits-1)):
-			self.sys_state = np.kron(qbit[i],self.sys_state)
-		# Now convert the state vector to density matrix
-		self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
+		if not self.initstate is None:
+			# check if the state is np.matrix type
+			if not type(self.initstate) is np.matrixlib.defmatrix.matrix:
+				errmsg = "User Error. Wrong type. Initstate must be a numpy.matrix."
+				raise QSimError(errmsg)
+			# check if the size of the passed state is 2**nqbits
+			(rows,cols) = self.initstate.shape
+			if rows != 2**self.nqbits or cols != 1:
+				errmsg = "User Error. wrong dimensions. Initstate shape must be (2^nqbits,1)."
+				raise QSimError(errmsg)
+			# check if normalized
+			p = 0
+			for i in range(2**self.nqbits):
+				p += np.absolute(self.initstate[i].item(0))**2
+			if np.absolute(p-1.0) > self.maxerr:
+				errmsg = "User Error. Initial state not normalized."
+				raise QSimError(errmsg)
+			self.sys_state = deepcopy(self.initstate)
+			# Now convert the state vector to density matrix
+			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
+		elif not self.prepqubits is None:
+			if len(self.prepqubits) != self.nqbits:
+				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
+				raise QSimError(errmsg)
+			pqbit = np.transpose(np.matrix(self.prepqubits[self.nqbits-1],dtype=complex))
+			prepstate = pqbit
+			for i in reversed(range(self.nqbits-1)):
+				pqbit = np.transpose(np.matrix(self.prepqubits[i],dtype=complex))
+				prepstate = np.kron(pqbit,prepstate)
+			p = 0
+			for i in range(len(prepstate)):
+				p += np.absolute(prepstate[i].item(0))**2
+			prepstate = prepstate/np.sqrt(p)
+			self.sys_state = prepstate
+			# Now convert the state vector to density matrix
+			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
+		else:
+			# initialize the qbits to |0>
+			qbit = [None]*self.nqbits
+			for i in range(self.nqbits):
+				qbit[i] = np.transpose(np.matrix([1,0],dtype=complex))
+			# Now create the state as a tensor product of the qbits (MSB to the left)
+			self.sys_state = qbit[self.nqbits-1]
+			for i in reversed(range(self.nqbits-1)):
+				self.sys_state = np.kron(qbit[i],self.sys_state)
+			# Now convert the state vector to density matrix
+			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
 		if self.trace:
 			self.qreport(header="Initial State")
 
@@ -81,17 +123,6 @@ class QSimulator:
 
 	def qsnapshot(self):
 		return self.cregister, np.squeeze(np.asarray(self.sys_state))
-
-	def densmat_realign_test(self, qbit_list):
-		qbit_reorder = self.__qbit_realign_list(qbit_list)
-		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
-		test_state = self.sys_state
-		rflip_sys_state = rmat * test_state
-		cflip_sys_state = np.transpose(rmat * np.transpose(rflip_sys_state))
-		self.qreport(header='Flipped state', state=cflip_sys_state)
-		crest_sys_state = np.transpose(rrmat * np.transpose(cflip_sys_state))
-		rrest_sys_state = rrmat * crest_sys_state
-		self.qreport('Restored state', state = rrest_sys_state)
 
 	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
@@ -172,39 +203,37 @@ class QSimulator:
 
 		return meas_val
 
-	def qreport(self, header="State", state=None):
+	def qreport(self, header="State", state=None, probestates=None, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		if state is None:
 			state = self.sys_state
-		# print('state type', type(state))
 		st_diag = np.diagonal(state)
-		# identify rows and columns to print
-		# assume self.disp_zeros is False
+		if probestates is not None:
+			header = header + " - Probestates: "+str(probestates)
+		print(header)
+
+		if self.disp_zeros:
+			self.verbose = False # cannot print columns of sys density matrix if also displaying zeros
+		# identify rows and columns to print that are non-zero or disp_zeros is set
 		(nrows,ncols) = state.shape
 		pr_row = [False]*nrows
 		pr_col = [False]*nrows
 		for i in range(nrows):
 			for j in range(ncols):
-				if np.absolute(state[i,j]) > self.maxerr:
+				if np.absolute(state[i,j]) > self.maxerr or self.disp_zeros:
 					pr_row[i] = True
 					pr_col[j] = True
-		print(header)
+
 		for i,row in enumerate(np.array(state)):
-			if pr_row[i]:
+			if (probestates is None and pr_row[i]) or (probestates is not None and i in probestates):
 				print(('{:0'+str(self.nqbits)+'b}    ').format(i), end='')
 				if self.verbose:
 					for j,v in enumerate(row):
-						if pr_col[j]:
-							if np.absolute(v) < self.maxerr:
-								print('  0.0+0.0j ', end='')
-							else:
-								print(f'{v:.2f} ', end='')
+						if (probestates is None and pr_col[j]) or (probestates is not None and j in probestates):
+							print(f'{v:.2f} ', end='')
 				else:
 					print('...', end='')
-				if np.absolute(st_diag[i]) < self.maxerr:
-					print(' |   0.0000+0.0000j')
-				else:
-					print(f' | {st_diag[i]:.4f}')
+				print(f' | {st_diag[i]:.4f}')
 		purity = np.trace(self.sys_state * self.sys_state).real
 		print(f'Mixed State Purity: {purity:.4f}')
 		print("CREGISTER: ", end="")
@@ -223,6 +252,8 @@ class QSimulator:
 	def qzerosON(self, val):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		self.disp_zeros = val
+		if self.disp_zeros:
+			self.verbose = False # cannot print columns of sys density matrix if also displaying zeros
 
 
 	####################################################################################################
@@ -386,11 +417,12 @@ if __name__ == "__main__":
 
 	import qgates as qgt
 	try:
-		q = QSimulator(3,qtrace=True, verbose=False)
+		q = QSimulator(3,qtrace=True, verbose=True)
 		q.qgate(qgt.H(),[2])
 		q.qgate(qgt.C(),[2,1])
 		# q.qgate(qgt.H(),[1])
 		q.qreport('Final state')
+		q.qzerosON(True)
 		q.qmeasure([2,1])
 		# q.densmat_realign_test([0])
 
