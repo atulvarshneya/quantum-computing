@@ -46,8 +46,6 @@ class QSimulator:
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
-		if self.disp_zeros:
-			self.verbose = False # cannot print columns of sys density matrix if also displaying zeros
 
 		# Clear the classical bits register
 		self.cregister = [0]*self.ncbits
@@ -212,8 +210,9 @@ class QSimulator:
 			header = header + " - Probestates: "+str(probestates)
 		print(header)
 
+		verbose = self.verbose
 		if self.disp_zeros:
-			self.verbose = False # cannot print columns of sys density matrix if also displaying zeros
+			verbose = False # cannot print columns of sys density matrix if also displaying zeros
 		# identify rows and columns to print that are non-zero or disp_zeros is set
 		(nrows,ncols) = state.shape
 		pr_row = [False]*nrows
@@ -227,7 +226,7 @@ class QSimulator:
 		for i,row in enumerate(np.array(state)):
 			if (probestates is None and pr_row[i]) or (probestates is not None and i in probestates):
 				print(('{:0'+str(self.nqbits)+'b}    ').format(i), end='')
-				if self.verbose:
+				if verbose:
 					for j,v in enumerate(row):
 						if (probestates is None and pr_col[j]) or (probestates is not None and j in probestates):
 							print(f'{v:.2f} ', end='')
@@ -252,8 +251,6 @@ class QSimulator:
 	def qzerosON(self, val):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
 		self.disp_zeros = val
-		if self.disp_zeros:
-			self.verbose = False # cannot print columns of sys density matrix if also displaying zeros
 
 
 	####################################################################################################
