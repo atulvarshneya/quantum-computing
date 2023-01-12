@@ -27,7 +27,7 @@ class NISQdeb:
 			elif op["op"] == "probe":
 				nqbits = job.nqubits
 				ncbits = job.nclbits
-				(creglist, sveclist) = qc.qsnapshot()
+				(creglist, sveclist, runstats) = qc.qsnapshot()
 				print(op["header"])
 				for i in range(len(sveclist)):
 					if (op["probestates"] is None and abs(sveclist[i][i]) > 0.0) \
@@ -42,13 +42,14 @@ class NISQdeb:
 				pass
 			else:
 				raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-		cregvec,statevecarr = qc.qsnapshot()
+		cregvec,statevecarr,runstats = qc.qsnapshot()
 		cregres = Cregister()
 		cregres.setvalue_vec(cregvec)
 		cregres_list = [cregres]
 		statevec = StateVector()
 		statevec.value = statevecarr
 		job.result = Result(cregvals=cregres_list,svecvals=statevec)
+		job.runstats = runstats
 		return self
 
 class NISQeng:
@@ -74,11 +75,12 @@ class NISQeng:
 					pass
 				else:
 					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-			cregvec,statevec = qc.qsnapshot()
+			cregvec,statevec,runstats = qc.qsnapshot()
 			cregres = Cregister()
 			cregres.setvalue_vec(cregvec)
 			cregres_list[shot_count] = cregres
 		job.result = Result(cregvals=cregres_list)
+		job.runstats = runstats
 		return self
 
 class Qeng:
@@ -104,11 +106,12 @@ class Qeng:
 					pass
 				else:
 					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-			cregvec,statevec = qc.qsnapshot()
+			cregvec,statevec,runstats = qc.qsnapshot()
 			cregres = Cregister()
 			cregres.setvalue_vec(cregvec)
 			cregres_list[shot_count] = cregres
 		job.result = Result(cregvals=cregres_list)
+		job.runstats = runstats
 		return self
 
 class Qdeb:
@@ -132,7 +135,7 @@ class Qdeb:
 			elif op["op"] == "probe":
 				nqbits = job.nqubits
 				ncbits = job.nclbits
-				(creglist, sveclist) = qc.qsnapshot()
+				(creglist, sveclist, runstats) = qc.qsnapshot()
 				print(op["header"])
 				for i in range(len(sveclist)):
 					if (op["probestates"] is None and abs(sveclist[i]) > 0.0) \
@@ -147,13 +150,14 @@ class Qdeb:
 				pass
 			else:
 				raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-		cregvec,statevecarr = qc.qsnapshot()
+		cregvec,statevecarr,runstats = qc.qsnapshot()
 		cregres = Cregister()
 		cregres.setvalue_vec(cregvec)
 		cregres_list = [cregres]
 		statevec = StateVector()
 		statevec.value = statevecarr
 		job.result = Result(cregvals=cregres_list,svecvals=statevec)
+		job.runstats = runstats
 		return self
 
 

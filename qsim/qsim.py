@@ -9,6 +9,7 @@ import random as rnd
 from copy import deepcopy
 import types
 from qSimException import QSimError
+import time
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
 ##            NOTE: when refering to bits by position numbers, MSB would be 7, in an 8-qubit machine
@@ -33,6 +34,11 @@ class QSimulator:
 		self.validation = validation
 		self.visualize = visualize
 
+		# runstats
+		self.qsteps = 0
+		self.op_times = {}
+		self.op_counts = {}
+
 		# Useful constants
 		self.pi = np.pi
 		self.errprec = 6 # number of digits after decimal
@@ -46,6 +52,11 @@ class QSimulator:
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
+
+		# clear the runstats
+		self.qsteps = 0
+		self.op_times = {}
+		self.op_counts = {}
 
 		# Clear the classical bits register
 		self.cregister = [0]*self.ncbits
@@ -96,7 +107,9 @@ class QSimulator:
 			self.qreport(header="Initial State")
 
 	def qgate(self, oper, qbit_list, qtrace=False):
-		##
+		# runstats - sim cpu time
+		st = time.process_time()
+
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
@@ -113,15 +126,25 @@ class QSimulator:
 			hdr = opname + " Qubit" + opargs
 			self.qreport(header=hdr)
 
+		#update runstats
+		et = time.process_time()
+		self.op_times[oper[0]] = self.op_times.get(oper[0], 0.0) + (et-st)
+		self.op_counts[oper[0]] = self.op_counts.get(oper[0], 0) + 1
+		self.qsteps += 1
+
 	def qsnapshot(self):
-		return self.cregister, np.squeeze(np.asarray(self.sys_state))
+		return self.cregister, np.squeeze(np.asarray(self.sys_state)), {'QSteps':self.qsteps, 'OpCounts':self.op_counts, 'OpTimes':self.op_times}
 
 	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
+		# runstats - sim cpu time
+		st = time.process_time()
+		oper = ["MEASURE"] # use this to lookup name as in a qgate call
+
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
 			raise QSimError(errmsg)
-		##
+
 		if cbit_list is None:
 			cbit_list = qbit_list
 		# check the validity of the cbit_list (reapeated cbits, all cbits within self.ncbits)
@@ -195,6 +218,12 @@ class QSimulator:
 		if qtrace or self.trace:
 			hdr = "MEASURED "+"Qubit" + str(qbit_list) + " = " + str(meas_val) + " with probability = " + str(round(prob_val,self.probprec-1)) 
 			self.qreport(header=hdr)
+
+		#update runstats
+		et = time.process_time()
+		self.op_times[oper[0]] = self.op_times.get(oper[0], 0.0) + (et-st)
+		self.op_counts[oper[0]] = self.op_counts.get(oper[0], 0) + 1
+		self.qsteps += 1
 
 		return meas_val
 
@@ -407,6 +436,11 @@ if __name__ == "__main__":
 		q = QSimulator(2,qtrace=True, visualize=True)
 		q.qgate(qgt.H(),[1])
 		q.qgate(qgt.C(), [1,0])
+		q.qmeasure([1,0])
+
+		print(q.qsteps)
+		print(q.op_times)
+		print(q.op_counts)
 
 		quit()
 

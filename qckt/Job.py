@@ -12,6 +12,7 @@ class Job:
 		self.shots = shots
 		# result will be populated after the job is run
 		self.result = None
+		self.runstats = None
 
 	def get_svec(self):
 		return self.result.state_vector
@@ -24,6 +25,22 @@ class Job:
 		for r in self.result.cregister:
 			counts[r.intvalue] += 1
 		return counts
+
+	def get_runstats(self):
+		return self.runstats
+
+	def print_runstats(self):
+		qsteps = self.runstats['QSteps']
+		op_counts = self.runstats['OpCounts']
+		op_times = self.runstats['OpTimes']
+		tot_time = 0.0
+		for k,v in op_times.items():
+			tot_time = tot_time + v
+		print(f'Total Ops  :  {qsteps:4d}      times')
+		print(f'Total Time :  {tot_time:9.4f} sec')
+		print(f'Per Operation:')
+		for op in op_counts.keys():
+			print(f'    {op:8s} {op_times[op]:9.4f} sec  {op_counts[op]:4d} times {op_times[op]/op_counts[op]:4.4f} avg')
 
 	def plot_counts(self,verbose=False):
 		counts = self.get_counts()
