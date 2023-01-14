@@ -3,6 +3,7 @@
 import numpy as np
 import qsim
 import qgates as qgt
+import qgatesUtils as qgu
 
 
 def intro():
@@ -53,13 +54,13 @@ def __u(q,key,name):
 		else:
 			op_list.append(["I",np.matrix(np.eye(2),dtype=complex)])
 	op_list.append(["I",np.matrix(np.eye(2),dtype=complex)])
-	uprep = qgt.qcombine_par("U-Prep",op_list)
+	uprep = qgu.qcombine_par("U-Prep",op_list)
 
 	uflip = qgt.X()
 	for i in range(n-1,0,-1):
 		uflip = qgt.CTL(uflip)
 
-	return qgt.qcombine_seq(name,[uprep,uflip,uprep])
+	return qgu.qcombine_seq(name,[uprep,uflip,uprep])
 
 #################################################################################
 

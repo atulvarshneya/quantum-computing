@@ -2,6 +2,7 @@
 
 import qsim
 import qgates as qgt
+import qgatesUtils as qgu
 import math
 
 # Initialize the Quantum Computer
@@ -13,7 +14,7 @@ M = 2**(nqbits-2)
 # setup the periodic function
 op1 = q.qstretch(qgt.C(),[2,0])
 op2 = q.qstretch(qgt.C(),[3,1])
-f = qgt.qcombine_seq("F(x)",[op1,op2])
+f = qgu.qcombine_seq("F(x)",[op1,op2])
 print("Psst ... f(x) defined as having period of 4\n")
 
 # Now loop to repeatedly find values of multiples of M/r by

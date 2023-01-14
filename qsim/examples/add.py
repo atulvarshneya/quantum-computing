@@ -22,6 +22,7 @@ Need to copy the final carry-out bit into the highest order result bit, as shown
 
 import qsim
 import qgates as qgt
+import qgatesUtils as qgu
 
 q = qsim.QSimulator(10,qtrace=False)
 
@@ -30,7 +31,7 @@ c = [3, 4, 5]	# carry bits, scratch pad register - Junk bits
 b = [6, 7]	# input number B
 a = [8, 9]	# input number A
 
-H4 = qgt.qcombine_par("H4",[qgt.H(),qgt.H(),qgt.H(),qgt.H()])
+H4 = qgu.qcombine_par("H4",[qgt.H(),qgt.H(),qgt.H(),qgt.H()])
 q.qgate(H4,[a[0],a[1],b[0],b[1]])
 
 # run the addition 

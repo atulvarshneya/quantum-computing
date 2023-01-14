@@ -2,6 +2,7 @@
 
 import qsim
 import qgates as qgt
+import qgatesUtils as qgu
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ def get_fx(qc):
 		if secret_code & (0x1<<i):
 			sn_optep = qc.qstretch(qgt.C(),[i,input_sz])
 			fx_oplist.append(sn_optep)
-	fx = qgt.qcombine_seq("FX",fx_oplist)
+	fx = qgu.qcombine_seq("FX",fx_oplist)
 	return fx
 
 class bernvazi:

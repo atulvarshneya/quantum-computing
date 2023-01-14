@@ -2,13 +2,14 @@
 
 import qsim
 import qgates as qgt
+import qgatesUtils as qgu
 from qSimException import *
 
 print()
 print("Parallel HHHH and CCCC---------------------------------")
 qc = qsim.QSimulator(8)
-H4 = qgt.qcombine_par("H4",[qgt.H(),qgt.H(),qgt.H(),qgt.H()])
-C4 = qgt.qcombine_par("C4",[qgt.C(),qgt.C(),qgt.C(),qgt.C()])
+H4 = qgu.qcombine_par("H4",[qgt.H(),qgt.H(),qgt.H(),qgt.H()])
+C4 = qgu.qcombine_par("C4",[qgt.C(),qgt.C(),qgt.C(),qgt.C()])
 qc.qgate(H4,[7,5,3,1], qtrace=True)
 qc.qgate(C4,[7,6,5,4,3,2,1,0], qtrace=True)
 qc.qgate(qgt.C(),[7,6])
@@ -25,8 +26,8 @@ qc.qreport(header="AFTER 4 individual H's")
 print()
 print("Sequence HXYZ------------------------------------------")
 qc = qsim.QSimulator(8,qtrace=True)
-HXYZ = qgt.qcombine_seq("HXYZ",[qgt.H(),qgt.X(),qgt.Y(),qgt.Z()])
-ZYXH = qgt.qcombine_seq("ZYXH",[qgt.Z(),qgt.Y(),qgt.X(),qgt.H()])
+HXYZ = qgu.qcombine_seq("HXYZ",[qgt.H(),qgt.X(),qgt.Y(),qgt.Z()])
+ZYXH = qgu.qcombine_seq("ZYXH",[qgt.Z(),qgt.Y(),qgt.X(),qgt.H()])
 qc.qgate(HXYZ,[0],qtrace=True)
 qc.qgate(qgt.Z(),[0],qtrace=True)
 qc.qgate(qgt.Y(),[0],qtrace=True)
