@@ -10,6 +10,9 @@ from copy import deepcopy
 import types
 from qSimException import QSimError
 import time
+import qgates as qgt
+from qgatesUtils import *
+import math
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
 ##            NOTE: when refering to bits by position numbers, MSB would be 7, in an 8-qubit machine
@@ -33,6 +36,7 @@ class QSimulator:
 		self.verbose = verbose
 		self.validation = validation
 		self.visualize = visualize
+		self.kraus_chan = []
 
 		# runstats
 		self.qsteps = 0
@@ -112,6 +116,69 @@ class QSimulator:
 		if self.trace:
 			self.qreport(header="Initial State")
 
+	## Noise
+	# kraus channel is specified as a sequence of pairs of series of operations, and a state probability multiplier
+	# 	= (operations_seq,state_prob_multiplier)
+	#	= (
+	#		  [ (op1,prob1_mult), (op2,prob2_mult), ...  ],
+	#		  state_prob_multiplier
+	#	  )
+	#
+	# operations_seq = [(op1,op_prob_multiplier), (op2,op_prob_multiplier), ...]
+	#	op is in the same format as gates, i.e., ['name', opmatrix]
+	#		note that mostly the opmatrix is unitary, but cases such as Amplitude Damping is not [[1.0, 0.0],[0.0, sqrt(gamma)]]
+	#	op_prob_multiplier is gives the noise contribution by this op, i.e., = op_prob_multiplier * (op * state * op.dagger)
+	# state_prob_multiplier is the factor by which state is multiplied when noise is added
+	#	typically, state_prob_multiplier = 1 - sum(op_prob_multiplier)
+	#	however, in some cases, e.g., Amplitude Damping, the operator itself gives the state with noise added
+	#   	so in those cases the state_prob_multiplier will be 0.0; and op_orob_multiplier for those ops will be 1.0
+	#
+	# so, in math terms, rho = state_prob_multiplier * rho + prob1_mult * (op1 * rho * op1.dag) + prob2_mult * (op2 * rho * op2.dag) + ...
+	#
+	#                                                        |---------------------------- noise_add --------------------------------------|
+
+	def qsim_noise_spec(self, kraus_spec):
+		# argument validation TODO
+		self.kraus_chan = kraus_spec
+
+	# Canned noise profiles
+	def qsim_noise_profile(self, profile_id=None,p1=0.10,p2=0.10,p3=0.10):
+		s = p1 # used in BitFlip, PhaseFlip, Depolarization
+		gamma = p1 # used in AmplitudeDamping, GeneralizedApmplitudeDamping, PhaseDamping
+		p = p2 # used in GeneralizedAmplitudeDamping
+		px,py,pz = p1,p2,p3
+
+		AD_K1 = ['K1',np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
+		AD_K2 = ['K2',np.matrix([[0.0,math.sqrt(gamma)],[0.0,0.0]], dtype=complex)]
+
+		# !!! Kraus operators validation fails for Generalized Amplitude Damping
+		GAD_K0 = ['K0',math.sqrt(p)*np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
+		GAD_K1 = ['K1',math.sqrt(p)*np.matrix([[1.0,math.sqrt(gamma)],[0.0,0.0]], dtype=complex)]
+		GAD_K2 = ['K2',math.sqrt(1-p)*np.matrix([[math.sqrt(1-gamma),0.0],[0.0,1.0]], dtype=complex)]
+		GAD_K3 = ['K3',math.sqrt(1-p)*np.matrix([[0.0,0.0],[math.sqrt(gamma),0.0]], dtype=complex)]
+
+		PD_K0 = ['K0',np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
+		PD_K1 = ['K1',np.matrix([[0.0,0.0],[0.0,math.sqrt(gamma)]], dtype=complex)]
+
+		noise_profile = {
+			'BitFlip': ([(qgt.X(),s)],(1-s)),
+			'PhaseFlip': ([(qgt.Z(),s)],(1-s)),
+			'Depolarizing': ([(qgt.X(),s/3.0),(qgt.Y(),s/3.0),(qgt.Z(),s/3.0)],(1-s)),
+			'AmplitudeDamping': ([(AD_K1,1.0),(AD_K2,1.0)],0.0),
+			# 'GeneralizedAmplitudeDamping': ([(GAD_K0,1.0),(GAD_K1,1.0),(GAD_K2,1.0),(GAD_K3,1.0)],0.0),
+			'PhaseDamping':([(PD_K0,1.0),(PD_K1,1.0)],0.0),
+			'PauliChannel':([(qgt.X(),px),(qgt.Y(),py),(qgt.Z(),pz)],(1-px-py-pz))
+			}
+
+		if profile_id == 'LIST':
+			return noise_profile.keys()
+
+		kraus_spec = noise_profile.get(profile_id, None)
+		if kraus_spec is None:
+			errmsg = f'Unknown noise profile: {profile_id}'
+			raise QSimError(errmsg)
+		return kraus_spec
+
 	def qgate(self, oper, qbit_list, qtrace=False):
 		# runstats - sim cpu time
 		st = time.process_time()
@@ -126,6 +193,23 @@ class QSimulator:
 				raise QSimError(errmsg)
 		a_op = self.__stretched_mat(oper,qbit_list)
 		self.sys_state = a_op * self.sys_state * np.transpose(np.conjugate(a_op))
+
+		# add noise if kraus_chan present
+		if len(self.kraus_chan) > 0:
+			op_seq, state_prob_mult = self.kraus_chan
+
+			# calculate the noise to be added for all qubits
+			noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
+			for op,prob in op_seq:
+				for qbit in range(self.nqbits):
+					a_op = self.__stretched_mat(op,[qbit])
+					noise_component = (prob/float(self.nqbits)) * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
+					noise_add = noise_add + noise_component
+				# self.qreport(header='cumulative noise_add '+op[0],state=noise_add)
+
+			# add noise to sys_state per the probability weights in kraus_chan
+			self.sys_state = state_prob_mult * self.sys_state + noise_add
+
 		if qtrace or self.trace:
 			opname = oper[0]
 			opargs = str(qbit_list)
@@ -262,7 +346,8 @@ class QSimulator:
 				else:
 					print('...', end='')
 				print(f' | {st_diag[i]:.4f}')
-		purity = np.trace(self.sys_state * self.sys_state).real
+		# print(f'Trace : ----  {np.trace(state):.4f}')
+		purity = np.trace(state * state).real
 		print(f'Mixed State Purity: {purity:.4f}')
 		print("CREGISTER: ", end="")
 		for i in range(self.ncbits): # cregister[0] is MSB
@@ -441,37 +526,50 @@ class QSimulator:
 
 if __name__ == "__main__":
 
-	import qgates as qgt
+	def pretty_print_op(op):
+		name = op[0]
+		mat = np.array(op[1])
+		print('Operator:', name, type(op[1]))
+		for row in mat:
+			for v in row:
+				print(f'{v:.6f} ',end='')
+			print()
+
 	try:
-		q = QSimulator(3,qtrace=True, verbose=True)
-		q.qgate(qgt.H(),[2])
-		q.qgate(qgt.C(),[2,1])
-		# q.qgate(qgt.H(),[1])
-		q.qreport('Final state')
-		q.qzerosON(True)
-		q.qmeasure([2,1])
+		prname = 'BitFlip'
+		print('Kraus profile',prname)
 
-		print(q.qsteps)
-		print(q.op_counts)
-		print(q.op_times)
+		q = QSimulator(2,qtrace=True, verbose=False)
 
-		quit()
+		noise_profile = {'profile_id':prname, 'p1':0.10, 'p2':0.10, 'p3':0.10}
+		# kraus_spec = q.qsim_noise_profile(prname, p1=0.10, p2=0.10, p3=0.10)
+		kraus_spec = q.qsim_noise_profile(**noise_profile)
+		q.qsim_noise_spec(kraus_spec)
 
-		q = QSimulator(4,qtrace=True)
+		q.qgate(qgt.H(),[0])
+		_,state,_ = q.qsnapshot()
+		print(state)
+		print(f'State trace {np.trace(state):.4f}')
+		print()
 
-		print("Entangling 2 bits -------------------------")
-		q.qgate(qgt.H(),[1])
-		for i in range(1):
-			q.qgate(qgt.C(),[1,i])
-		print("-------------------------------------------")
-		for i in range(1):
-			q.qgate(qgt.X(),[i+2])
-		# q.qgate(qgt.Rphi(q.pi/2),[7])
-		print("-------------------------------------------")
-		# v = q.qmeasure([2])
-		# print("Qubit 2 value measured = ",v)
-		# v = q.qmeasure([1])
-		# print("Qubit 1 value measured = ",v)
-		# q.qreport()
+		q.qgate(qgt.C(),[0,1])
+		_,state,_ = q.qsnapshot()
+		print(state)
+		print(f'State trace {np.trace(state):.4f}')
+		print()
+
+		# I = ['Identity',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
+		# q.qgate(I,[0])
+		# _,state,_ = q.qsnapshot()
+		# print(state)
+		# print(f'State trace {np.trace(state):.4f}')
+		# print()
+
+		# q.qmeasure([0])
+
+		# print(q.qsteps)
+		# print(q.op_counts)
+		# print(q.op_times)
+
 	except QSimError as m:
 		print(m.args)

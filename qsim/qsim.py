@@ -106,6 +106,14 @@ class QSimulator:
 		if self.trace:
 			self.qreport(header="Initial State")
 
+	def qsim_noise_profile(self, profile_id):
+		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
+		raise QSimError(errmsg)
+
+	def qsim_noise_spec(self, kraus_spec): # just expands the op to self.nqbits width
+		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
+		raise QSimError(errmsg)
+
 	def qgate(self, oper, qbit_list, qtrace=False):
 		# runstats - sim cpu time
 		st = time.process_time()

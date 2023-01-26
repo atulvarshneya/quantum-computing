@@ -40,7 +40,7 @@ def Rphi(phi):
 
 def Rk(k):
 	"""
-	Controlled Phase rotation gate. Takes the k as an argument to divide 2*pi by 2**k.
+	Phase rotation gate. Takes the k as an argument to divide 2*pi by 2**k.
 	"""
 	ck = np.cos(2*np.pi/(2**k))
 	sk = np.sin(2*np.pi/(2**k))
@@ -50,7 +50,7 @@ def Rk(k):
 
 def SQSWAP():
 	"""
-	Swap gate.
+	Square-root of Swap gate.
 	"""
 	return ["SQSWAP", np.matrix([[1,0,0,0],[0,0.5+0.5j,0.5-0.5j,0],[0,0.5-0.5j,0.5+0.5j,0],[0,0,0,1]],dtype=complex)]
 

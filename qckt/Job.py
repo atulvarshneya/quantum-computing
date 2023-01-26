@@ -2,11 +2,12 @@ import sys
 
 class Job:
 	'just a packet of all job attributes. Is a qckt concept, so is '
-	def __init__(self, circuit, qtrace=False, verbose=False, shots=1):
+	def __init__(self, circuit, noise_profile=None, qtrace=False, verbose=False, shots=1):
 		'Job is a qckt concept to encapsulate the work packet that is to be submitted to the quantum computer to execute'
 		self.circuit = circuit
 		self.nqubits, self.nclbits = circuit.get_size()
 		self.assembledCkt = circuit.assemble()
+		self.noise_profile = noise_profile
 		self.qtrace = qtrace
 		self.verbose = verbose
 		self.shots = shots
@@ -25,22 +26,6 @@ class Job:
 		for r in self.result.cregister:
 			counts[r.intvalue] += 1
 		return counts
-
-	def get_runstats(self):
-		return self.runstats
-
-	def print_runstats(self):
-		qsteps = self.runstats['QSteps']
-		op_counts = self.runstats['OpCounts']
-		op_times = self.runstats['OpTimes']
-		tot_time = 0.0
-		for k,v in op_times.items():
-			tot_time = tot_time + v
-		print(f'Total Ops  :  {qsteps:4d}      times')
-		print(f'Total Time :  {tot_time:9.4f} sec')
-		print(f'Per Operation:')
-		for op in op_counts.keys():
-			print(f'    {op:8s} {op_times[op]:9.4f} sec  {op_counts[op]:4d} times {op_times[op]/op_counts[op]:4.4f} avg')
 
 	def plot_counts(self,verbose=False):
 		counts = self.get_counts()
@@ -71,4 +56,20 @@ class Job:
 						print("*",end="")
 					print()
 		return counts
+
+	def get_runstats(self):
+		return self.runstats
+
+	def print_runstats(self):
+		qsteps = self.runstats['QSteps']
+		op_counts = self.runstats['OpCounts']
+		op_times = self.runstats['OpTimes']
+		tot_time = 0.0
+		for k,v in op_times.items():
+			tot_time = tot_time + v
+		print(f'Total Ops  :  {qsteps:4d}      times')
+		print(f'Total Time :  {tot_time:9.4f} sec')
+		print(f'Per Operation:')
+		for op in op_counts.keys():
+			print(f'    {op:8s} {op_times[op]:9.4f} sec  {op_counts[op]:4d} times {op_times[op]/op_counts[op]:4.4f} avg')
 

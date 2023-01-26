@@ -6,6 +6,40 @@ import NISQsim
 from BackendAPI import *
 
 
+class NISQeng:
+	def __init__(self):
+		pass
+
+	def runjob(self, job):
+		cregres_list = [None]*job.shots
+		for shot_count in range(job.shots):
+			qc = NISQsim.QSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
+			if not job.noise_profile is None:
+				kraus_spec = qc.qsim_noise_profile(**job.noise_profile)
+				qc.qsim_noise_spec(kraus_spec)
+			for op in job.assembledCkt:
+				if op["op"] == "gate":
+					if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
+						for q in op["qubits"][0]:
+							qc.qgate([op["name"],op["opMatrix"]], [q])
+					else:
+						qc.qgate([op["name"],op["opMatrix"]], op["qubits"])
+				elif op["op"] == "measure":
+					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+				elif op["op"] == "probe":
+					pass
+				elif op["op"] == "noop":
+					pass
+				else:
+					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
+			cregvec,statevec,runstats = qc.qsnapshot()
+			cregres = Cregister()
+			cregres.setvalue_vec(cregvec)
+			cregres_list[shot_count] = cregres
+		job.result = Result(cregvals=cregres_list)
+		job.runstats = runstats
+		return self
+
 class NISQdeb:
 	def __init__(self):
 		pass
@@ -15,6 +49,9 @@ class NISQdeb:
 		if job.shots != 1:
 			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
 		qc = NISQsim.QSimulator(job.nqubits,job.nclbits,qtrace=job.qtrace,verbose=job.verbose)
+		if not job.noise_profile is None:
+			kraus_spec = qc.qsim_noise_profile(**job.noise_profile)
+			qc.qsim_noise_spec(kraus_spec)
 		for op in job.assembledCkt:
 			if op["op"] == "gate":
 				if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
@@ -49,37 +86,6 @@ class NISQdeb:
 		statevec = StateVector()
 		statevec.value = statevecarr
 		job.result = Result(cregvals=cregres_list,svecvals=statevec)
-		job.runstats = runstats
-		return self
-
-class NISQeng:
-	def __init__(self):
-		pass
-
-	def runjob(self, job):
-		cregres_list = [None]*job.shots
-		for shot_count in range(job.shots):
-			qc = NISQsim.QSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
-			for op in job.assembledCkt:
-				if op["op"] == "gate":
-					if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
-						for q in op["qubits"][0]:
-							qc.qgate([op["name"],op["opMatrix"]], [q])
-					else:
-						qc.qgate([op["name"],op["opMatrix"]], op["qubits"])
-				elif op["op"] == "measure":
-					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
-				elif op["op"] == "probe":
-					pass
-				elif op["op"] == "noop":
-					pass
-				else:
-					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-			cregvec,statevec,runstats = qc.qsnapshot()
-			cregres = Cregister()
-			cregres.setvalue_vec(cregvec)
-			cregres_list[shot_count] = cregres
-		job.result = Result(cregvals=cregres_list)
 		job.runstats = runstats
 		return self
 

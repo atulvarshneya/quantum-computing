@@ -6,6 +6,12 @@ import qgatesUtils as qgu
 from qSimException import *
 
 print()
+print("Parallel HX--------------------------------------------")
+qc = NISQsim.QSimulator(8)
+hx = qgu.qcombine_par('HX',[qgt.H(),qgt.X()])
+qc.qgate(hx,[7,6], qtrace=True)
+
+print()
 print("Parallel HHHH and CCCC---------------------------------")
 qc = NISQsim.QSimulator(8)
 H4 = qgu.qcombine_par("H4",[qgt.H(),qgt.H(),qgt.H(),qgt.H()])
