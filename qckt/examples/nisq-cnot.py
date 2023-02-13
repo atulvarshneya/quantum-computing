@@ -12,7 +12,7 @@ cnotckt.M([0,1],[0,1])
 
 cnotckt.draw()
 
-noise_profile = {'profile_id':'BitFlip', 'p1':0.05, 'p2':0.05, 'p3':0.05}
+noise_profile = {'profile_id':'BitFlip', 'p1':0.05}
 job = Job(cnotckt, noise_profile=noise_profile, shots=1000)
 bk = NISQeng()
 bk.runjob(job)
