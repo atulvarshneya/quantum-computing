@@ -173,7 +173,7 @@ the nq and nc should be used while creating the circuit --
 			import QSystems as qsys
 			import Job
 			job = Job.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=100)
-			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim")
+			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim") where svc = reg.getSvc("QSystems")
 			bk_engine.runjob(job)
 			print(job.get_creg()[0]) # print the cregister value from the first execution of the circuit
 			counts = job.get_counts()
@@ -182,14 +182,18 @@ the nq and nc should be used while creating the circuit --
 					print("{0:04b} ({0:2d})    {1:d}".format(i,c))
 
 	Cregister class
-		An object of this class holds the classical register value got from the measurement operation.
+		An object of this class is returned by job.get_creg(), and holds the classical register value got from the measurement operation.
 		It provides method to convert that to pretty printable string, e.g., str(cregister), print(cregister).
 		The classical bits array can be accessed through the .value field and its integer value through .intvalue field of the returned object
+		This class is defined in BackendAPI.py
 
 	StateVector class
-		An object of this class holds the statevector value from the simulator backend engine.
+		An object of this class is returned by job.get_svec(), and holds the statevector value from the simulator backend engine.
+		Note that state is available only when you run on a simulator, not on an actual QC hardware.
+		In case of NISQ simulator, the diagonal of the density operator is returned.
 		It provides methods to convert that to pretty printable string, e.g., str(statevector), print(statevector).
 		The state-vector array can be accessed through the .value field of the object
 		The returned object also supports a method StateVector.verbose(boolean), which affects the string conversion such that 
 		it includes all states even those with an amplitude of 0. Svec.verbose(boolean) returns the same state-vector object
+		This class is defined in BackendAPI.py
 
