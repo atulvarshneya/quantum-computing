@@ -143,7 +143,7 @@ class QSimulator:
 
 	# Canned noise profiles
 	def qsim_noise_profile(self, profile_id=None,p1=0.10,p2=0.10,p3=0.10):
-		s = p1 # used in BitFlip, PhaseFlip, Depolarization
+		s = p1 # used in BitFlip, PhaseFlip, Depolarizing
 		gamma = p1 # used in AmplitudeDamping, GeneralizedApmplitudeDamping, PhaseDamping
 		p = p2 # used in GeneralizedAmplitudeDamping
 		px,py,pz = p1,p2,p3
@@ -151,7 +151,7 @@ class QSimulator:
 		AD_K1 = ['K1',np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
 		AD_K2 = ['K2',np.matrix([[0.0,math.sqrt(gamma)],[0.0,0.0]], dtype=complex)]
 
-		# !!! Kraus operators validation fails for Generalized Amplitude Damping
+		# !!! Kraus operators normalization condition fails for Generalized Amplitude Damping
 		GAD_K0 = ['K0',math.sqrt(p)*np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
 		GAD_K1 = ['K1',math.sqrt(p)*np.matrix([[1.0,math.sqrt(gamma)],[0.0,0.0]], dtype=complex)]
 		GAD_K2 = ['K2',math.sqrt(1-p)*np.matrix([[math.sqrt(1-gamma),0.0],[0.0,1.0]], dtype=complex)]
