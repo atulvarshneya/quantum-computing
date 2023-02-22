@@ -4,6 +4,14 @@ A functionally complete simulator for Universal Quantum Computer in Python. Have
 
 Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement quantum computing programs using Quantum Circuits with qsim as a backed to execute the quantum circuits
 
+INSTALLING
+-------------------
+mkdir yourdir
+cd yourdir
+git clone https://github.com/atulvarshneya/quantum-computing.git
+cd quantum-computing
+./pip-install.sh
+
 
 FEATURES
 -------------------
