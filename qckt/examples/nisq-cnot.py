@@ -14,7 +14,9 @@ cnotckt.draw()
 
 noise_profile = {'profile_id':'BitFlip', 'p1':0.05}
 job = Job(cnotckt, noise_profile=noise_profile, shots=1000)
-bk = NISQeng()
+
+print('Backends:',qsimSvc().listInstances())
+bk = qsimSvc().getInstance('nisqsim-eng') # NISQeng()
 bk.runjob(job)
 print()
 print("READ OUT STATE VECTOR: ")
