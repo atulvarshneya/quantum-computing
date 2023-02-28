@@ -38,9 +38,10 @@ class Job:
 			for i,c in enumerate(counts):
 				if verbose or c > 0:
 					binlbl = ('[{0:0'+str(nbits)+'b}]').format(i)
-					lbl.append(str(i)+"\n"+binlbl)
+					lbl.append(str(i)+" "+binlbl)
 					vals.append(c)
 			import matplotlib.pyplot as plt
+			plt.xticks(rotation='vertical')
 			fig = plt.bar(lbl,vals)
 			for i in range(len(vals)):
 				plt.annotate(str(vals[i]), xy=(lbl[i],vals[i]), ha='center', va='bottom')
