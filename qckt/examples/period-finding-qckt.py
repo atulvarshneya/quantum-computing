@@ -5,7 +5,7 @@ from QSystems import *
 from Job import Job
 import Registers as regs
 import numpy as np
-from fractions import gcd
+from math import gcd
 import math
 
 fxinpsz = 6
