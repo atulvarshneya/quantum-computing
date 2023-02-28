@@ -2,7 +2,7 @@ Backends:
 --------------------------------------------------------------------------------------
 Support adding more backends ... develop a normalized API for Backend engine.
 NOTE: the following interface will hinder the use of Probe() debugging gate
-The backend interface should allow 
+. The backend interface should allow 
 	X create a job, to include
 		X initial state (like initstate, prepqubits)
 		X circuit
@@ -25,3 +25,5 @@ X Allow looking up Backends by name, and then instantiate as the backend object 
 ckts, and get CRegister contants, and in simulator backends, also allow inspecting
 state vector any time.
 
+. QRegister and CRegister classes operations - when any list operations are performed on 
+these objects of these classes, the returned object is of type 'list'
