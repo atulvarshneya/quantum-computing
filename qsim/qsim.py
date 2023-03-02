@@ -114,24 +114,38 @@ class QSimulator:
 		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
 		raise QSimError(errmsg)
 
-	def qgate(self, oper, qbit_list, qtrace=False):
+	def qgate(self, oper, qbit_list, cond_cbit_list=None, qtrace=False):
 		# runstats - sim cpu time
 		st = time.process_time()
 
-		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		if not self.__valid_bit_list(qbit_list,self.nqbits):
-			errmsg = "Error: the list of qubits is not valid."
-			raise QSimError(errmsg)
-		if self.validation:
-			if not self.qisunitary(oper):
-				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+		cbit_cond = True
+		if not cond_cbit_list is None:
+			# check the validity of the cond_cbit_list (reapeated cbits, all cbits within self.ncbits)
+			if not self.__valid_bit_list(cond_cbit_list,self.ncbits):
+				errmsg = "Error: the list of cbits is not valid."
 				raise QSimError(errmsg)
-		a_op = self.__stretched_mat(oper,qbit_list)
-		self.sys_state = a_op * self.sys_state
+			for c in cond_cbit_list:
+				if self.cregister[c] == 0:
+					cbit_cond = False
+
+		# perform the gate operation if cbits condition is satisfied
+		if cbit_cond:
+			# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+			if not self.__valid_bit_list(qbit_list,self.nqbits):
+				errmsg = "Error: the list of qubits is not valid."
+				raise QSimError(errmsg)
+			if self.validation:
+				if not self.qisunitary(oper):
+					errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+					raise QSimError(errmsg)
+			a_op = self.__stretched_mat(oper,qbit_list)
+			self.sys_state = a_op * self.sys_state
+
 		if qtrace or self.trace:
+			cond_cbit_arg = '' if cond_cbit_list is None else ' if Cbits'+str(cond_cbit_list)
 			opname = oper[0]
 			opargs = str(qbit_list)
-			hdr = opname + " Qubit" + opargs
+			hdr = opname + " Qubit" + opargs + cond_cbit_arg
 			self.qreport(header=hdr)
 
 		#update runstats
@@ -157,7 +171,7 @@ class QSimulator:
 			cbit_list = qbit_list
 		# check the validity of the cbit_list (reapeated cbits, all cbits within self.ncbits)
 		if not self.__valid_bit_list(cbit_list,self.ncbits):
-			errmsg = "Error: the list of cubits is not valid."
+			errmsg = "Error: the list of cbits is not valid."
 			raise QSimError(errmsg)
 		# check if equal number of qbits and cbits are passed
 		if len(qbit_list) != len(cbit_list):
@@ -445,10 +459,11 @@ if __name__ == "__main__":
 		q.qgate(qgt.H(),[1])
 		q.qgate(qgt.C(), [1,0])
 		q.qmeasure([1,0])
+		q.qgate(qgt.X(), [0], cond_cbit_list=[0])
 
-		print(q.qsteps)
-		print(q.op_times)
-		print(q.op_counts)
+		# print(q.qsteps)
+		# print(q.op_times)
+		# print(q.op_counts)
 
 		quit()
 

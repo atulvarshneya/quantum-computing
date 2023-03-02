@@ -179,41 +179,54 @@ class QSimulator:
 			raise QSimError(errmsg)
 		return kraus_spec
 
-	def qgate(self, oper, qbit_list, qtrace=False):
+	def qgate(self, oper, qbit_list, cond_cbit_list=None, qtrace=False):
 		# runstats - sim cpu time
 		st = time.process_time()
 
-		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		if not self.__valid_bit_list(qbit_list,self.nqbits):
-			errmsg = "Error: the list of qubits is not valid."
-			raise QSimError(errmsg)
-		if self.validation:
-			if not self.qisunitary(oper):
-				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+		cbit_cond = True
+		if not cond_cbit_list is None:
+			# check the validity of the cond_cbit_list (reapeated cbits, all cbits within self.ncbits)
+			if not self.__valid_bit_list(cond_cbit_list,self.ncbits):
+				errmsg = "Error: the list of cbits is not valid."
 				raise QSimError(errmsg)
-		a_op = self.__stretched_mat(oper,qbit_list)
-		self.sys_state = a_op * self.sys_state * np.transpose(np.conjugate(a_op))
+			for c in cond_cbit_list:
+				if self.cregister[c] == 0:
+					cbit_cond = False
 
-		# add noise if kraus_chan present
-		if len(self.kraus_chan) > 0:
-			op_seq, state_prob_mult = self.kraus_chan
+		# perform the gate operation if cbits condition is satisfied
+		if cbit_cond:
+			# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+			if not self.__valid_bit_list(qbit_list,self.nqbits):
+				errmsg = "Error: the list of qubits is not valid."
+				raise QSimError(errmsg)
+			if self.validation:
+				if not self.qisunitary(oper):
+					errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+					raise QSimError(errmsg)
+			a_op = self.__stretched_mat(oper,qbit_list)
+			self.sys_state = a_op * self.sys_state * np.transpose(np.conjugate(a_op))
 
-			# calculate the noise to be added for all qubits
-			noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
-			for op,prob in op_seq:
-				for qbit in range(self.nqbits):
-					a_op = self.__stretched_mat(op,[qbit])
-					noise_component = (prob/float(self.nqbits)) * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
-					noise_add = noise_add + noise_component
-				# self.qreport(header='cumulative noise_add '+op[0],state=noise_add)
+			# add noise if kraus_chan present
+			if len(self.kraus_chan) > 0:
+				op_seq, state_prob_mult = self.kraus_chan
 
-			# add noise to sys_state per the probability weights in kraus_chan
-			self.sys_state = state_prob_mult * self.sys_state + noise_add
+				# calculate the noise to be added for all qubits
+				noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
+				for op,prob in op_seq:
+					for qbit in range(self.nqbits):
+						a_op = self.__stretched_mat(op,[qbit])
+						noise_component = (prob/float(self.nqbits)) * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
+						noise_add = noise_add + noise_component
+					# self.qreport(header='cumulative noise_add '+op[0],state=noise_add)
+
+				# add noise to sys_state per the probability weights in kraus_chan
+				self.sys_state = state_prob_mult * self.sys_state + noise_add
 
 		if qtrace or self.trace:
+			cond_cbit_arg = '' if cond_cbit_list is None else ' if Cbits'+str(cond_cbit_list)
 			opname = oper[0]
 			opargs = str(qbit_list)
-			hdr = opname + " Qubit" + opargs
+			hdr = opname + " Qubit" + opargs + cond_cbit_arg
 			self.qreport(header=hdr)
 
 		#update runstats
@@ -525,6 +538,16 @@ class QSimulator:
 
 
 if __name__ == "__main__":
+
+	try:
+		q = QSimulator(2,qtrace=True, visualize=True)
+		q.qgate(qgt.H(),[1])
+		q.qgate(qgt.C(), [1,0])
+		q.qmeasure([1,0])
+		q.qgate(qgt.X(), [0], cond_cbit_list=[0])
+
+	except QSimError as m:
+		print(m.args)
 
 	def pretty_print_op(op):
 		name = op[0]
