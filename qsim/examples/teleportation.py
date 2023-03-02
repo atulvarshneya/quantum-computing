@@ -3,68 +3,40 @@
 import qsim
 import qgates as qgt
 import numpy as np
-import random as rnd
 
-'''
-This example shows an implementation of the teleportation protocol
-The implementation done here demonstrates
-	1. creating an initial state in qsim,
-	2. measuring in a specific basis
-'''
+q = qsim.QSimulator(3)
 
-theta = rnd.random() * 2 * np.pi
-c = np.cos(theta)
-s = np.sin(theta)
-# prepare the initial state with qbit-2 with the above computed random amplitude
-msb = np.transpose(np.matrix([[c,s]],dtype=complex))
-init = msb
-for i in range(3-1):
-	init = np.kron(init,np.transpose(np.matrix([[1,0]],dtype=complex)))
+# put the qubit 2 in some randoom state
+# this is the qubit that is to be teleported by Alice to Bob
+print("\nThe qubit 2 is put in some random state, it will be teleported into qubit 0.")
+q.qgate(qgt.RND(),[2], qtrace=True)
 
-
-# now get started ...
-q = qsim.QSimulator(3,initstate=init)
-q.qreport(header="Initial State")
-
-# first put qbits 0 and 1 in bell state
+# get qubits 0 and 1 in the triplet state, |00> + |11>
+# Alice and Bob have one of each of these entangled qubits
 q.qgate(qgt.H(),[0])
 q.qgate(qgt.C(),[0,1])
-# q.qreport(header="0 and 1 in bell state")
-# qbit 1 is kept 'here' and qbit 0 is sent 'far away'; and we have the input qbit to be teleported, qbit 2, also 'here'.
 
-# at 'here' we measure the qbit to be teleported and qbit 1 in bell basis.
-q.qgate(qgt.BELL_BASIS(),[2,1])
-mvals = q.qmeasure([2,1])
-q.qgate(q.qinverse(qgt.BELL_BASIS()),[2,1])
-b0 = mvals[1]
-b1 = mvals[0]
+print( '''
+cbit2  ============m=======.==
+                   |       |
+cbit1  ========m===|===.===|==
+               |   |   |   |
+qubit2 -.-[H]-(/)------|---|--
+        |              |   |
+qubit1 -o---------(/)--|---|--
+                       |   |
+qubit0 ---------------[X]-[Z]-- qubit 2 teleported into qubit 0
 
-# now we send these classical bits b0 and b1 to 'far away' and apply appropriate gates to recover the input bit's state in qbit 1
-if b1 == 0 and b0 == 0:
-	q.qgate(qgt.C(),[2,1])
-	q.qgate(qgt.H(),[2])
-elif b1 == 0 and b0 == 1:
-	q.qgate(qgt.Z(),[0])
+''')
 
-	# reset the state of 2 and 1, for clarity
-	q.qgate(qgt.C(),[2,1])
-	q.qgate(qgt.H(),[2])
-	q.qgate(qgt.X(),[2])
-elif b1 == 1 and b0 == 0:
-	q.qgate(qgt.X(),[0])
+print("Starting the teleportation protocol...")
+q.qgate(qgt.C(),[2,1])
+q.qgate(qgt.H(),[2])
+q.qmeasure([1])
+q.qmeasure([2])
 
-	# reset the state of 2 and 1, for clarity
-	q.qgate(qgt.C(),[2,1])
-	q.qgate(qgt.H(),[2])
-	q.qgate(qgt.X(),[1])
-else:
-	q.qgate(qgt.X(),[0])
-	q.qgate(qgt.Z(),[0])
+q.qgate(qgt.X(),[0], ifcbits=[1])
+q.qgate(qgt.Z(),[0], ifcbits=[2])
 
-	# reset the state of 2 and 1, for clarity
-	q.qgate(qgt.C(),[2,1])
-	q.qgate(qgt.H(),[2])
-	q.qgate(qgt.X(),[2])
-	q.qgate(qgt.X(),[1])
-
-q.qreport(header="Final state")
+q.qreport()
+print("qubit 2 teleported into qubit 0.")
