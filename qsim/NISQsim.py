@@ -179,18 +179,18 @@ class QSimulator:
 			raise QSimError(errmsg)
 		return kraus_spec
 
-	def qgate(self, oper, qbit_list, cond_cbit_list=None, qtrace=False):
+	def qgate(self, oper, qbit_list, ifcbits=None, qtrace=False):
 		# runstats - sim cpu time
 		st = time.process_time()
 
 		cbit_cond = True
-		if not cond_cbit_list is None:
-			# check the validity of the cond_cbit_list (reapeated cbits, all cbits within self.ncbits)
-			if not self.__valid_bit_list(cond_cbit_list,self.ncbits):
+		if not ifcbits is None:
+			# check the validity of the ifcbits (reapeated cbits, all cbits within self.ncbits)
+			if not self.__valid_bit_list(ifcbits,self.ncbits):
 				errmsg = "Error: the list of cbits is not valid."
 				raise QSimError(errmsg)
-			for c in cond_cbit_list:
-				if self.cregister[c] == 0:
+			for c in ifcbits:
+				if self.cregister[self.ncbits-1-c] == 0:
 					cbit_cond = False
 
 		# perform the gate operation if cbits condition is satisfied
@@ -223,7 +223,7 @@ class QSimulator:
 				self.sys_state = state_prob_mult * self.sys_state + noise_add
 
 		if qtrace or self.trace:
-			cond_cbit_arg = '' if cond_cbit_list is None else ' if Cbits'+str(cond_cbit_list)
+			cond_cbit_arg = '' if ifcbits is None else ' if Cbits'+str(ifcbits)
 			opname = oper[0]
 			opargs = str(qbit_list)
 			hdr = opname + " Qubit" + opargs + cond_cbit_arg
@@ -541,10 +541,10 @@ if __name__ == "__main__":
 
 	try:
 		q = QSimulator(2,qtrace=True, visualize=True)
-		q.qgate(qgt.H(),[1])
-		q.qgate(qgt.C(), [1,0])
+		q.qgate(qgt.X(),[1])
 		q.qmeasure([1,0])
-		q.qgate(qgt.X(), [0], cond_cbit_list=[0])
+		q.qgate(qgt.X(), [0], ifcbits=[0])
+		q.qgate(qgt.X(), [0], ifcbits=[1])
 
 	except QSimError as m:
 		print(m.args)
