@@ -114,35 +114,36 @@ class QSimulator:
 		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
 		raise QSimError(errmsg)
 
-	def qgate(self, oper, qbit_list, ifcbits=None, qtrace=False):
+	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False): # ifcbit is encoded as tuple (cbit, ifvalue)
 		# runstats - sim cpu time
 		st = time.process_time()
 
 		cbit_cond = True
-		if not ifcbits is None:
-			# check the validity of the ifcbits (reapeated cbits, all cbits within self.ncbits)
-			if not self.__valid_bit_list(ifcbits,self.ncbits):
-				errmsg = "Error: the list of cbits is not valid."
+		if not ifcbit is None:
+			# check the validity of the ifcbit[0] (reapeated cbits, all cbits within self.ncbits)
+			if not self.__valid_bit_list([ifcbit[0]],self.ncbits):
+				errmsg = "Error: the ifcbit[0] value is not valid."
 				raise QSimError(errmsg)
-			for c in ifcbits:
-				if self.cregister[self.ncbits-1-c] == 0:
-					cbit_cond = False
+			if ifcbit[1] != 0 and ifcbit[1] != 1:
+				errmsg = "Error: the ifcbit[1] value is not valid."
+				raise QSimError(errmsg)
+			cbit_cond = ( self.cregister[self.ncbits-1-ifcbit[0]] == ifcbit[1] )
 
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+		if not self.__valid_bit_list(qbit_list,self.nqbits):
+			errmsg = "Error: the list of qubits is not valid."
+			raise QSimError(errmsg)
+		if self.validation:
+			if not self.qisunitary(oper):
+				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+				raise QSimError(errmsg)
 		# perform the gate operation if cbits condition is satisfied
 		if cbit_cond:
-			# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-			if not self.__valid_bit_list(qbit_list,self.nqbits):
-				errmsg = "Error: the list of qubits is not valid."
-				raise QSimError(errmsg)
-			if self.validation:
-				if not self.qisunitary(oper):
-					errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
-					raise QSimError(errmsg)
 			a_op = self.__stretched_mat(oper,qbit_list)
 			self.sys_state = a_op * self.sys_state
 
 		if qtrace or self.trace:
-			cond_cbit_arg = '' if ifcbits is None else ' if Cbits'+str(ifcbits)
+			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
 			opname = oper[0]
 			opargs = str(qbit_list)
 			hdr = opname + " Qubit" + opargs + cond_cbit_arg
@@ -452,36 +453,4 @@ class QSimulator:
 
 
 if __name__ == "__main__":
-
-	import qgates as qgt
-	try:
-		q = QSimulator(2,qtrace=True, visualize=True)
-		q.qgate(qgt.X(),[1])
-		q.qmeasure([1,0])
-		q.qgate(qgt.X(), [0], ifcbits=[0])
-		q.qgate(qgt.X(), [0], ifcbits=[1])
-
-		# print(q.qsteps)
-		# print(q.op_times)
-		# print(q.op_counts)
-
-		quit()
-
-		q = QSimulator(8,qtrace=True)
-
-		print("Entangling 4 bits -------------------------")
-		q.qgate(qgt.H(),[3])
-		for i in range(3):
-			q.qgate(qgt.CTL(),[3,i])
-		print("-------------------------------------------")
-		for i in range(4):
-			q.qgate(qgt.X(),[i+4])
-		q.qgate(qgt.Rphi(q.pi/2),[7])
-		print("-------------------------------------------")
-		v = q.qmeasure([2])
-		print("Qubit 2 value measured = ",v)
-		v = q.qmeasure([1])
-		print("Qubit 1 value measured = ",v)
-		q.qreport()
-	except QSimError as m:
-		print(m.args)
+	pass
