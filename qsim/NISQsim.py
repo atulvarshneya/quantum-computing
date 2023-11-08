@@ -20,7 +20,7 @@ import math
 ##            BUT, the state vector ordering is [0000, ...., 1111]. Good that it does not impact the user.
 ## Sorry, for this confusion, but too much effort to change now.
 
-class QSimulator:
+class NISQSimulator:
 
 	def __init__(self, nqbits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
 		# record input variables for reset
