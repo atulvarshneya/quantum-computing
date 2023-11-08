@@ -21,8 +21,8 @@ cbit2  ============m=======.==
                    |       |
 cbit1  ========m===|===.===|==
                |   |   |   |
-qubit2 -.-[H]-(/)------|---|--
-        |              |   |
+qubit2 -.-[H]-(/)--|---|---|--
+        |          |   |   |
 qubit1 -o---------(/)--|---|--
                        |   |
 qubit0 ---------------[X]-[Z]-- qubit 2 teleported into qubit 0
@@ -35,8 +35,8 @@ q.qgate(qgt.H(),[2])
 q.qmeasure([1])
 q.qmeasure([2])
 
-q.qgate(qgt.X(),[0], ifcbits=[1])
-q.qgate(qgt.Z(),[0], ifcbits=[2])
+q.qgate(qgt.X(),[0], ifcbit=(1,1))
+q.qgate(qgt.Z(),[0], ifcbit=(2,1))
 
 q.qreport()
 print("qubit 2 teleported into qubit 0.")
