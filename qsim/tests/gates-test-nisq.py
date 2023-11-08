@@ -3,7 +3,7 @@ import NISQsim
 import qgates
 from qSimException import *
 
-q = NISQsim.QSimulator(4,qtrace=True)
+q = NISQsim.NISQSimulator(4,qtrace=True)
 
 ## X gate
 q.qgate(qgates.X(),[0])

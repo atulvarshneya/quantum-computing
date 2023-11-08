@@ -3,7 +3,7 @@ import NISQsim
 import qgates
 from qSimException import *
 
-qc = NISQsim.QSimulator(8,qtrace=True)
+qc = NISQsim.NISQSimulator(8,qtrace=True)
 
 print()
 print("------------------------------------------------")

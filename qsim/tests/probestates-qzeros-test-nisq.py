@@ -3,7 +3,7 @@
 import NISQsim
 import qgates as qgt
 
-q = NISQsim.QSimulator(3,qtrace=True, verbose=True)
+q = NISQsim.NISQSimulator(3,qtrace=True, verbose=True)
 q.qgate(qgt.H(),[2])
 q.qgate(qgt.C(),[2,1])
 q.qreport('Entangled state')

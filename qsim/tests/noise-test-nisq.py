@@ -15,7 +15,7 @@ noise_profiles_list = [
 	]
 
 # print the list of canned kraus channels
-q = NISQsim.QSimulator(1,qtrace=False, verbose=False)
+q = NISQsim.NISQSimulator(1,qtrace=False, verbose=False)
 kraus_spec = list(q.qsim_noise_profile('LIST'))
 kraus_spec.sort()
 print(kraus_spec)
@@ -26,7 +26,7 @@ for prname in noise_profiles_list:
 	print('Kraus Channel: ',prname)
 	print('--------------------------------------------------------------------------')
 
-	q = NISQsim.QSimulator(3,qtrace=True, verbose=True)
+	q = NISQsim.NISQSimulator(3,qtrace=True, verbose=True)
 
 	kraus_spec = q.qsim_noise_profile(prname, p1=0.05, p2=0.05, p3=0.05)
 	q.qsim_noise_spec(kraus_spec)

@@ -28,7 +28,7 @@ try:
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 
 	# Start the Quantum Computer Simulator
-	q = NISQsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
+	q = NISQsim.NISQSimulator(nqbits,initstate=initstate, qtrace=True)
 
 	# Perform QFT
 	qftgate = qgates.QFT(nqbits)
