@@ -2,7 +2,6 @@
 import numpy as np
 from qException import QCktException
 import qsim
-import NISQsim
 from BackendAPI import *
 
 
@@ -13,7 +12,7 @@ class NISQeng:
 	def runjob(self, job):
 		cregres_list = [None]*job.shots
 		for shot_count in range(job.shots):
-			qc = NISQsim.QSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
+			qc = qsim.NISQSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
 			if not job.noise_profile is None:
 				kraus_spec = qc.qsim_noise_profile(**job.noise_profile)
 				qc.qsim_noise_spec(kraus_spec)
@@ -48,7 +47,7 @@ class NISQdeb:
 		cregres_list = [None]*job.shots
 		if job.shots != 1:
 			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
-		qc = NISQsim.QSimulator(job.nqubits,job.nclbits,qtrace=job.qtrace,verbose=job.verbose)
+		qc = qsim.NISQSimulator(job.nqubits,job.nclbits,qtrace=job.qtrace,verbose=job.verbose)
 		if not job.noise_profile is None:
 			kraus_spec = qc.qsim_noise_profile(**job.noise_profile)
 			qc.qsim_noise_spec(kraus_spec)
