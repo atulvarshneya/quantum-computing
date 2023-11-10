@@ -5,7 +5,6 @@ import ntpath
 import getopt
 import qsim
 import collections as col
-import qgates
 
 q = None
 def initqc(n):
@@ -52,20 +51,20 @@ clidata = {
 	"m":	[qsim.QSimulator.qmeasure,	"bit1 bit2 ...","qsim:,qlist:*",	"Measure qubits"],
 	"?":	[help,			"",		"",			"Help"],
 	"help": [help,			"",		"",			"Help"],
-	"sqsw":	[qgates.SQSWAP,	"bit1 bit2",	"qgate:,qlist:2","SQ root SWAP gate"],
-	"h":	[qgates.H,		"bit",		"qgate:,qlist:1","HADAMARD Gate"],
-	"z":	[qgates.Z,		"bit",		"qgate:,qlist:1","Z Gate"],
-	"c":	[qgates.C,		"cbit bit",	"qgate:,qlist:2","CNOT Gate"],
-	"rk":	[qgates.Rk,	"k bit",	"args:i,qgate:,qlist:1","ROT(k) Gate"],
-	"y":	[qgates.Y,		"bit",		"qgate:,qlist:1","Y Gate"],
-	"x":	[qgates.X,		"bit",		"qgate:,qlist:1","X Gate"],
-	"rphi":	[qgates.Rphi,	"phi bit",	"args:f,qgate:,qlist:1","ROT(Phi) Gate"],
-	"t":	[qgates.T,		"cbit1 cbit2 bit",	"qgate:,qlist:3","TOFFOLI Gate"],
-	"csw":	[qgates.CSWAP,	"cbit bit1 bit2",	"qgate:,qlist:3","C-SWAP Gate"],
-	"sw":	[qgates.SWAP,	"bit1 bit2",		"qgate:,qlist:2","SWAP Gate"],
-	"rnd":	[qgates.RND,	"bit",		"qgate:,qlist:1","Random aplitude Gate"],
-	"qft":	[qgates.QFT,	"n n-bits ...",	"args:i,qgate:,qlist:*","QFT(n) Gate"],
-	"hn":	[qgates.Hn,	"n n-bits ...",	"args:i,qgate:,qlist:*","Simultabeous n-HADAMARD Gates"]
+	"sqsw":	[qsim.SQSWAP,	"bit1 bit2",	"qgate:,qlist:2","SQ root SWAP gate"],
+	"h":	[qsim.H,		"bit",		"qgate:,qlist:1","HADAMARD Gate"],
+	"z":	[qsim.Z,		"bit",		"qgate:,qlist:1","Z Gate"],
+	"c":	[qsim.C,		"cbit bit",	"qgate:,qlist:2","CNOT Gate"],
+	"rk":	[qsim.Rk,	"k bit",	"args:i,qgate:,qlist:1","ROT(k) Gate"],
+	"y":	[qsim.Y,		"bit",		"qgate:,qlist:1","Y Gate"],
+	"x":	[qsim.X,		"bit",		"qgate:,qlist:1","X Gate"],
+	"rphi":	[qsim.Rphi,	"phi bit",	"args:f,qgate:,qlist:1","ROT(Phi) Gate"],
+	"t":	[qsim.T,		"cbit1 cbit2 bit",	"qgate:,qlist:3","TOFFOLI Gate"],
+	"csw":	[qsim.CSWAP,	"cbit bit1 bit2",	"qgate:,qlist:3","C-SWAP Gate"],
+	"sw":	[qsim.SWAP,	"bit1 bit2",		"qgate:,qlist:2","SWAP Gate"],
+	"rnd":	[qsim.RND,	"bit",		"qgate:,qlist:1","Random aplitude Gate"],
+	"qft":	[qsim.QFT,	"n n-bits ...",	"args:i,qgate:,qlist:*","QFT(n) Gate"],
+	"hn":	[qsim.Hn,	"n n-bits ...",	"args:i,qgate:,qlist:*","Simultabeous n-HADAMARD Gates"]
 	}
 
 def parse_aspec(aspec):

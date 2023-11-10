@@ -1,8 +1,8 @@
 
 import numpy as np
-from qSimException import *
+from qsim.qSimException import *
 import random as rnd
-import qgatesUtils as qgu
+import qsim.qgatesUtils as qgu
 
 ## QC Gates
 def X():

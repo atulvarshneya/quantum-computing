@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import qsim
-import qgates as qgt
-import qgatesUtils as qgu
 import math
 
 # Initialize the Quantum Computer
@@ -12,9 +10,9 @@ q = qsim.QSimulator(nqbits)
 M = 2**(nqbits-2)
 
 # setup the periodic function
-op1 = q.qstretch(qgt.C(),[2,0])
-op2 = q.qstretch(qgt.C(),[3,1])
-f = qgu.qcombine_seq("F(x)",[op1,op2])
+op1 = q.qstretch(qsim.C(),[2,0])
+op2 = q.qstretch(qsim.C(),[3,1])
+f = qsim.qcombine_seq("F(x)",[op1,op2])
 print("Psst ... f(x) defined as having period of 4\n")
 
 # Now loop to repeatedly find values of multiples of M/r by
@@ -26,10 +24,10 @@ while idx < 2:
 	q.qreset()
 
 	# QFT(x) - F(x) - QFT(x) - Measure
-	q.qgate(qgt.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
+	q.qgate(qsim.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
 	q.qgate(f,list(reversed(range(nqbits))))
 	# measure this if you like - q.qmeasure([1,0])
-	q.qgate(qgt.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
+	q.qgate(qsim.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
 	mbyrarr = q.qmeasure(list(range(nqbits-1,1,-1)))
 
 	# convert to integer the measured values of the x register

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import qsim
-import qgates as qgt
 import numpy as np
 import random as rnd
 
@@ -41,16 +40,16 @@ q = qsim.QSimulator(NQUBITS,initstate=initstate)
 q.qreport(header="Initial State")
 
 # first put qbits 0 and 1 in bell state
-q.qgate(qgt.H(),[0])
-q.qgate(qgt.C(),[0,1])
+q.qgate(qsim.H(),[0])
+q.qgate(qsim.C(),[0,1])
 q.qreport(header="0 and 1 in bell state")
 # qbit 1 is kept 'here' and qbit 0 is sent 'far away'; and we have 
 # the input qbit to be teleported, qbit 2, also 'here'.
 
 # at 'here' we CNOT qbit 2 (control qubit) and qbit 1 
-q.qgate(qgt.C(), [2,1])
+q.qgate(qsim.C(), [2,1])
 # at 'here' perform H on qubit 2 (the qubit to be teleported)
-q.qgate(qgt.H(),[2])
+q.qgate(qsim.H(),[2])
 q.qreport(header="C(2,1), H(2)")
 
 # Now "measure" qubits 1 and 2
@@ -70,8 +69,8 @@ q.qreport(header="C(2,1), H(2)")
 #         == m(2)
 #               \
 #                ==
-q.qgate(qgt.C(), [1,5])
-q.qgate(qgt.C(), [2,4])
+q.qgate(qsim.C(), [1,5])
+q.qgate(qsim.C(), [2,4])
 q.qreport(header="q5 measured q1, and q4 measured q2")
 
 # OK, now we pick any one branch of the 4 branched worlds we 
@@ -88,9 +87,9 @@ mvals = q.qmeasure([2,1])
 mq2 = mvals[0]
 mq1 = mvals[1]
 if mq1 == 1:
-	q.qgate(qgt.X(), [0])
+	q.qgate(qsim.X(), [0])
 if mq2 == 1:
-	q.qgate(qgt.Z(), [0])
+	q.qgate(qsim.Z(), [0])
 
 q.qreport(header="Final state")
 

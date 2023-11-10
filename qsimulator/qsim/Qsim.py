@@ -8,7 +8,7 @@ import numpy as np
 import random as rnd
 from copy import deepcopy
 import types
-from qSimException import QSimError
+from qsim.qSimException import QSimError
 import time
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.

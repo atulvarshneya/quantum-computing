@@ -1,6 +1,7 @@
 import qckt
 from QSystems import *
 from Job import Job
+import numpy as np
 
 ck1 = qckt.QCkt(4)
 ck1.X([0,1])
@@ -38,7 +39,7 @@ if len(svec1.value) != len(svec2.value):
 	res = False
 else:
 	for i in range(len(svec1.value)):
-		if svec1.value[i][i] != svec2.value[i][i]:
+		if np.around(svec1.value[i][i],6) != np.around(svec2.value[i][i],6):
 			print("ERROR - svecs are different",i,": ",svec1.value[i][i], " != ",svec2.value[i][i])
 			res = False
 if res:

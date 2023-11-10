@@ -2,8 +2,6 @@
 
 import numpy as np
 import qsim
-import qgates as qgt
-import qgatesUtils as qgu
 
 
 def intro():
@@ -50,17 +48,17 @@ def __u(q,key,name):
 	op_list = []
 	for i in range(n-1,0,-1):
 		if (key & (0b1<<(i-1))) == 0:
-			op_list.append(qgt.X())
+			op_list.append(qsim.X())
 		else:
 			op_list.append(["I",np.matrix(np.eye(2),dtype=complex)])
 	op_list.append(["I",np.matrix(np.eye(2),dtype=complex)])
-	uprep = qgu.qcombine_par("U-Prep",op_list)
+	uprep = qsim.qcombine_par("U-Prep",op_list)
 
-	uflip = qgt.X()
+	uflip = qsim.X()
 	for i in range(n-1,0,-1):
-		uflip = qgt.CTL(uflip)
+		uflip = qsim.CTL(uflip)
 
-	return qgu.qcombine_seq(name,[uprep,uflip,uprep])
+	return qsim.qcombine_seq(name,[uprep,uflip,uprep])
 
 #################################################################################
 
@@ -78,17 +76,17 @@ def main(n):
 	for m in range(5):  # Look for best of 5
 		q.qreset()
 		# Hn on x-register
-		q.qgate(qgt.Hn(n-1), list(range(n-1,0,-1)))
+		q.qgate(qsim.Hn(n-1), list(range(n-1,0,-1)))
 		# prepare b as |->
-		q.qgate(qgt.X(),[0])
-		q.qgate(qgt.H(),[0])
+		q.qgate(qsim.X(),[0])
+		q.qgate(qsim.H(),[0])
 
 		numitrs = int(q.pi * (2.0**((n-1.0)/2.0))/4.0) # optimal # iter, less or more dont work
 		for itr in range(numitrs):
 			q.qgate(Ufgate,list(reversed(range(n))))
-			q.qgate(qgt.Hn(n-1), list(range(n-1,0,-1)))
+			q.qgate(qsim.Hn(n-1), list(range(n-1,0,-1)))
 			q.qgate(UinvMgate,list(reversed(range(n))))
-			q.qgate(qgt.Hn(n-1), list(range(n-1,0,-1)))
+			q.qgate(qsim.Hn(n-1), list(range(n-1,0,-1)))
 		res = q.qmeasure(list(range(n-1,0,-1)))
 		print("Result",m,"=",res)
 

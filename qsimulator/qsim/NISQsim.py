@@ -8,10 +8,10 @@ import numpy as np
 import random as rnd
 from copy import deepcopy
 import types
-from qSimException import QSimError
+from qsim.qSimException import QSimError
 import time
-import qgates as qgt
-from qgatesUtils import *
+import qsim.qgates as qgt
+from qsim.qgatesUtils import *
 import math
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
