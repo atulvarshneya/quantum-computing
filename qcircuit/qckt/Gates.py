@@ -159,7 +159,7 @@ class X(QGate):
 		self.opMatrix = np.matrix([[0,1],[1,0]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"X")
+		canvas._add_simple(self.qbits[0],"X", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -177,7 +177,7 @@ class Y(QGate):
 		self.opMatrix = np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Y")
+		canvas._add_simple(self.qbits[0],"Y", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -195,7 +195,7 @@ class Z(QGate):
 		self.opMatrix = np.matrix([[1,0],[0,-1]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Z")
+		canvas._add_simple(self.qbits[0],"Z", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -214,7 +214,7 @@ class H(QGate):
 		self.opMatrix = np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"H")
+		canvas._add_simple(self.qbits[0],"H", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -235,7 +235,7 @@ class CX(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["X"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["X"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -256,7 +256,7 @@ class CY(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Y"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Y"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -277,7 +277,7 @@ class CZ(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Z"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Z"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -297,7 +297,7 @@ class CCX(QGate):
 		self.opMatrix = gutils.CTL(gutils.CTL(np.matrix([[0,1],[1,0]],dtype=complex)))
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,[".",".","X"])
+		canvas._add_connected(self.qbits,[".",".","X"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -316,7 +316,7 @@ class SWAP(QGate):
 		self.opMatrix = np.matrix([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,["*","*"])
+		canvas._add_connected(self.qbits,["*","*"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -363,6 +363,9 @@ class M(QGate):
 			retval = False
 		return retval
 
+	def ifcbit(self,cbit,val):
+		raise QCktException("M gate does not support ifcbit()")
+
 	# INHERIT realign(self,newseq):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -395,6 +398,9 @@ class Border(QGate):
 
 	def check_qbit_args(self,nqbits):
 		pass
+
+	def ifcbit(self,cbit,val):
+		raise QCktException("Border does not support ifcbit()")
 
 	# INHERIT realign(self,newseq):
 
@@ -432,6 +438,9 @@ class Probe(QGate):
 
 	def check_qbit_args(self,nqbits):
 		pass
+
+	def ifcbit(self,cbit,val):
+		raise QCktException("Probe does not support ifcbit()")
 
 	# INHERIT realign(self,newseq):
 
@@ -478,7 +487,7 @@ class QFT(QGate):
 		self.opMatrix = np.matrix(opMat,dtype=complex) / np.sqrt(N)
 
 	def addtocanvas(self,canvas):
-		canvas._add_boxed(self.qbits,"QFT")
+		canvas._add_boxed(self.qbits,"QFT", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -502,10 +511,10 @@ class RND(QGate):
 		im1 = camp*np.sin(phi)
 		re2 = samp*np.cos(phi)
 		im2 = samp*np.sin(phi)
-		self.OpMatrix = np.matrix([[complex(-re1,-im1),complex(re2,im2)],[complex(re2,im2),complex(re1,im1)]],dtype=complex)
+		self.opMatrix = np.matrix([[complex(-re1,-im1),complex(re2,im2)],[complex(re2,im2),complex(re1,im1)]],dtype=complex)
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"RND")
+		canvas._add_simple(self.qbits[0],"RND", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -528,7 +537,7 @@ class P(QGate):
 		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"P")
+		canvas._add_simple(self.qbits[0],"P", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -554,7 +563,7 @@ class CP(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["P"])
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["P"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -577,7 +586,7 @@ class UROTk(QGate):
 		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"UROTk")
+		canvas._add_simple(self.qbits[0],"UROTk", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -602,8 +611,8 @@ class CROTk(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"])
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["UROTk"])
+		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["UROTk"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -626,7 +635,7 @@ class Rx(QGate):
 		self.opMatrix = np.matrix([ [complex(ck,0),complex(0,-sk)], [complex(0,-sk),complex(ck,0)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Rx")
+		canvas._add_simple(self.qbits[0],"Rx", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -651,8 +660,8 @@ class CRx(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"])
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Rx"])
+		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Rx"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -676,7 +685,7 @@ class Ry(QGate):
 		self.opMatrix = np.matrix([ [complex(ck,0),complex(-sk,0)], [complex(sk,0),complex(ck,0)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Ry")
+		canvas._add_simple(self.qbits[0],"Ry", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -701,8 +710,8 @@ class CRy(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"])
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Ry"])
+		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Ry"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -726,7 +735,7 @@ class Rz(QGate):
 		self.opMatrix = np.matrix([ [complex(ck,-sk),complex(0,0)], [complex(0,0),complex(ck,sk)]],dtype=complex)
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Rz")
+		canvas._add_simple(self.qbits[0],"Rz", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -751,8 +760,8 @@ class CRz(QGate):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
 	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"])
-		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Rz"])
+		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Rz"], self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
@@ -775,7 +784,7 @@ class CUSTOM(QGate):
 		self.qbits = qbits
 
 	def addtocanvas(self,canvas):
-		canvas._add_boxed(self.qbits,self.name)
+		canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
