@@ -29,8 +29,10 @@ Example usesof registers:
 	outreg = qckt.QRegister(2)
 	wrkreg = qckt.QRegister(4)
 	clmeas = qckt.CRegister(6)
-	# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them. For that we use placement()
+	# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them.
+ 	# For that we use placement()
 	nq,nc,placedqu,placedcl = regs.placement(inpreg,outreg,wrkreg,clmeas)
+
 
 The above code declares registers and then assigned actual qubits and clbits to them (does the placement of the registers). The way the placement has been done above, the inpreg qubits occupy the MSB locations in the overall number of qubits in the circuit. Followed by outreg and then wrkreg. Since thereis only 1 classical register, it occupies the only number of classical bits in the circuit. Each register has bits assigned in the MSB to LSB order per the convention. So, the order in which the QRegiter objects appear in the placement() arguments, the qubits are assigned in accordance to that. Same for CRegister objects.
 
@@ -123,13 +125,14 @@ the nq and nc should be used while creating the circuit --
 				inpqubits is a vector that specifies how the old circuit's qubits be replaced in the new circuit
 				As an example see the circuits below --
 				say,                    current circuit                   new circuit
-							   q000 ----[H]-[.]----------     q000 --------------------------
-											 |                                               
-							   q001 --------[X]----------     q001 -----------[H]------------
+						q000 ----[H]-[.]----------     q000 --------------------------
+							      |                                               
+						q001 --------[X]----------     q001 -----------[H]------------
 																							 
-							   q002 ------------[H]------     q002 --------[X]---------------
-																			|                
-															  q003 ----[H]-[.]---------------
+						q002 ------------[H]------     q002 --------[X]---------------
+											     |                
+										q003 ---[H]-[.]---------------
+	     
 				For this realignment, this vector basically answers the questions [q002 -> q?, q001 -> q?, q000 -> q?]
 				so, the vector should be [1,2,3], and the realign call should be realign(4,4,[1,2,3])
 
