@@ -14,7 +14,7 @@ qckt as well as qsim follow the convention that when providing arguments to any 
 Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target), or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT it very much *does* matter.
 
 ## Using Registers
-The use of Registers simplifies, and can help in generalizing the quantum circuit.
+The use of registers simplifies, and can help in generalizing the quantum circuit.
 When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program.
 While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it somewhat more streamlined.
 
@@ -24,11 +24,11 @@ At the end of the day, both the registers are subclasses of list data type. So, 
 
 Example usesof registers:
 
-	import Registers as regs
-	inpreg = regs.QRegister(4)
-	outreg = regs.QRegister(2)
-	wrkreg = regs.QRegister(4)
-	clmeas = regs.CRegister(6)
+	import qckt
+	inpreg = qckt.QRegister(4)
+	outreg = qckt.QRegister(2)
+	wrkreg = qckt.QRegister(4)
+	clmeas = qckt.CRegister(6)
 	# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them. For that we use placement()
 	nq,nc,placedqu,placedcl = regs.placement(inpreg,outreg,wrkreg,clmeas)
 
@@ -130,36 +130,37 @@ the nq and nc should be used while creating the circuit --
 		listSvc() returns a list of tuples (name, description) of all services available (i.e. registered in the installation's configuration)
 		getSvc(svcName) returns handle to the named backend service
 		Example usage:
-			import svcReg
-			reg = svcReg.Registry()
+			import qckt.backend as bknd
+			reg = bknd.Registry()
 			svcTuples = reg.listSvc()
 			svc = reg.getSvc("QSystems")
 
 	Backend Service
-		Backend service class implments the methods to connect with the quantum computing service, using the required authentication/authorization.
+		Backend service implments the methods to connect with the quantum computing service, using the required authentication/authorization.
 		The service provides methods to discover backend engines under that service, and get the handles to them to run the quantum computing circuits/programs.
 		listInstances() returns a list of tuples (name, description) of all instances (quamtum computer) available at this service
 		getInstance(name) returns an object representation of the named instance (quantum computer)
 		Example usage: Going through the Registry
-			import svcReg
-			reg = svcReg.Registry()
+			import qckt.backend as bknd
+			reg = bknd.Registry()
 			svcTuples = reg.listSvc()
 			svc = reg.getSvc("QSystems")
 			engine_list = svc.listInstances()
 			bk_engine = svc.getInstance("local")
 		Example usage: Directly accessing the QSystems engines
-			import QSystems as qsys
-			bk_debugging_engine = qsys.Qdeb() # same as svc.getInstance("local")
-			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim")
+			import qckt.backend as bknd
+			bk_debugging_engine = bknd.Qdeb() # same as svc.getInstance("local")
+			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
 
 	Backend engines
 		The adaptor for the backend needs to interpret the operations sequence in the qckt representation.
 		At the end of the job execution (all the shots), the backend adaptor populates the results in the job object, as mentioned above.
 		runjob(job) this is the only function impleented by the backend adaptor. It runs the given job on the backend execution engine. Returns the backend adaptor object itself.
 		Example usage: Directly accessing the QSystems engines
-			import QSystems as qsys
-			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim")
-			job = Job(somecircuit, initstate=somestate, shots=100)
+			import qckt
+			import qckt.backend as bknd
+			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
+			job = qckt.Job(somecircuit, initstate=somestate, shots=100)
 			bk_engine.runjob(job)
 
 	Job class
@@ -170,10 +171,10 @@ the nq and nc should be used while creating the circuit --
 		Job.get_counts() returns the frequencies of different Cregister values in the results.
 		Job.get_svec(), only useful for simulator backends, this returns the state-vector at the end of the execution. For simulator backends, shots must be only 1.
 		Example Usage:
-			import QSystems as qsys
-			import Job
-			job = Job.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=100)
-			bk_engine = qsys.Qeng() # same as svc.getInstance("qsim") where svc = reg.getSvc("QSystems")
+			import qckt
+			import qckt.backend as bknd
+			job = qckt.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=100)
+			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim") where svc = reg.getSvc("QSystems")
 			bk_engine.runjob(job)
 			print(job.get_creg()[0]) # print the cregister value from the first execution of the circuit
 			counts = job.get_counts()
