@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import qckt
-import Registers as regs
 import numpy as np
 import random as rnd
-from qException import QCktException
+from qckt import QCktException
 
 #################################################################################
 # Details @ https://en.wikipedia.org/wiki/Grover%27s_algorithm
@@ -32,9 +31,9 @@ class Grover:
 		###
 		# Start building the basic grover circuit, sized appropritely for the in and out registers
 		###
-		self.compact_inreg  = regs.QRegister(inreg_len)
-		self.compact_outreg = regs.QRegister(outreg_len)
-		totreg_len,_,_,_ = regs.placement(self.compact_outreg,self.compact_inreg)
+		self.compact_inreg  = qckt.QRegister(inreg_len)
+		self.compact_outreg = qckt.QRegister(outreg_len)
+		totreg_len,_,_,_ = qckt.placement(self.compact_outreg,self.compact_inreg)
 
 		#### 1. Initialization circuit
 		init_ckt = qckt.QCkt(totreg_len,name="Initialize")

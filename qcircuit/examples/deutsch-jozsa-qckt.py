@@ -3,9 +3,7 @@
 import random as rnd
 import numpy as np
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 
 print("""
 -------------------------------------------------------------------------------------------------------
@@ -31,10 +29,10 @@ def get_fxckt(inpreg, outreg):
 
 
 fxsize = 7
-inpreg = regs.QRegister(fxsize)
-outreg = regs.QRegister(1)
-clmeas = regs.CRegister(fxsize)
-nqbits,ncbits,_,_ = regs.placement(inpreg,outreg,clmeas)
+inpreg = qckt.QRegister(fxsize)
+outreg = qckt.QRegister(1)
+clmeas = qckt.CRegister(fxsize)
+nqbits,ncbits,_,_ = qckt.placement(inpreg,outreg,clmeas)
 
 dj_ckt = qckt.QCkt(nqbits,ncbits)
 
@@ -50,7 +48,7 @@ dj_ckt.M(inpreg,clmeas)
 
 dj_ckt.draw()
 
-job = Job(dj_ckt,qtrace=False, shots=1)
+job = qckt.Job(dj_ckt,qtrace=False, shots=1)
 bk = Qdeb()
 bk.runjob(job)
 res = job.get_creg()[0]

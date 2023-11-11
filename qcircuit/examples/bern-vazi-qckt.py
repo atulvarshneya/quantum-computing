@@ -13,9 +13,7 @@ Problem Statement:
 """)
 
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 import random as rand
 
 ## The function with the secret code
@@ -35,10 +33,10 @@ def get_fxop(inreg, outreg):
 
 ## Bern-Vazi algorithm
 fxsize = 6
-fxin = regs.QRegister(fxsize)
-fxout = regs.QRegister(1)
-rdout = regs.CRegister(fxsize)
-nqubits, nclbits, _, _ = regs.placement(fxout, fxin, rdout)
+fxin = qckt.QRegister(fxsize)
+fxout = qckt.QRegister(1)
+rdout = qckt.CRegister(fxsize)
+nqubits, nclbits, _, _ = qckt.placement(fxout, fxin, rdout)
 
 print("Getting the secret function box...")
 fxop = get_fxop(fxin,fxout)
@@ -66,7 +64,7 @@ bv_ckt.M(fxin, rdout)
 
 bv_ckt.draw()
 
-job = Job(bv_ckt,qtrace=False, verbose=False)
+job = qckt.Job(bv_ckt,qtrace=False, verbose=False)
 # Qdeb().runjob(job)
 NISQdeb().runjob(job)
 print(job.get_creg()[0])

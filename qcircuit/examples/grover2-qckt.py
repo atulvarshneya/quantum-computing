@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 import random as rnd
 import numpy as np
 
 ufinpsz = 4
-inpreg = regs.QRegister(ufinpsz)
-clmeas = regs.CRegister(ufinpsz)
-nqubits,nclbits,_,_ = regs.placement(inpreg,clmeas)
+inpreg = qckt.QRegister(ufinpsz)
+clmeas = qckt.CRegister(ufinpsz)
+nqubits,nclbits,_,_ = qckt.placement(inpreg,clmeas)
 
 ### Uf - The oracle (the verifying function, the database lookup)
 marked = int(rnd.random()*2**nqubits)
@@ -58,7 +56,7 @@ fullckt.draw()
 nattempts = 5
 stats = {}
 for _ in range(nattempts):
-	job = Job(fullckt)
+	job = qckt.Job(fullckt)
 	bk = Qdeb()
 	bk.runjob(job)
 	creg = job.get_creg()[0]

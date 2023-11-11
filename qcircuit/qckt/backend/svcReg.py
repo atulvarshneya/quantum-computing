@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-import QSystems as qsys
+import qckt.backend.QSystems as qsys
+from qckt.qException import QCktException
 
 
 class Registry:

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 import numpy as np
 import random as rnd
 
@@ -12,10 +10,10 @@ import random as rnd
 #################################################################################
 
 ufinpsz = 6
-inpreg = regs.QRegister(ufinpsz)
-outreg = regs.QRegister(1)
-clmeas = regs.CRegister(ufinpsz)
-nqbits,ncbits,_,_ = regs.placement(outreg,inpreg,clmeas)
+inpreg = qckt.QRegister(ufinpsz)
+outreg = qckt.QRegister(1)
+clmeas = qckt.CRegister(ufinpsz)
+nqbits,ncbits,_,_ = qckt.placement(outreg,inpreg,clmeas)
 
 # 'needle' in the haytack = key
 marker = int(rnd.random() * (2**(nqbits-1)-1))
@@ -65,7 +63,7 @@ fullckt.M(inpreg,clmeas)
 
 maxattempts = 5
 for m in range(maxattempts):  # Look for best of all attempts
-	job = Job(fullckt)
+	job = qckt.Job(fullckt)
 	bk = Qdeb()
 	bk.runjob(job)
 	res = job.get_creg()[0]
@@ -73,10 +71,10 @@ for m in range(maxattempts):  # Look for best of all attempts
 	print()
 
 	### Verify if the resultis correct
-	vrinpreg = regs.QRegister(ufinpsz)
-	vroutreg = regs.QRegister(1)
-	vrclmeas = regs.CRegister(1)
-	vrnq,vrnc,_,_ = regs.placement(vroutreg,vrinpreg,vrclmeas)
+	vrinpreg = qckt.QRegister(ufinpsz)
+	vroutreg = qckt.QRegister(1)
+	vrclmeas = qckt.CRegister(1)
+	vrnq,vrnc,_,_ = qckt.placement(vroutreg,vrinpreg,vrclmeas)
 	verifyckt = qckt.QCkt(vrnq,vrnc,name="Verify")
 	x_list = []
 	for i in range(len(vrinpreg)):
@@ -89,7 +87,7 @@ for m in range(maxattempts):  # Look for best of all attempts
 	# print("### Verification Circuit ################################")
 	# verifyckt.draw()
 
-	job = Job(verifyckt)
+	job = qckt.Job(verifyckt)
 	bk = Qdeb()
 	bk.runjob(job)
 	creg = job.get_creg()[0]

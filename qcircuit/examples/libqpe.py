@@ -2,8 +2,7 @@
 
 import numpy as np
 import qckt
-import GatesUtils as gutils
-import Registers as regs
+import qckt.gatesutils as gutils
 
 class QPE:
 	def __init__(self, uop, uop_qubits, measurement_qubits):
@@ -13,10 +12,10 @@ class QPE:
 		self.nqubits = max(measurement_qubits + uop_qubits) + 1
 		self.qpe_circuit = None
 
-		compact_measqubits = regs.QRegister(len(self.measurement_qubits))
-		compact_uopqubits = regs.QRegister(len(self.uop_qubits))
-		compact_cregister = regs.CRegister(len(compact_measqubits))
-		compact_nqubits,compact_nclbits,_,_ = regs.placement(compact_uopqubits,compact_measqubits, compact_cregister)
+		compact_measqubits = qckt.QRegister(len(self.measurement_qubits))
+		compact_uopqubits = qckt.QRegister(len(self.uop_qubits))
+		compact_cregister = qckt.CRegister(len(compact_measqubits))
+		compact_nqubits,compact_nclbits,_,_ = qckt.placement(compact_uopqubits,compact_measqubits, compact_cregister)
 
 		qc = qckt.QCkt(compact_nqubits)
 
@@ -33,8 +32,8 @@ class QPE:
 			repetitions *= 2
 
 		# Apply the inverse quantum Fourier transform
-		qftckt_qubits = regs.QRegister(len(self.measurement_qubits))
-		nq,_,_,_ = regs.placement(qftckt_qubits)
+		qftckt_qubits = qckt.QRegister(len(self.measurement_qubits))
+		nq,_,_,_ = qckt.placement(qftckt_qubits)
 		QFTinvOp = gutils.opmat_dagger(qckt.QCkt(nq).QFT(qftckt_qubits).to_opMatrix())
 
 		qc.CUSTOM("QFTinv", QFTinvOp, compact_measqubits)

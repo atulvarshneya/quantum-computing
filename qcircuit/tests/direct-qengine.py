@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from Job import *
-from QSystems import *
+from qckt.backend import *
 
 ck = qckt.QCkt(4,4)
 ck.H(0)
@@ -14,7 +13,7 @@ ck.Border()
 ck.Probe("point 1")
 ck.draw()
 
-job = Job(ck,qtrace=False,shots=5)
+job = qckt.Job(ck,qtrace=False,shots=5)
 bk = Qdeb().runjob(job)
 # bk = Qeng().runjob(job)
 print(job.get_svec())

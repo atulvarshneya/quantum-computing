@@ -2,19 +2,17 @@
 
 import numpy as np
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 import libqpe as qpe
 
 n_counting_qubits = 4
 
-measurement_qubits = regs.QRegister(n_counting_qubits)
-gap1 = regs.QRegister(1)
-target_qubit = regs.QRegister(1)
-gap2 = regs.QRegister(1)
-measurement_clbits = regs.CRegister(n_counting_qubits)
-nqubits,nclbits,qplaced,_ = regs.placement(gap1, target_qubit, measurement_qubits, gap2, measurement_clbits)
+measurement_qubits = qckt.QRegister(n_counting_qubits)
+gap1 = qckt.QRegister(1)
+target_qubit = qckt.QRegister(1)
+gap2 = qckt.QRegister(1)
+measurement_clbits = qckt.CRegister(n_counting_qubits)
+nqubits,nclbits,qplaced,_ = qckt.placement(gap1, target_qubit, measurement_qubits, gap2, measurement_clbits)
 
 theta = 6.0/8.0
 uop = qckt.QCkt(1).P(2*np.pi*theta,0).to_opMatrix()
@@ -34,7 +32,7 @@ readouts = {}
 maxreads = 0
 resvalue = None
 for i in range(100):
-	job = Job(mycircuit)
+	job = qckt.Job(mycircuit)
 	bk = Qdeb()
 	bk.runjob(job)
 

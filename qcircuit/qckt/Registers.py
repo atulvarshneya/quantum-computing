@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from qException import QCktException
+from qckt.qException import QCktException
 
 class Register(list):
 	def __init__(self,sz):

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
+from qckt.backend import *
 
 #test 02
 nq = 6
@@ -15,7 +14,7 @@ qc.Y(5)
 qc.M([4,5])
 qc.draw()
 
-job = Job(qc,qtrace=False)
+job = qckt.Job(qc,qtrace=False)
 bk = NISQdeb()
 bk.runjob(job)
 
@@ -47,7 +46,7 @@ ck.UROTk(2,[2,3,4,5,6,7])
 ck.list()
 ck.draw()
 
-job = Job(ck,qtrace=True)
+job = qckt.Job(ck,qtrace=True)
 bk = NISQdeb()
 bk.runjob(job)
 

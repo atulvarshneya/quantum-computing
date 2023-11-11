@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
+from qckt.backend import *
 import numpy as np
 
 def qft_rotations(circuit, n):
@@ -39,7 +38,7 @@ ck.Border()
 ck.draw()
 ck.list()
 
-job = Job(ck)
+job = qckt.Job(ck)
 bk = Qdeb()
 bk.runjob(job)
 svec1 = job.get_svec()
@@ -54,7 +53,7 @@ ck.Border()
 ck.draw()
 ck.list()
 
-job = Job(ck)
+job = qckt.Job(ck)
 bk = Qdeb()
 bk.runjob(job)
 svec2 = job.get_svec()

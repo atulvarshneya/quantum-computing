@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
+from qckt.backend import *
 
 cnotckt = qckt.QCkt(2, 2)
 
@@ -13,7 +12,7 @@ cnotckt.M([0,1],[0,1])
 cnotckt.draw()
 
 noise_profile = {'profile_id':'BitFlip', 'p1':0.05}
-job = Job(cnotckt, noise_profile=noise_profile, shots=1000)
+job = qckt.Job(cnotckt, noise_profile=noise_profile, shots=1000)
 
 print('Backends:',qsimSvc().listInstances())
 bk = qsimSvc().getInstance('nisqsim-eng') # NISQeng()

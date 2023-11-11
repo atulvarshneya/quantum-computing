@@ -1,7 +1,6 @@
-import qckt
 import numpy as np
-from QSystems import *
-from Job import Job
+import qckt
+from qckt.backend import *
 
 ck = qckt.QCkt(4)
 ck.X(0)
@@ -12,7 +11,7 @@ ck.H(1)
 ck.H(2)
 ck.CX(1,2)
 ck.draw()
-job = Job(ck)
+job = qckt.Job(ck)
 Qdeb().runjob(job)
 
 print('Total steps',job.runstats['QSteps'])

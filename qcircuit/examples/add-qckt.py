@@ -23,8 +23,7 @@ Need to copy the final carry-out bit into the highest order result bit, as shown
 
 
 import qckt
-from QSystems import *
-from Job import Job
+from qckt.backend import *
 
 nq = 9
 
@@ -65,7 +64,7 @@ for i in reversed(range(2)):
 
 addckt.draw()
 
-job = Job(addckt,qtrace=True, verbose=False)
+job = qckt.Job(addckt,qtrace=True, verbose=False)
 bk = Qdeb()
 bk.runjob(job)
 print()

@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from qException import QCktException
-import Registers as regs
+from qckt.backend import *
+from qckt import QCktException
 import libgrover as grv
-from Job import *
 
 
-inreg = regs.QRegister(4)
-work = regs.QRegister(4)
-outreg = regs.QRegister(1)
-rclreg = regs.CRegister(4)
-nqbits,ncbits,allqreg,allcreg = regs.placement(outreg,work,inreg,rclreg)
+inreg = qckt.QRegister(4)
+work = qckt.QRegister(4)
+outreg = qckt.QRegister(1)
+rclreg = qckt.CRegister(4)
+nqbits,ncbits,allqreg,allcreg = qckt.placement(outreg,work,inreg,rclreg)
 
 ### Sudoku validation circuit
 sudo = qckt.QCkt(nqbits,name="Sudoku Validator")
@@ -36,7 +34,7 @@ grv_ckt = grv.Grover(sudockt,inreg,outreg,nmarked=2).getckt()
 grv_ckt.M(inreg,rclreg)
 grv_ckt.draw()
 
-job = Job(grv_ckt,shots=40)
+job = qckt.Job(grv_ckt,shots=40)
 q = Qeng()
 q.runjob(job)
 job.plot_counts()

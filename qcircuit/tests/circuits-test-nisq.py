@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import qckt as qk
-from QSystems import *
-from Job import Job
+from qckt.backend import *
 
 ckt1 = qk.QCkt(4,4)
 
@@ -26,7 +25,7 @@ ckt3.M([3,4,5],[3,4,5])
 
 ckt3.draw()
 
-job = Job(ckt3, qtrace=False)
+job = qk.Job(ckt3, qtrace=False)
 bk = NISQdeb()
 bk.runjob(job)
 print("READ OUT STATE VECTOR: ")

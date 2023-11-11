@@ -1,7 +1,6 @@
 import qckt
+from qckt.backend import *
 import numpy as np
-from QSystems import *
-from Job import Job
 
 
 # CX
@@ -12,7 +11,7 @@ ck.X([4,5,6])
 ck.CX(6,5,4,3)
 ck.list()
 ck.draw()
-job = Job(ck, qtrace=True)
+job = qckt.Job(ck, qtrace=True)
 Qdeb().runjob(job)
 
 # CY
@@ -23,7 +22,7 @@ ck.X([4,5,6])
 ck.CY(6,5,4,3)
 ck.list()
 ck.draw()
-job = Job(ck, qtrace=True)
+job = qckt.Job(ck, qtrace=True)
 Qdeb().runjob(job)
 
 # CZ
@@ -34,7 +33,7 @@ ck.X([3,4,5,6])
 ck.CZ(6,5,4,3)
 ck.list()
 ck.draw()
-job = Job(ck, qtrace=True)
+job = qckt.Job(ck, qtrace=True)
 Qdeb().runjob(job)
 
 # CP
@@ -45,7 +44,7 @@ ck.X([4,5,6,3])
 ck.CP(np.pi/4,6,5,4,3)
 ck.list()
 ck.draw()
-job = Job(ck, qtrace=True)
+job = qckt.Job(ck, qtrace=True)
 Qdeb().runjob(job)
 
 
@@ -57,5 +56,5 @@ ck.X([4,5,6,3])
 ck.CROTk(3,6,5,4,3)
 ck.list()
 ck.draw()
-job = Job(ck, qtrace=True)
+job = qckt.Job(ck, qtrace=True)
 Qdeb().runjob(job)

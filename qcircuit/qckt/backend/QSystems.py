@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import numpy as np
-from qException import QCktException
 import qsim
-from BackendAPI import *
+from qckt.backend.BackendAPI import *
+from qckt.qException import QCktException
 
 
 class NISQeng:

@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 
 import qckt
-import svcReg
-from Job import *
+import qckt.backend as bknd
 
 print("Services available")
-svclist = svcReg.Registry.listSvc()
+svclist = bknd.Registry.listSvc()
 for i in svclist: print(i[0],":", i[1])
 print("-------------------------")
 print()
 usesvc = svclist[0][0]
 print("Using service:",usesvc)
-svc = svcReg.Registry.getSvc('QSystems')
+svc = bknd.Registry.getSvc('QSystems')
 # print("Service object:", svc)
 print("-------------------------")
 print()
@@ -35,7 +34,7 @@ ck.Border()
 ck.Probe("point 1")
 ck.draw()
 
-job = Job(ck,qtrace=False,shots=1)
+job = qckt.Job(ck,qtrace=False,shots=1)
 engine.runjob(job)
 print("-------------------------------")
 print("printing results")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import qckt as q
-from qException import QCktException
+from qckt import QCktException
 import numpy as np
 
 ck = q.QCkt(4,4)

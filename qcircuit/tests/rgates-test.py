@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-import qckt
 import numpy as np
-from QSystems import *
-from Job import Job
+import qckt
+from qckt.backend import *
 
 theta = 3*np.pi/2
 
@@ -13,7 +12,7 @@ ck.H(0)
 ck.Probe()
 ck.Rx(theta,0)
 ck.draw()
-job = Job(ck)
+job = qckt.Job(ck)
 Qdeb().runjob(job)
 print("STATE VECTOR READ OUT")
 print(job.get_svec())
@@ -28,7 +27,7 @@ ck.H(0)
 ck.Probe()
 ck.Ry(theta,0)
 ck.draw()
-job = Job(ck)
+job = qckt.Job(ck)
 Qdeb().runjob(job)
 print("STATE VECTOR READ OUT")
 print(job.get_svec())
@@ -43,7 +42,7 @@ ck.H(0)
 ck.Probe()
 ck.Rz(theta,0)
 ck.draw()
-job = Job(ck)
+job = qckt.Job(ck)
 Qdeb().runjob(job)
 print("STATE VECTOR READ OUT")
 print(job.get_svec())

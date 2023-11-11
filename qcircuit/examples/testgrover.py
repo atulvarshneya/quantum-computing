@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 import libgrover as grv
 import random as rnd
 import sys
@@ -16,10 +14,10 @@ ninreg = int(sys.argv[1])
 noutreg = 1
 
 ### place the registers spreadout within the available qubits
-inreg = regs.QRegister(ninreg)
-outreg = regs.QRegister(noutreg)
-rclreg = regs.CRegister(ninreg)
-nqbits,ncbits,qplaced,cplaced = regs.placement(outreg,inreg,rclreg)
+inreg = qckt.QRegister(ninreg)
+outreg = qckt.QRegister(noutreg)
+rclreg = qckt.CRegister(ninreg)
+nqbits,ncbits,qplaced,cplaced = qckt.placement(outreg,inreg,rclreg)
 print("nq,nc,qplaced,cplaced =",nqbits,ncbits,qplaced,cplaced)
 
 ### 'needle' in the haytack = key
@@ -52,7 +50,7 @@ grv_ckt.draw()
 maxattempts = 5
 solved = False
 for m in range(maxattempts):  # Look for best of all attempts
-	job = Job(grv_ckt, qtrace=False)
+	job = qckt.Job(grv_ckt, qtrace=False)
 	bk = Qdeb()
 	bk.runjob(job)
 	res = job.get_creg()[0]
@@ -72,7 +70,7 @@ for m in range(maxattempts):  # Look for best of all attempts
 	# print("### Verification Circuit ################################")
 	# verifyckt.draw()
 
-	job = Job(verifyckt)
+	job = qckt.Job(verifyckt)
 	bk = Qdeb()
 	bk.runjob(job)
 	creg = job.get_creg()[0]

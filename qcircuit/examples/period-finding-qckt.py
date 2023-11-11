@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 
 import qckt
-from QSystems import *
-from Job import Job
-import Registers as regs
+from qckt.backend import *
 import numpy as np
 from math import gcd
 import math
 
 fxinpsz = 6
 fxoutsz = 2
-inpreg = regs.QRegister(fxinpsz)
-outreg = regs.QRegister(fxoutsz)
-clmeas = regs.CRegister(fxinpsz)
-nqbits,ncbits,_,_ = regs.placement(inpreg, outreg, clmeas)
+inpreg = qckt.QRegister(fxinpsz)
+outreg = qckt.QRegister(fxoutsz)
+clmeas = qckt.CRegister(fxinpsz)
+nqbits,ncbits,_,_ = qckt.placement(inpreg, outreg, clmeas)
 
 M = 2**fxinpsz
 
@@ -37,7 +35,7 @@ ckt.M(inpreg,clmeas)
 ckt.draw()
 
 # run the circuit many times
-job = Job(ckt, qtrace=False, shots=100)
+job = qckt.Job(ckt, qtrace=False, shots=100)
 bk = Qeng()
 bk.runjob(job)
 

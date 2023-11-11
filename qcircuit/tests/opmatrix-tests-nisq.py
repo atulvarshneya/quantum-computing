@@ -1,7 +1,6 @@
-import qckt
-from QSystems import *
-from Job import Job
 import numpy as np
+import qckt
+from qckt.backend import *
 
 ck1 = qckt.QCkt(4)
 ck1.X([0,1])
@@ -14,7 +13,7 @@ ck1.Probe("Expanded Circuit")
 ck1.draw()
 op = ck1.to_opMatrix()
 
-job1 = Job(ck1)
+job1 = qckt.Job(ck1)
 bk = NISQdeb()
 bk.runjob(job1)
 svec1 = job1.get_svec()
@@ -26,7 +25,7 @@ ck2.CUSTOM("CKT",op,[3,2,1,0])
 ck2.Probe("Circuit to_opMatrix()")
 ck2.draw()
 
-job2 = Job(ck2)
+job2 = qckt.Job(ck2)
 bk = NISQdeb()
 bk.runjob(job2)
 svec2 = job2.get_svec()

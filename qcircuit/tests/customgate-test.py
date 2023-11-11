@@ -1,8 +1,7 @@
-import qckt
 import numpy as np
-from qException import QCktException
-from QSystems import *
-from Job import Job
+import qckt
+from qckt import QCktException
+from qckt.backend import *
 
 ck = qckt.QCkt(4)
 opmat = np.matrix([
@@ -26,7 +25,7 @@ ckt = ckt.append(ck)
 ckt = ckt.append(ck)
 ckt.CUSTOM("CNOT",opmat,[1,3])
 ckt.draw()
-job = Job(ckt,qtrace=True)
+job = qckt.Job(ckt,qtrace=True)
 Qdeb().runjob(job)
 
 ## by appending circuits, the custom gates definitions are inherited by the new circuit
@@ -43,5 +42,5 @@ try:
 except QCktException as e:
 	print(e)
 ckt.draw()
-job = Job(ckt,qtrace=True)
+job = qckt.Job(ckt,qtrace=True)
 Qdeb().runjob(job)

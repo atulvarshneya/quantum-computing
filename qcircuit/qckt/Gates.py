@@ -2,8 +2,8 @@
 
 import numpy as np
 import random as rnd
-import GatesUtils as gutils
-from qException import QCktException
+import qckt.gatesutils as gutils
+from qckt.qException import QCktException
 
 class QGate:
 	def __init__(self):

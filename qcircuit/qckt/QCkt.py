@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import Canvas as cnv
-import Gates as gts
-import GatesUtils as gutils
+import qckt.Canvas as cnv
+import qckt.Gates as gts
+import qckt.gatesutils as gutils
+from qckt.qException import QCktException
 import qsim
 import numpy as np
-from qException import QCktException
 
 class GateWrapper:
 	def __init__(self, qckt, gateCls):

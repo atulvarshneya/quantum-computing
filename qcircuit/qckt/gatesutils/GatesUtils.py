@@ -2,7 +2,7 @@
 
 import numpy as np
 import copy
-from qException import QCktException
+from qckt.qException import QCktException
 
 ####################################################################################################
 ## Utility functions ###############################################################################

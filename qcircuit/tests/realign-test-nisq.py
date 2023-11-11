@@ -1,6 +1,5 @@
 import qckt
-from QSystems import *
-from Job import Job
+from qckt.backend import *
 
 ck = qckt.QCkt(4)
 ck.X(0)
@@ -12,7 +11,7 @@ ck = ck.realign(6,6,inpqubits)
 print("Realigned with:",inpqubits)
 ck.draw()
 
-job = Job(ck,qtrace=True)
+job = qckt.Job(ck,qtrace=True)
 bk = NISQdeb()
 bk.runjob(job)
 print("STATE VECTOR READ OUT")

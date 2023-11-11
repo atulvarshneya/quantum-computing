@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd qsim
+pushd qsimulator
 pip uninstall -y qsim
 pip install .
 rm -r build
@@ -9,7 +9,7 @@ rm -r __pycache__
 popd
 echo '-----------------------------------------------------'
 
-pushd qckt
+pushd qcircuit
 pip uninstall -y qckt
 pip install .
 rm -r build
