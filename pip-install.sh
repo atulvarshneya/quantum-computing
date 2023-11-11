@@ -1,19 +1,25 @@
 #!/bin/bash
 
-pushd qsimulator
-pip uninstall -y qsim
-pip install .
-rm -r build
-rm -r qsim.egg-info
-rm -r __pycache__
-popd
-echo '-----------------------------------------------------'
+select=${1:-all}
 
-pushd qcircuit
-pip uninstall -y qckt
-pip install .
-rm -r build
-rm -r qckt.egg-info
-rm -r __pycache__
-popd
-echo '-----------------------------------------------------'
+if [ $select == "all" ] || [ $select == "qsim" ]; then
+	pushd qsimulator
+	pip uninstall -y qsim
+	pip install .
+	rm -r build
+	rm -r qsim.egg-info
+	rm -r __pycache__
+	popd
+	echo '-----------------------------------------------------'
+fi
+
+if [ $select == "all" ] || [ $select == "qckt" ]; then
+	pushd qcircuit
+	pip uninstall -y qckt
+	pip install .
+	rm -r build
+	rm -r qckt.egg-info
+	rm -r __pycache__
+	popd
+	echo '-----------------------------------------------------'
+fi
