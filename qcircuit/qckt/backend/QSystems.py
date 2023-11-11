@@ -20,9 +20,9 @@ class NISQeng:
 				if op["op"] == "gate":
 					if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
 						for q in op["qubits"][0]:
-							qc.qgate([op["name"],op["opMatrix"]], [q])
+							qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
 					else:
-						qc.qgate([op["name"],op["opMatrix"]], op["qubits"])
+						qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
 				elif op["op"] == "measure":
 					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
 				elif op["op"] == "probe":
@@ -55,9 +55,9 @@ class NISQdeb:
 			if op["op"] == "gate":
 				if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
 					for q in op["qubits"][0]:
-						qc.qgate([op["name"],op["opMatrix"]], [q])
+						qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
 				else:
-					qc.qgate([op["name"],op["opMatrix"]], op["qubits"])
+					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
 			elif op["op"] == "measure":
 				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
 			elif op["op"] == "probe":
@@ -100,9 +100,9 @@ class Qeng:
 				if op["op"] == "gate":
 					if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
 						for q in op["qubits"][0]:
-							qc.qgate([op["name"],op["opMatrix"]], [q])
+							qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
 					else:
-						qc.qgate([op["name"],op["opMatrix"]], op["qubits"])
+						qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
 				elif op["op"] == "measure":
 					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
 				elif op["op"] == "probe":
@@ -132,9 +132,9 @@ class Qdeb:
 			if op["op"] == "gate":
 				if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
 					for q in op["qubits"][0]:
-						qc.qgate([op["name"],op["opMatrix"]], [q])
+						qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
 				else:
-					qc.qgate([op["name"],op["opMatrix"]], op["qubits"])
+					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
 			elif op["op"] == "measure":
 				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
 			elif op["op"] == "probe":

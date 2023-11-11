@@ -12,6 +12,7 @@ class QGate:
 		self.gateparams = []
 		self.name = None
 		self.opMatrix = None
+		self.cbit_cond = None
 
 	def _reorderlist(self,oseq,nseq):
 		newseq = []
@@ -30,7 +31,7 @@ class QGate:
 		return self
 
 	def assemble(self):
-		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits}
+		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond}
 
 	def to_fullmatrix(self,nqbits):
 		oplist = []
@@ -42,6 +43,9 @@ class QGate:
 		else:
 			opmat = gutils.stretched_opmatrix(nqbits,self.opMatrix,self.qbits)
 		return opmat
+
+	def ifcbit(self,cbit,val):
+		self.cbit_cond = (cbit,val)
 
 	def __str__(self):
 		stringify = self.name

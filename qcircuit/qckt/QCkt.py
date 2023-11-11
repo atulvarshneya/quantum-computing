@@ -17,7 +17,7 @@ class GateWrapper:
 		if gateObj.check_qbit_args(self.qckt.nqubits) == False:
 			errmsg = "Error: qubit arguments incorrect. " + gateObj.name + str(gateObj.qbits)
 			raise QCktException(errmsg)
-		return self.qckt
+		return gateObj
 
 class QCkt:
 
