@@ -1,4 +1,4 @@
-# Reference
+# Core concepts
 
 ## Convention for arguments for quantum gates API
 * All single qubit gates, such as, X, Y, Z, H, P, UROTk, RND, accept a list of qubits as argument, e.g., circuit.H([3,2,1]) applies hadamard gate to each of these qubits individually. As a shortcut a single integer can also be provided as input argument to apply the gate to that sigle qubit.
@@ -53,123 +53,107 @@ the nq and nc should be used while creating the circuit --
 	circuit = qckt.QCkt(nq,nc)
 
 # API Documentation
-## QCkt
-	QCkt(nqubits, nclbits=None, name="QCkt")
+
+## Package qckt
+
+	class QCkt(nqubits, nclbits=None, name="QCkt")
 		Returns an empty quantum circuit
-	CX(control, target)
-		Appends a CNOT gate to the quantum circuit
-		Returns the updted quantum circuit
-	H(qubit)
-		Appends a HADAMARD gate to the quantum circuit
-		Returns the updted quantum circuit
-	X(qubit)
-		Appends a NOT gate to the quantum circuit
-		Returns the updted quantum circuit
-	Y(qubit)
-		Appends a PAULI-Y gate to the quantum circuit
-		Returns the updted quantum circuit
-	Z(qubit)
-		Appends a PAULI-Z gate to the quantum circuit
-		Returns the updted quantum circuit
-	T(control1, control2, target)
-		Appends a TOFFOLI gate to the quantum circuit
-		Returns the updted quantum circuit
-	M(qubitslist, clbitslist=None)
-		Appends MEASUREMENT gates for measuring given qubits list into classical bits list
-		Returns the updted quantum circuit
-	QFT(qubitslist)
-		Appends a QFT gate across the given qubits list
-		The drawn circuit depicts multiple QFT gates, but it is 1 QFT gate acting on those qubits
-		Returns the updted quantum circuit
-	Border()
-		Places a border in the quantum circuit. Has effect only in the drawing of the circuit
-	Probe(header,probestates)
-		This is a debuggig aid. Its execution gets skipped on backends which are actual quantum compuetrs.
-		header is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout.
-		probestates is either None or a list of states, and probe prints only the amplitude of only those states.
-	custom_gate(gatename, op_matrix)
-		To add user defined custom gates
-		gatename should be per the syntax of a Python variable; op_matrix is the operator matrix in form of numpy.matrix([...],dtype=complex)
-	get_size()
-		Returns the size of quantum and classical registers as a a tuple (nqubits, nclbits)
-	realign(newnq,newnc,inpqubits)
-		Creates a potentially larger new circuit from the current circuit with a changed order of the qubits. The original circuitis left intact.
-		All the custom gate definitions from the circuit are copied over to the new circuit.
-		Returns the new circuit
-		Parameters newnq and newnc are the sizesof the new (larger or equal sized) circuit
-		inpqubits is a vector that specifies how the old circuit's qubits be replaced in the new circuit
-		As an example see the circuits below --
-		say,                    current circuit                   new circuit
-		               q000 ----[H]-[.]----------     q000 --------------------------
-		                             |                                               
-		               q001 --------[X]----------     q001 -----------[H]------------
-		                                                                             
-		               q002 ------------[H]------     q002 --------[X]---------------
-		                                                            |                
-		                                              q003 ----[H]-[.]---------------
-		For this realignment, this vector basically answers the questions [q002 -> q?, q001 -> q?, q000 -> q?]
-		so, the vector should be [1,2,3], and the realign call should be realign(4,4,[1,2,3])
 
-		In much simpler terms, consider the current circuit as a large gate, and inpqubits vector basically is 
-		the way you would use that gate. E.g., CX is defined as MSB = control, LSB as target, but if you 
-		want qubit 2 be control and qubit 4 be target, you would say CX(2,4), i.e., inpqubits = [2,4]
+		Methods - Gates:
 
-	append(othercircuit)
-		Creates a new circuit by appending othercircuit to the current circuit. Both the original circuits are left intact.
-		Returned circuit qubits match the larger one.  Returned circuit clbits match the larger one.
-		All the custom gate definitions from both the circuits are copied over to the new circuit.
-		Returns the updated new circuit
-	draw()
-		Draws a text drawing of the circuit
+			CX(control, target)
+				Appends a CNOT gate to the quantum circuit
+				Returns the updted quantum circuit
+			H(qubit)
+				Appends a HADAMARD gate to the quantum circuit
+				Returns the updted quantum circuit
+			X(qubit)
+				Appends a NOT gate to the quantum circuit
+				Returns the updted quantum circuit
+			Y(qubit)
+				Appends a PAULI-Y gate to the quantum circuit
+				Returns the updted quantum circuit
+			Z(qubit)
+				Appends a PAULI-Z gate to the quantum circuit
+				Returns the updted quantum circuit
+			T(control1, control2, target)
+				Appends a TOFFOLI gate to the quantum circuit
+				Returns the updted quantum circuit
+			M(qubitslist, clbitslist=None)
+				Appends MEASUREMENT gates for measuring given qubits list into classical bits list
+				Returns the updted quantum circuit
+			QFT(qubitslist)
+				Appends a QFT gate across the given qubits list
+				The drawn circuit depicts multiple QFT gates, but it is 1 QFT gate acting on those qubits
+				Returns the updted quantum circuit
+			Border()
+				Places a border in the quantum circuit. Has effect only in the drawing of the circuit
+			Probe(header,probestates)
+				This is a debuggig aid. Its execution gets skipped on backends which are actual quantum compuetrs.
+				header is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout.
+				probestates is either None or a list of states, and probe prints only the amplitude of only those states.
+			custom_gate(gatename, op_matrix)
+				To add user defined custom gates
+				gatename should be per the syntax of a Python variable; op_matrix is the operator matrix in form of numpy.matrix([...],dtype=complex)
+			ifcbit(cbit, value)
+				Configures the gate object for the operator to be applied only if the mentioned cbit has the mentioned value (0 or 1). ifcbit is not supported by M, Border, and Probe.
 
-# Backend framework
+				Exampe usage: apply X on qubit 4 only if cbit 2 has value 0.
+					import qckt
+					ckt = qckt.QCkt(,4)
+					ckt.X(4).ifcbit(2,0)
 
-	Backend Services Registry
-		This is an API for accessing the registry of Quantum Computing Services registered at your installation's configuration.
-		The examples of services that could be registered are IBM quantum computing, Ionq quantum computing, local qsim simulator
-		listSvc() returns a list of tuples (name, description) of all services available (i.e. registered in the installation's configuration)
-		getSvc(svcName) returns handle to the named backend service
-		Example usage:
-			import qckt.backend as bknd
-			reg = bknd.Registry()
-			svcTuples = reg.listSvc()
-			svc = reg.getSvc("QSystems")
+					OR
 
-	Backend Service
-		Backend service implments the methods to connect with the quantum computing service, using the required authentication/authorization.
-		The service provides methods to discover backend engines under that service, and get the handles to them to run the quantum computing circuits/programs.
-		listInstances() returns a list of tuples (name, description) of all instances (quamtum computer) available at this service
-		getInstance(name) returns an object representation of the named instance (quantum computer)
-		Example usage: Going through the Registry
-			import qckt.backend as bknd
-			reg = bknd.Registry()
-			svcTuples = reg.listSvc()
-			svc = reg.getSvc("QSystems")
-			engine_list = svc.listInstances()
-			bk_engine = svc.getInstance("local")
-		Example usage: Directly accessing the QSystems engines
-			import qckt.backend as bknd
-			bk_debugging_engine = bknd.Qdeb() # same as svc.getInstance("local")
-			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
+					import qckt
+					ckt = qckt.QCkt(,4)
+					xgate = ckt.X(4)
+					xgate.ifcbit(2,0)
 
-	Backend engines
-		The adaptor for the backend needs to interpret the operations sequence in the qckt representation.
-		At the end of the job execution (all the shots), the backend adaptor populates the results in the job object, as mentioned above.
-		runjob(job) this is the only function impleented by the backend adaptor. It runs the given job on the backend execution engine. Returns the backend adaptor object itself.
-		Example usage: Directly accessing the QSystems engines
-			import qckt
-			import qckt.backend as bknd
-			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
-			job = qckt.Job(somecircuit, initstate=somestate, shots=100)
-			bk_engine.runjob(job)
+		Methods - circuit perations:
 
-	Job class
+			get_size()
+				Returns as a tuple (nqubits, nclbits), the size of quantum and classical registers in the circuit.
+
+			realign(newnq,newnc,inpqubits)
+				Creates a potentially larger new circuit from the current circuit with a changed order of the qubits. The original circuitis left intact.
+				All the custom gate definitions from the circuit are copied over to the new circuit.
+				Returns the new circuit
+				Parameters newnq and newnc are the sizesof the new (larger or equal sized) circuit
+				inpqubits is a vector that specifies how the old circuit's qubits be replaced in the new circuit
+				As an example see the circuits below --
+				say,                    current circuit                   new circuit
+							   q000 ----[H]-[.]----------     q000 --------------------------
+											 |                                               
+							   q001 --------[X]----------     q001 -----------[H]------------
+																							 
+							   q002 ------------[H]------     q002 --------[X]---------------
+																			|                
+															  q003 ----[H]-[.]---------------
+				For this realignment, this vector basically answers the questions [q002 -> q?, q001 -> q?, q000 -> q?]
+				so, the vector should be [1,2,3], and the realign call should be realign(4,4,[1,2,3])
+
+				In much simpler terms, consider the current circuit as a large gate, and inpqubits vector basically is 
+				the way you would use that gate. E.g., CX is defined as MSB = control, LSB as target, but if you 
+				want qubit 2 be control and qubit 4 be target, you would say CX(2,4), i.e., inpqubits = [2,4]
+
+			append(othercircuit)
+				Creates a new circuit by appending othercircuit to the current circuit. Both the original circuits are left intact.
+				Returned circuit qubits match the larger one.  Returned circuit clbits match the larger one.
+				All the custom gate definitions from both the circuits are copied over to the new circuit.
+				Returns the updated new circuit
+
+			draw()
+				Draws a text drawing of the circuit
+
+	class Job 
 		Packages the job to be executed on a backend engine.
 		Job object converts the circuit to an array of implementation neutral, fully-specified operations (gates, measurement, and probes (for simulator backends))
 		Once executed, the backend engine populates the results in the job object.
-		Job.get_creg() returns an array of Cregister objects from all runs/shots.
-		Job.get_counts() returns the frequencies of different Cregister values in the results.
-		Job.get_svec(), only useful for simulator backends, this returns the state-vector at the end of the execution. For simulator backends, shots must be only 1.
+		job.get_creg() returns an array of Cregister objects from all runs/shots.
+		job.get_counts() returns the frequencies of different Cregister values in the results.
+		job.get_svec(), only useful for simulator backends, this returns the state-vector at the end of the execution. For simulator backends, shots must be only 1.
+
 		Example Usage:
 			import qckt
 			import qckt.backend as bknd
@@ -182,13 +166,80 @@ the nq and nc should be used while creating the circuit --
 				if c > 0: # lets print only the important ones
 					print("{0:04b} ({0:2d})    {1:d}".format(i,c))
 
-	Cregister class
+
+# Package qckt.gatesutils
+
+	stretched_opmatrix(nqbits,oper,qbit_list)
+		Converts the quantum gate's operator matrix into a matrix for a system with larger number of qubits. The qubits on which the gate operates are kept as the 
+		highest order qubits, the additional qubits are left unchanged by the 'stretched' operator.
+		
+	combine_par(op_list)
+		Combines two or more operator matrices into one when they act on separate set of qubits simultaneously.
+
+	combine_seq(op_list)
+		Combines two or more operator matrices into one when tey act on the same qubits sequentially.
+
+	isunitary(mat)
+		Cheks of the given operator matrix is unitary or not, returns a boolean (True/False).
+
+	opmat_dagger(opMat)
+		returns the transpose conjugate (dagger) of a given operator matrix.
+
+	CTL(opMatrix)
+		Utility function to add control bit
+
+# Package qckt.backend (Backend framework)
+
+	Backend Services Registry
+		This is an API for accessing the registry of Quantum Computing Services registered at your installation's configuration.
+		The examples of services that could be registered are IBM quantum computing, Ionq quantum computing, local qsim simulator
+		listSvc() returns a list of tuples (name, description) of all services available (i.e. registered in the installation's configuration)
+		getSvc(svcName) returns handle to the named backend service
+
+		Example usage:
+			import qckt.backend as bknd
+			reg = bknd.Registry()
+			svcTuples = reg.listSvc()
+			svc = reg.getSvc("QSystems")
+
+	Backend Service
+		Backend service implments the methods to connect with the quantum computing service, using the required authentication/authorization.
+		The service provides methods to discover backend engines under that service, and get the handles to them to run the quantum computing circuits/programs.
+		listInstances() returns a list of tuples (name, description) of all instances (quamtum computer) available at this service
+		getInstance(name) returns an object representation of the named instance (quantum computer)
+
+		Example usage: Going through the Registry
+			import qckt.backend as bknd
+			reg = bknd.Registry()
+			svcTuples = reg.listSvc()
+			svc = reg.getSvc("QSystems")
+			engine_list = svc.listInstances()
+			bk_engine = svc.getInstance("local")
+
+		Example usage: Directly accessing the QSystems engines
+			import qckt.backend as bknd
+			bk_debugging_engine = bknd.Qdeb() # same as svc.getInstance("local")
+			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
+
+	Backend engines
+		The adaptor for the backend needs to interpret the operations sequence in the qckt representation.
+		At the end of the job execution (all the shots), the backend adaptor populates the results in the job object, as mentioned above.
+		runjob(job) this is the only function impleented by the backend adaptor. It runs the given job on the backend execution engine. Returns the backend adaptor object itself.
+
+		Example usage: Directly accessing the QSystems engines
+			import qckt
+			import qckt.backend as bknd
+			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
+			job = qckt.Job(somecircuit, initstate=somestate, shots=100)
+			bk_engine.runjob(job)
+
+	class Cregister 
 		An object of this class is returned by job.get_creg(), and holds the classical register value got from the measurement operation.
 		It provides method to convert that to pretty printable string, e.g., str(cregister), print(cregister).
 		The classical bits array can be accessed through the .value field and its integer value through .intvalue field of the returned object
 		This class is defined in BackendAPI.py
 
-	StateVector class
+	class StateVector 
 		An object of this class is returned by job.get_svec(), and holds the statevector value from the simulator backend engine.
 		Note that state is available only when you run on a simulator, not on an actual QC hardware.
 		In case of NISQ simulator, the diagonal of the density operator is returned.
