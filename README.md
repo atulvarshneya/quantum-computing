@@ -31,7 +31,7 @@ Can implement any quantum computing algorithms. Several algorithm implementation
 An interactive commandline interface (qcli.py) to quickly check out operations and sequences.
 
 
-GATES
+GATES AND UTILITIES
 -------------------
 All commonly used gates included.
 
@@ -39,11 +39,13 @@ Can create CONTROLLED GATE for any given gate; add any number of control qubits.
 
 Allows easy addition of user-defined gates.
 
-
-UTILITIES
--------------------
 A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates into a single gate, check for unitarity, inverse.
 
-Easy to follow documentation with tutorial introduction - see qsim/README.md and qckt/README.md.
+QUANTUM CIRCUITS AND BACKEND COMOUTE ENGINES
+-------------------
+
+Quantum comouting circuits framework with backend compute engine (quantum computer simulator).
+
+Easy to follow documentation with tutorial introduction - see qsimumator/README.md and qcircuit/README.md. A bunch of examples under qsimulator/examples and qcircuit/examples.
 
 Code for [automated] regression tests also serves as examples to quickly learn qsim and qckt.
