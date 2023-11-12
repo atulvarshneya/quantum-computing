@@ -1,8 +1,8 @@
 # quantum-computing
 
-A functionally complete simulator for Universal Quantum Computer in Python. Have tried upto 11 qubits on an old laptop (1 core, 1GB RAM).
+A functionally complete Universal Quantum Computer in Python.
 
-Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement quantum computing programs using Quantum Circuits with qsim as a backed to execute the quantum circuits
+Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement quantum computing programs using Quantum Circuits with qsim as a backed engine to execute the quantum circuits
 
 INSTALLING
 -------------------
@@ -15,9 +15,9 @@ cd quantum-computing
 
 FEATURES
 -------------------
-All expected features and more, simple to use, extensible and flexible to allow all aspects of quantum computing. Flexible, because you write the algorithms in a regular programming language, Python, so no limitations on the program logic, the simulator API abstracts a Universal Quantum Computer as a backend resource.
+All expected features, simple to use, extensible and flexible to allow all aspects of quantum computing.
 
-Can implement any quantum computing algorithms. Several algorithm implementations included as examples:
+Implement any quantum computing algorithms. Several algorithm implementations included as examples:
 * Teleportation
 * Simple Search
 * Deutsch-Jozsa
@@ -33,19 +33,15 @@ An interactive commandline interface (qcli.py) to quickly check out operations a
 
 GATES AND UTILITIES
 -------------------
-All commonly used gates included.
+All standard gates included. Can create CONTROLLED GATE for any gates.  Allows addition of CUSTOM user-defined gates.
 
-Can create CONTROLLED GATE for any given gate; add any number of control qubits.
+A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates, check for unitarity, inverse.
 
-Allows easy addition of user-defined gates.
-
-A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates into a single gate, check for unitarity, inverse.
-
-QUANTUM CIRCUITS AND BACKEND COMOUTE ENGINES
+QUANTUM CIRCUITS AND BACKEND COMPUTE ENGINES
 -------------------
 
-Quantum comouting circuits framework with backend compute engine (quantum computer simulator).
+Quantum computing circuits framework with a backend compute simulator engine.
 
 Easy to follow documentation with tutorial introduction - see qsimumator/README.md and qcircuit/README.md. A bunch of examples under qsimulator/examples and qcircuit/examples.
 
-Code for [automated] regression tests also serves as examples to quickly learn qsim and qckt.
+Code for regression tests also serves as examples to quickly learn qsim and qckt.
