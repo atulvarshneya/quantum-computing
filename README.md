@@ -6,11 +6,12 @@ Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement qua
 
 INSTALLING
 -------------------
-mkdir yourdir
-cd yourdir
-git clone https://github.com/atulvarshneya/quantum-computing.git
-cd quantum-computing
-./pip-install.sh
+
+    mkdir yourdir
+    cd yourdir
+    git clone https://github.com/atulvarshneya/quantum-computing.git
+    cd quantum-computing
+    ./pip-install.sh
 
 
 FEATURES
