@@ -21,21 +21,21 @@ Entangled state
 Mixed State Purity: 1.0000
 CREGISTER: 000
 
-MEASURED Qubit[2, 1] = [1, 1] with probability = 0.5
-000    ... | 0.0000+0.0000j
+MEASURED Qubit[2, 1] = [0, 0] with probability = 0.5
+000    ... | 1.0000+0.0000j
 001    ... | 0.0000+0.0000j
 010    ... | 0.0000+0.0000j
 011    ... | 0.0000+0.0000j
 100    ... | 0.0000+0.0000j
 101    ... | 0.0000+0.0000j
-110    ... | 1.0000+0.0000j
+110    ... | 0.0000+0.0000j
 111    ... | 0.0000+0.0000j
 Mixed State Purity: 1.0000
-CREGISTER: 110
+CREGISTER: 000
 
 Final state - Probestates: [0, 7]
-000    ... | 0.0000+0.0000j
+000    ... | 1.0000+0.0000j
 111    ... | 0.0000+0.0000j
 Mixed State Purity: 1.0000
-CREGISTER: 110
+CREGISTER: 000
 

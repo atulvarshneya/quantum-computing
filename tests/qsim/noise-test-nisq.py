@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import NISQsim
-import qgates as qgt
+import qsim
 import numpy as np
 
 noise_profiles_list = [
@@ -15,7 +14,7 @@ noise_profiles_list = [
 	]
 
 # print the list of canned kraus channels
-q = NISQsim.NISQSimulator(1,qtrace=False, verbose=False)
+q = qsim.NISQSimulator(1,qtrace=False, verbose=False)
 kraus_spec = list(q.qsim_noise_profile('LIST'))
 kraus_spec.sort()
 print(kraus_spec)
@@ -26,30 +25,30 @@ for prname in noise_profiles_list:
 	print('Kraus Channel: ',prname)
 	print('--------------------------------------------------------------------------')
 
-	q = NISQsim.NISQSimulator(3,qtrace=True, verbose=True)
+	q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
 
 	kraus_spec = q.qsim_noise_profile(prname, p1=0.05, p2=0.05, p3=0.05)
 	q.qsim_noise_spec(kraus_spec)
 
-	q.qgate(qgt.X(),[0])
+	q.qgate(qsim.X(),[0])
 	_,state,_ = q.qsnapshot()
 	print(state)
 	print(f'State trace {np.trace(state):.4f}')
 	print()
 
-	q.qgate(qgt.H(),[0])
+	q.qgate(qsim.H(),[0])
 	_,state,_ = q.qsnapshot()
 	print(state)
 	print(f'State trace {np.trace(state):.4f}')
 	print()
 
-	q.qgate(qgt.X(),[1])
+	q.qgate(qsim.X(),[1])
 	_,state,_ = q.qsnapshot()
 	print(state)
 	print(f'State trace {np.trace(state):.4f}')
 	print()
 
-	q.qgate(qgt.H(),[1])
+	q.qgate(qsim.H(),[1])
 	_,state,_ = q.qsnapshot()
 	print(state)
 	print(f'State trace {np.trace(state):.4f}')

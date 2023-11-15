@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import qsim
+
+print()
+print("Parallel HX--------------------------------------------")
+qc = qsim.NISQSimulator(8)
+hx = qsim.qcombine_par('HX',[qsim.H(),qsim.X()])
+qc.qgate(hx,[7,6], qtrace=True)
+
+print()
+print("Parallel HHHH and CCCC---------------------------------")
+qc = qsim.NISQSimulator(8)
+H4 = qsim.qcombine_par("H4",[qsim.H(),qsim.H(),qsim.H(),qsim.H()])
+C4 = qsim.qcombine_par("C4",[qsim.C(),qsim.C(),qsim.C(),qsim.C()])
+qc.qgate(H4,[7,5,3,1], qtrace=True)
+qc.qgate(C4,[7,6,5,4,3,2,1,0], qtrace=True)
+qc.qgate(qsim.C(),[7,6])
+qc.qgate(qsim.C(),[5,4])
+qc.qgate(qsim.C(),[3,2])
+qc.qgate(qsim.C(),[1,0])
+qc.qreport(header="AFTER 4 individual C's")
+qc.qgate(qsim.H(),[7])
+qc.qgate(qsim.H(),[5])
+qc.qgate(qsim.H(),[3])
+qc.qgate(qsim.H(),[1])
+qc.qreport(header="AFTER 4 individual H's")
+
+print()
+print("Sequence HXYZ------------------------------------------")
+qc = qsim.NISQSimulator(8,qtrace=True)
+HXYZ = qsim.qcombine_seq("HXYZ",[qsim.H(),qsim.X(),qsim.Y(),qsim.Z()])
+ZYXH = qsim.qcombine_seq("ZYXH",[qsim.Z(),qsim.Y(),qsim.X(),qsim.H()])
+qc.qgate(HXYZ,[0],qtrace=True)
+qc.qgate(qsim.Z(),[0],qtrace=True)
+qc.qgate(qsim.Y(),[0],qtrace=True)
+qc.qgate(qsim.X(),[0],qtrace=True)
+qc.qgate(qsim.H(),[0],qtrace=True)

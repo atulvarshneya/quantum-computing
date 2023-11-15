@@ -7,9 +7,7 @@ Problem Statement:
 -------------------------------------------------------------------------------------------------------
 """)
 
-import NISQsim
-import qgates
-from qSimException import *
+import qsim
 import numpy as np
 
 nqbits = 8
@@ -28,11 +26,11 @@ try:
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 
 	# Start the Quantum Computer Simulator
-	q = NISQsim.NISQSimulator(nqbits,initstate=initstate, qtrace=True)
+	q = qsim.NISQSimulator(nqbits,initstate=initstate, qtrace=True)
 
 	# Perform QFT
-	qftgate = qgates.QFT(nqbits)
+	qftgate = qsim.QFT(nqbits)
 	q.qgate(qftgate, list(reversed(range(nqbits))))
 
-except NISQsim.QSimError as ex:
+except qsim.QSimError as ex:
 	print(ex.args)

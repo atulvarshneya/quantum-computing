@@ -1,6 +1,4 @@
 import qsim
-import qgates
-from qSimException import *
 import numpy as np
 
 try:
@@ -8,13 +6,13 @@ try:
 
 	# initialise with the default state of all qbits = |0>
 	q = qsim.QSimulator(nqbits,qtrace=True)
-	q.qgate(qgates.H(),[1])
-	q.qgate(qgates.C(),[1,0])
+	q.qgate(qsim.H(),[1])
+	q.qgate(qsim.C(),[1,0])
 
 	# initialise with initial states of qbits
 	q = qsim.QSimulator(nqbits,prepqubits=[[1,0],[1,0],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
-	q.qgate(qgates.H(),[1])
-	q.qgate(qgates.C(),[1,0])
+	q.qgate(qsim.H(),[1])
+	q.qgate(qsim.C(),[1,0])
 
 	# or build the full state yourself (good if you need a very custom state, e.g., for testing QFT)
 	initstate = [None]*(2**nqbits)
@@ -27,8 +25,8 @@ try:
 		p += np.absolute(initstate[i])**2
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
 	q = qsim.QSimulator(nqbits,initstate=initstate, qtrace=True)
-	q.qgate(qgates.H(),[1])
-	q.qgate(qgates.C(),[1,0])
+	q.qgate(qsim.H(),[1])
+	q.qgate(qsim.C(),[1,0])
 
-except QSimError as ex:
+except qsim.QSimError as ex:
 	print(ex.args)
