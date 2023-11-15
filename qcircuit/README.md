@@ -5,12 +5,12 @@
 * parameterized quantum gates such as phase-rotation gate P, takes the frst argument the phase value, and the second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., circuit.P(numpy.pi/4,[3,2,1,0]), circuit.P(numpy.pi,3), circuit.UROTk(4,[7,6,5,4])
 * Gates that inherently take variable number of qubits as arguments, such as QFT, inputs to those are provided as multiple input arguments, e.g., circuit.QFT(7,6,5,4,3,2,1,0). QFT also accepts a list of qubits as the one argument, e.g., circuit.QFT([i for i in range(8)])
 * All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the last one is the target qubit and all other preceding ones are control qubits. E.g., circuit.CX(ctrl1, ctrl2, ctrl3, target), circuit.CP(numpy.pi/8,control, target).
-* Please note the following about control gates. GateUtils allow addition of a control qubit (MSB) to a gate. Note the original gate can be a multi-qubit gate. So it is more accurate to say that all control gates use as many MSBs as control qubits as is per their operation.
+* Please note the following about control gates. Package qckt.gatesutils allow addition of a control qubit (MSB) to a gate. Note the original gate can be a multi-qubit gate. So it is more accurate to say that all control gates use as many MSBs as control qubits as is per their operation.
 
 ## A note about MSB - LSB ordering
 qckt as well as qsim follow the convention that when providing arguments to any of the functions the list argument representing qubits or clbits is ordered as [MSB, ...., LSB]. Yes, :-), the [0] element is MSB!
 
-Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target), or does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT it very much *does* matter.
+Note that in many gates the order is either explicit, e.g., in CX the arguments are explicitly (control, and target), and in many others it does not matter, e.g., in M the qubits will be measured irrespective of the order. But in some gates, such as QFT it very much *does* matter.
 
 ## Using Registers
 The use of registers simplifies, and can help in generalizing the quantum circuit.
@@ -65,39 +65,41 @@ the nq and nc should be used while creating the circuit --
 			CX(control, target)
 				Appends a CNOT gate to the quantum circuit
 				Returns the updted quantum circuit
+
 			H(qubit)
 				Appends a HADAMARD gate to the quantum circuit
 				Returns the updted quantum circuit
+
 			X(qubit)
 				Appends a NOT gate to the quantum circuit
 				Returns the updted quantum circuit
+
 			Y(qubit)
 				Appends a PAULI-Y gate to the quantum circuit
 				Returns the updted quantum circuit
+
 			Z(qubit)
 				Appends a PAULI-Z gate to the quantum circuit
 				Returns the updted quantum circuit
+
 			T(control1, control2, target)
 				Appends a TOFFOLI gate to the quantum circuit
 				Returns the updted quantum circuit
+
 			M(qubitslist, clbitslist=None)
 				Appends MEASUREMENT gates for measuring given qubits list into classical bits list
 				Returns the updted quantum circuit
+
 			QFT(qubitslist)
 				Appends a QFT gate across the given qubits list
 				The drawn circuit depicts multiple QFT gates, but it is 1 QFT gate acting on those qubits
 				Returns the updted quantum circuit
-			Border()
-				Places a border in the quantum circuit. Has effect only in the drawing of the circuit
-			Probe(header,probestates)
-				This is a debuggig aid. Its execution gets skipped on backends which are actual quantum computers.
-				header is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's
-				printout. probestates is either None or a list of states, and probe prints only the amplitude of 
-				only those states.
+
 			custom_gate(gatename, op_matrix)
 				To add user defined custom gates
 				gatename should be per the syntax of a Python variable; op_matrix is the operator matrix in form 
 				of numpy.matrix([...],dtype=complex)
+
 			ifcbit(cbit, value)
 				Configures the gate object for the operator to be applied only if the mentioned cbit has the 
 				mentioned value (0 or 1). ifcbit is not supported by M, Border, and Probe.
@@ -114,7 +116,16 @@ the nq and nc should be used while creating the circuit --
 					xgate = ckt.X(4)
 					xgate.ifcbit(2,0)
 
-		Methods - circuit perations:
+			Border()
+				Places a border in the quantum circuit. Has effect only in the drawing of the circuit
+
+			Probe(header,probestates)
+				This is a debuggig aid. Its execution gets skipped on backends which are actual quantum computers.
+				header is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's
+				printout. probestates is either None or a list of states, if None, probe prints amplitude of all 
+				the states, else prints the amplitude of only the specified states.
+
+		Methods - circuit operations:
 
 			get_size()
 				Returns as a tuple (nqubits, nclbits), the size of quantum and classical registers in the circuit.
@@ -124,7 +135,7 @@ the nq and nc should be used while creating the circuit --
 				qubits. The original circuitis left intact.
 				All the custom gate definitions from the circuit are copied over to the new circuit.
 				Returns the new circuit
-				Parameters newnq and newnc are the sizesof the new (larger or equal sized) circuit
+				Parameters newnq and newnc are the sizes of the new (larger or equal sized) circuit
 				inpqubits is a vector that specifies how the old circuit's qubits be replaced in the new circuit
 				As an example see the circuits below --
 				say,                    current circuit                   new circuit
@@ -153,6 +164,9 @@ the nq and nc should be used while creating the circuit --
 			draw()
 				Draws a text drawing of the circuit
 
+			list()
+				prints out the sequence of gates in the circuit
+
 	class Job 
 		Packages the job to be executed on a backend engine.
 		Job object converts the circuit to an array of implementation neutral, fully-specified operations (gates, 
@@ -167,7 +181,7 @@ the nq and nc should be used while creating the circuit --
 			import qckt
 			import qckt.backend as bknd
 			job = qckt.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=100)
-			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim") where svc = reg.getSvc("QSystems")
+			bk_engine = bknd.Qeng() # same as svc.getInstance("qsim") where svc = bknd.Registry().getSvc("QSystems")
 			bk_engine.runjob(job)
 			print(job.get_creg()[0]) # print the cregister value from the first execution of the circuit
 			counts = job.get_counts()
@@ -186,16 +200,16 @@ the nq and nc should be used while creating the circuit --
 		Combines two or more operator matrices into one when they act on separate set of qubits simultaneously.
 
 	combine_seq(op_list)
-		Combines two or more operator matrices into one when tey act on the same qubits sequentially.
+		Combines two or more operator matrices into one when they act on the same qubits sequentially.
 
 	isunitary(mat)
-		Cheks of the given operator matrix is unitary or not, returns a boolean (True/False).
+		Checks if the given operator matrix is unitary or not, returns a boolean (True/False).
 
 	opmat_dagger(opMat)
 		returns the transpose conjugate (dagger) of a given operator matrix.
 
 	CTL(opMatrix)
-		Utility function to add control bit
+		Utility function to add control bit.
 
 # Package qckt.backend (Backend framework)
 
