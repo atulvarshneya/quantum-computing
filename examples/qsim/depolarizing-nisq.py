@@ -1,19 +1,20 @@
-import NISQsim
-import qgates as qgt
+#!/usr/bin/env python
+
+import qsim
 import numpy as np
 
 prname = 'Depolarizing'
 
-q = NISQsim.NISQSimulator(2,qtrace=True, verbose=False)
+q = qsim.NISQSimulator(2,qtrace=True, verbose=False)
 
-q.qgate(qgt.H(),[0])
+q.qgate(qsim.H(),[0])
 _,state,_ = q.qsnapshot()
 print('Full state dump:')
 print(state)
 print(f'State trace {np.trace(state):.4f}')
 print()
 
-q.qgate(qgt.C(),[0,1])
+q.qgate(qsim.C(),[0,1])
 _,state,_ = q.qsnapshot()
 print('Full state dump:')
 print(state)
