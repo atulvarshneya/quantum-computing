@@ -178,18 +178,18 @@ qstretch takes a gate and an ordered list of qubits on which it would operate an
 
 For instance, lets assume we created a 4 qubit system (qsim.QSimulator(4)), and in that we use C gate on qubits 3 and 0 (qgate(C(),[3,0])). Shown on the left side of the figure below. qstretch takes the same arguments and creates a gate that operates on 4 qubits, but still affects only qubits 3 and 0, passing the others through.
 
-	                         +---+
-	3 ---.-----          3 --| . |--
+                                 +---+
+        3 ---.-----          3 --| . |--
              |                   | | |
-	2 ---|-----          2 --| | |--
+        2 ---|-----          2 --| | |--
              |                   | | |
-	1 ---|-----          1 --| | |--
+        1 ---|-----          1 --| | |--
              |                   | | |
-	0 ---O-----          0 --| O |--
-	                         +---+
+        0 ---O-----          0 --| O |--
+                                 +---+
 
     qc.qgate(C(),[3,0])   ng = qc.qstretch(C(),[3,0])
-	                     qc.qgate(ng,[3,2,1,0])
+                         qc.qgate(ng,[3,2,1,0])
 
 qstretch() is useful in cases where you want to make a 'blackbox' function which does an equivalent of a series of operations in one go (see the accompanying bern_vazy.py). To do that you would typically use qcombine_seq()'s and qcombine_par()'s in conjunction with qstretch()'s.
 
