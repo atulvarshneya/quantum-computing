@@ -17,8 +17,8 @@ CNOT Qubit[0, 3]
 Mixed State Purity: 1.0000
 CREGISTER: 00000000
 
-MEASURED Qubit[0] = [0] with probability = 0.5
-00000000    ... | 1.0000+0.0000j
+MEASURED Qubit[0] = [1] with probability = 0.5
+00001001    ... | 1.0000+0.0000j
 Mixed State Purity: 1.0000
-CREGISTER: 00000000
+CREGISTER: 00000001
 
