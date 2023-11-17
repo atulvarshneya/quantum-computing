@@ -6,13 +6,10 @@ Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement qua
 
 INSTALLING
 -------------------
+The pqusimulator and qucircuit are on PyPi now. So, you can simply install using pip. Since qucircuit has qusimulator as a dependency, so installing qucircuit will also install qusimulator.
 
-    mkdir yourdir
-    cd yourdir
-    git clone https://github.com/atulvarshneya/quantum-computing.git
-    cd quantum-computing
-    ./pip-install.sh
-
+    pip install qusimulator
+    pip install qucircuit
 
 FEATURES
 -------------------
