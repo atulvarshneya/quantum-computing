@@ -1,4 +1,7 @@
 # 1. QUICK START
+Install using pip command -
+
+$ pip install qusimulator
 
 1.2	TUTORIAL INTRODUCTION
 --------
@@ -90,6 +93,8 @@ and, here is its output --
 qsim assumes a programming model as shown below.
 
 Users write the algorithms on a front-end classical computer using standard programming language (Python), and qsim provides an API to access and perform operations on a Quantum Computer as a back-end resource.
+
+While executing one quantum operation at a time is not how realistic quantum computers operate, the idea is to provide a quantum programming environment to easily develop and debug quantum algorithms. The companion project, qucircuit (pip install qucircuit), provides a paradigm applicable to real quantum computers.
 
 	                     +--------------------+          +----------------+
 	                     |                +---|          |                |

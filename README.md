@@ -2,11 +2,11 @@
 
 A functionally complete Universal Quantum Computer in Python.
 
-Comprises of two parts - qsim the Quantum Simulator, and qckt - to implement quantum computing programs using Quantum Circuits with qsim as a backed engine to execute the quantum circuits
+Comprises of two parts - qusimulator (package qsim) the Quantum Simulator, and qucircuit (packages qckt, qckt.gatesutils, and qckt.backend) the library to implement quantum computing programs using Quantum Circuits. qucircuit uses qusimulator as a backed engine to execute quantum circuits
 
 INSTALLING
 -------------------
-The pqusimulator and qucircuit are on PyPi now. So, you can simply install using pip. Since qucircuit has qusimulator as a dependency, so installing qucircuit will also install qusimulator.
+qusimulator and qucircuit are on PyPi now. So, you can simply install them using pip. Since qucircuit has qusimulator as a dependency, so installing qucircuit will also install qusimulator.
 
     pip install qusimulator
     pip install qucircuit
@@ -31,7 +31,7 @@ An interactive commandline interface (qcli.py) to quickly check out operations a
 
 GATES AND UTILITIES
 -------------------
-All standard gates included. Can create CONTROLLED GATE for any gates.  Allows addition of CUSTOM user-defined gates.
+All common gates included. Can create CONTROLLED GATE for any gates.  Allows addition of CUSTOM user-defined gates.
 
 A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates, check for unitarity, inverse.
 
@@ -40,6 +40,6 @@ QUANTUM CIRCUITS AND BACKEND COMPUTE ENGINES
 
 Quantum computing circuits framework with a backend compute simulator engine.
 
-Easy to follow documentation with tutorial introduction - see qsimumator/README.md and qcircuit/README.md. A bunch of examples under qsimulator/examples and qcircuit/examples.
+Easy to follow documentation with tutorial introduction - see qusimumator/README.md and qucircuit/README.md. A bunch of examples under qusimulator/examples and qucircuit/examples.
 
-Code for regression tests also serves as examples to quickly learn qsim and qckt.
+Code for regression tests also serves as examples to quickly learn qsim and qckt packages.
