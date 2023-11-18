@@ -46,6 +46,7 @@ class QGate:
 
 	def ifcbit(self,cbit,val):
 		self.cbit_cond = (cbit,val)
+		return self
 
 	def __str__(self):
 		stringify = self.name
