@@ -1,7 +1,7 @@
 # 1. QUICK START
 Install using pip command -
 
-$ pip install qusimulator
+    pip install qusimulator
 
 1.2	TUTORIAL INTRODUCTION
 --------
