@@ -1,21 +1,21 @@
 # quantum-computing
 
-A functionally complete Universal Quantum Computer in Python.
+A full featured quantum computer simulator in Python.
 
-Comprises of two parts - qusimulator (package qsim) the Quantum Simulator, and qucircuit (packages qckt, qckt.gatesutils, and qckt.backend) the library to implement quantum computing programs using Quantum Circuits. qucircuit uses qusimulator as a backed engine to execute quantum circuits
+Comprises of two parts - qusimulator (package qsim) the quantum simulator, and qucircuit (packages qckt, qckt.gatesutils, and qckt.backend) the library to implement quantum computing programs using quantum circuits. qucircuit uses qusimulator as a backed engine to run quantum circuits
 
-INSTALLING
--------------------
-qusimulator and qucircuit are on PyPi now. So, you can simply install them using pip. Since qucircuit has qusimulator as a dependency, so installing qucircuit will also install qusimulator.
+## INSTALLATION
+qusimulator and qucircuit are on PyPi now. So, you can simply install them using pip. 
 
     pip install qusimulator
     pip install qucircuit
 
-FEATURES
--------------------
-All expected features, simple to use, extensible and flexible to allow all aspects of quantum computing.
+Since qucircuit has qusimulator as a dependency, so installing qucircuit will also install qusimulator.
 
-Implement any quantum computing algorithms. Several algorithm implementations included as examples:
+## FEATURES
+Full featured, extensible, supports full range of quantum algorithms.
+
+Several quantum algorithm implementations included as examples:
 * Teleportation
 * Simple Search
 * Deutsch-Jozsa
@@ -24,20 +24,16 @@ Implement any quantum computing algorithms. Several algorithm implementations in
 * Period-finding
 * Grover's algorithm
 * Sudoku using Grover's algorithm
-* ... will add more as I get a chance
+* ... will add more
 
-An interactive commandline interface (qcli.py) to quickly check out operations and sequences.
+An interactive commandline interface (qsimcli) to quickly check out operations and sequences.
 
-
-GATES AND UTILITIES
--------------------
-All common gates included. Can create CONTROLLED GATE for any gates.  Allows addition of CUSTOM user-defined gates.
+## GATES AND UTILITIES
+Includes all common gates. Can create CONTROLLED GATE for any gates.  Allows addition of CUSTOM user-defined gates.
 
 A number of utility functions to manipulate gates - combine sequentially applied, or parallelly applied gates, check for unitarity, inverse.
 
-QUANTUM CIRCUITS AND BACKEND COMPUTE ENGINES
--------------------
-
+## QUANTUM CIRCUITS AND BACKEND COMPUTE ENGINES
 Quantum computing circuits framework with a backend compute simulator engine.
 
 Easy to follow documentation with tutorial introduction - see qusimumator/README.md and qucircuit/README.md. A bunch of examples under qusimulator/examples and qucircuit/examples.
