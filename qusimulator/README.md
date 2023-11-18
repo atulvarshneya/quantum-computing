@@ -353,3 +353,66 @@ Following is an example shows how these exceptions are handled --
 Following is the list of error messages with the name of the function, thrown in an exception --
 
 	(TBD with the latest list)
+
+# 7. COMMAND LINE TOOL qsimcli
+
+Release 1.5.1 adds a simple commandline tool, qsimcli, which provides an interactive way to execute quantum operations. It is more a learning tool than for any serious use. Below is a sample session -
+
+	$ qsimcli
+	Type '?' for help.
+	> i 4
+
+	Initial State
+	0000    1.00000000+0.00000000j
+	CREGISTER: 0000
+	> h 0
+
+	HADAMARD Qubit[0]
+	0000    0.70710678+0.00000000j
+	0001    0.70710678+0.00000000j
+	CREGISTER: 0000
+	> c 0 1
+
+	CNOT Qubit[0, 1]
+	0000    0.70710678+0.00000000j
+	0011    0.70710678+0.00000000j
+	CREGISTER: 0000
+	> m 0 1
+
+	MEASURED Qubit[0, 1] = [0, 0] with probability = 0.5
+	0000    1.00000000+0.00000000j
+	CREGISTER: 0000
+	> q
+	$
+
+Type a ? to get help, and that is all you will need to know about using the cli. See below.
+
+	$ qsimcli
+	Type '?' for help.
+	>
+	> ?
+	Commands:
+	  ?                    -- Help
+	  help                 -- Help
+	  i nqbits             -- Initialize QC
+	  m bit1 bit2 ...      -- Measure qubits
+	  q                    -- Quit
+	  r                    -- Reset to init
+	Gates:
+	  c cbit bit           -- CNOT Gate
+	  csw cbit bit1 bit2   -- C-SWAP Gate
+	  h bit                -- HADAMARD Gate
+	  hn n n-bits ...      -- Simultabeous n-HADAMARD Gates
+	  qft n n-bits ...     -- QFT(n) Gate
+	  rk k bit             -- ROT(k) Gate
+	  rnd bit              -- Random aplitude Gate
+	  rphi phi bit         -- ROT(Phi) Gate
+	  sqsw bit1 bit2       -- SQ root SWAP gate
+	  sw bit1 bit2         -- SWAP Gate
+	  t cbit1 cbit2 bit    -- TOFFOLI Gate
+	  x bit                -- X Gate
+	  y bit                -- Y Gate
+	  z bit                -- Z Gate
+	> q
+	$
+
