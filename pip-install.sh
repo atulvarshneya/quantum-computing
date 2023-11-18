@@ -3,7 +3,7 @@
 select=${1:-all}
 
 if [ $select == "all" ] || [ $select == "qsim" ]; then
-	pushd qsimulator
+	pushd qusimulator
 	pip uninstall -y qsim
 	pip install .
 	rm -r build
@@ -14,7 +14,7 @@ if [ $select == "all" ] || [ $select == "qsim" ]; then
 fi
 
 if [ $select == "all" ] || [ $select == "qckt" ]; then
-	pushd qcircuit
+	pushd qucircuit
 	pip uninstall -y qckt
 	pip install .
 	rm -r build
