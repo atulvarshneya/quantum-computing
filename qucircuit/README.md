@@ -1,3 +1,8 @@
+# Installation
+Install using pip command -
+
+$ pip install qucircuit
+
 # Core concepts
 
 ## Convention for arguments for quantum gates API
