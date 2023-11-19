@@ -304,6 +304,7 @@ So, using the above created gates as below, you can create 2 entangled |Phi+> be
 Qcsim allows using user defined gates. A user defined gate would be a Python array with two elements [name_string, unitary_matrix]. The element unitary_matrix is the matrix that specifies the gate. It should be created using numpy.matrix([...],dtype=complex), or equivalent. The element name_string is a string that is a user-friendly name of that gate that is used in logs and debug traces.
 
 Here is an example of a simple way for a user to define a CNOT gate in form of a function --
+
 	def myCNOT():
 		return ["MY-CNOT", numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
 
