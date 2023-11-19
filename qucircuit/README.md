@@ -247,7 +247,7 @@ Checks if the given operator matrix is unitary or not.
 Returns a boolean (`True`/`False`).
 
 ### `opmat_dagger(opMat)`
-Returns the transpose conjugate (dagger) of a given operator matrix.
+Returns the conjugate transpose (dagger) of a given operator matrix.
 
 ### `CTL(opMatrix)`
 Utility function to add a control bit to an operator matrix (`opMatrix`).
