@@ -5,7 +5,7 @@ with open('README.md', 'r') as file:
 
 setup(
     name='qucircuit',
-    version='1.5.1',
+    version='1.5.1.1',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',
@@ -18,6 +18,6 @@ setup(
 	url='https://github.com/atulvarshneya/quantum-computing',
     install_requires=[
         'numpy',
-        'qusimulator>=1.5'
+        'qusimulator>=1.5.1.1'
         ]
     )
