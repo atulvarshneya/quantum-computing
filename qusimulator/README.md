@@ -66,7 +66,6 @@ This last qreport() function call outputs the state after the measurement of the
 Now, let us run the same code with trace turned on (therefore removed the qreport() calls). Turning trace ON, it outputs the state after init and each gate and measurement steps (see accompanying helloworld_traceON.py) --
 
 	import qsim
-	from qgates import *
 	qc = qsim.QSimulator(8, qtrace=True)
 	qc.qgate(qsim.H(),[0])
 	qc.qgate(qsim.C(),[0,3])
@@ -130,13 +129,13 @@ If visualize=True, the qreport() displays an additional bar graph showing the ma
 
 Brings the simulator to the same state as after QSimulator() call - initial state, qtrace, qzeros, ... everything.
 
-2.3	**qc.qgate(gate_function, list_of_qubits, qtrace=False)**
+2.3	**qc.qgate(quantum_gate, list_of_qubits, ifcbit=None, qtrace=False)**
 
-qgate() is used to perform quantum gate operations on a set of qubits.
+qgate() is used to perform quantum gate operations, quantum_gate, on a set of qubits, list_of_qubits.
 
-There are a number of gates pre-created within the qgates module, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, SWAP gate, etc.) then the list in the second argument (list_of_qubits) must contain that many qubits.
+There are a number of gates pre-created within the qsim package, and additional gates can be defined by the users (see Section USER DEFINED GATE below). If a gate operates on more than 1 qubit (e.g., CNOT gate, SWAP gate, etc.) then the list in the second argument (list_of_qubits) must contain that many qubits. qgate() validates the number of qubits passed in list_of_qubits against the number of qubits required for the gate, if not correct, throws an exception.
 
-The function qgate() validates the number of bits passed in list_of_qubits against the number of qubits required for the gate, if not correct, throws an exception.
+ifcbit argument, if provided, causes the gate to be applied conditionally. ifcbit value is a tuple (cbit, boolval), which essentially implies the gate is appled if the measured classical bit, cbit, value is 0 or is 1 as specified by boolval.
 
 If qtrace is True, the resulting state is printed out.
 
@@ -292,7 +291,7 @@ An illustrative example is
 	                         +--+
 	C2 = qsim.qcombine_par("C2",[qsim.C(),qsim.C()])
 
-Create 2 entangled |Phi+> bell states, between quits 7,6 and 5,4 using these --
+So, using the above created gates as below, you can create 2 entangled |Phi+> bell states, between quits 7,6 and 5,4 --
 
 	qc.qgate(H2,[7,5])
 	qc.qgate(C2,[7,6,5,4])
@@ -302,9 +301,9 @@ Create 2 entangled |Phi+> bell states, between quits 7,6 and 5,4 using these --
 
 (see accompanying user_def_gates.py)
 
-Qcsim allows using user defined gates. A user defined gate would be written as a function that returns a Python array with two elements [name_string, unitary_matrix]. The element unitary_matrix is the matrix that specifies the gate. It should be created using numpy.matrix([...],dtype=complex), or equivalent. The element name_string is a string that is a user-friendly name of that gate that is used in logs and debug traces.
+Qcsim allows using user defined gates. A user defined gate would be a Python array with two elements [name_string, unitary_matrix]. The element unitary_matrix is the matrix that specifies the gate. It should be created using numpy.matrix([...],dtype=complex), or equivalent. The element name_string is a string that is a user-friendly name of that gate that is used in logs and debug traces.
 
-Here is an example of a simple way for a user to define a CNOT gate --
+Here is an example of a simple way for a user to define a CNOT gate in form of a function --
 	def myCNOT():
 		return ["MY-CNOT", numpy.matrix([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]],dtype=complex)]
 
@@ -324,16 +323,13 @@ So, in general, if the gate operates on n qubits, then it should be written as i
 
 The system looks at the size of the matrix specifying the gate to determine the number of qubits required for that gate. If the number is incorrect, it throws an exception.
 
-Since the gate is defined in form of a function, it can take arguments. For instance, for a rotation gate, the rotation angle can be passed as an argument --
+If the gate is defined in form of a function, it can take arguments. For instance, for a rotation gate, the rotation angle can be passed as an argument --
 
 	def myR(theta):
 		c = numpy.cos(theta)
 		s = numpy.sin(theta)
 		return ["MY-Rotation({:0.4f})".format(theta), numpy.matrix([[1,0],[0,complex(c,s)]],dtype=complex)]
 	qc.qgate(myR(numpy.pi/2),[5])
- 
-(Note: To see some change in the state, perform an X() or H() or some such on the qubit before the phase rotation.)
-
 
 # 6. ERROR HANDLING, EXCEPTIONS
 
@@ -342,13 +338,12 @@ Various function calls raise exceptions, mostly in cases where user passed argum
 Following is an example shows how these exceptions are handled --
 
 	import qsim
-	from qSimException import *
 	try:
 		qc = qsim.QSimulator(8)
 		qc.qgate(qsim.H(),[0])
-		qc.qgate(qsim.C(),[0,1])
-	except qSimException as exp:
-		print(exp.args)
+		qc.qgate(qsim.C(),[0,9])
+	except qsim.QSimError as exp:
+		print(exp)
 
 Following is the list of error messages with the name of the function, thrown in an exception --
 
