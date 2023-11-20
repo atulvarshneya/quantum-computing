@@ -16,7 +16,7 @@ All common gates are available pre-defined. Allows user-defined gates. Allows ad
 
 A number of utility functions to manipulate gates - combine sequentially applied or parallelly applied gates, check for unitarity, inverse.
 
-Easy to follow documentation with tutorial introduction - see `qusimumator/README.md` and `qucircuit/README.md`. A bunch of examples under `qusimulator/examples` and `qucircuit/examples`. Code for regression tests also serves as examples to quickly learn `qsim` and `qckt` packages.
+Easy to follow documentation with tutorial introduction - see `qusimumator/README.md` and `qucircuit/README.md`. A bunch of examples under `examples/qsim` and `examples/qckt`. Code for regression tests also serves as examples to quickly learn `qsim` and `qckt` packages (see folder `tests/`).
 
 Several quantum algorithm implementations included as examples:
 * Teleportation
