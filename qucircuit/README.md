@@ -157,10 +157,11 @@ All the custom gate definitions from the circuit are copied over to the new circ
 Returns the new circuit
 
 Parameters `newnq` and `newnc` are the sizes of the new (larger or equal sized) circuit
-`inpqubits` is a vector that specifies how the old circuit's qubits be replaced in the new circuit
+`inpqubits` is a vector that specifies how the old circuit's qubits be replaced in the new circuit.
+
 As an example see the circuits below --
 
-                            current circuit                   new circuit
+                   current circuit                   new circuit
             q000 ----[H]-[.]----------     q000 --------------------------
                           |                                               
             q001 --------[X]----------     q001 -----------[H]------------
@@ -174,7 +175,7 @@ so, the vector should be `[1,2,3]`, and the realign call should be `realign(4,4,
 
 In much simpler terms, consider the current circuit as a large gate, and inpqubits vector basically is 
 the way you would use that gate. E.g., `CX` is defined as MSB = control, LSB as target, but if you 
-want qubit 2 be control and qubit 4 be target, you would say `CX(2,4)`, i.e., `inpqubits = [2,4]`
+want qubit 2 be control and qubit 4 be target, you would say `CX(2,4)`, i.e., `inpqubits = [2,4]`.
 
 #### `append(othercircuit)`
 Creates a new circuit by appending othercircuit to the current circuit. Both the original circuits are 
@@ -192,7 +193,7 @@ Draws a text drawing of the circuit.
 #### `list()`
 prints out the sequence of gates in the circuit.
 
-#### `class Job`
+### `class Job`
 Packages the job to be executed on a backend engine.
 
 `Job` object converts the circuit to an array of implementation neutral, fully-specified operations (gates, 
@@ -221,42 +222,38 @@ Example Usage:
 
 # Package `qckt.gatesutils`
 
-### `stretched_opmatrix(nqbits, oper, qbit_list)`
+#### `stretched_opmatrix(nqbits, oper, qbit_list)`
 Converts the quantum gate's operator matrix into a matrix for a system with larger number of qubits. 
 The qubits on which the gate operates are kept as the highest order qubits, the additional qubits are 
 left unchanged by the *stretched* operator.
 
-### `combine_par(op_list)`
+#### `combine_par(op_list)`
 Combines two or more operator matrices into one when they act on separate set of qubits simultaneously.
 
 Returns the generated operator matrix.
 
-### `combine_seq(op_list)`
+#### `combine_seq(op_list)`
 Combines two or more operator matrices into one when they act on the same set of qubits sequentially.
 
 Returns the generated operator matrix.
 
-### `isunitary(mat)`
+#### `isunitary(mat)`
 Checks if the given operator matrix is unitary or not.
 
 Returns a boolean (`True`/`False`).
 
-### `opmat_dagger(opMat)`
+#### `opmat_dagger(opMat)`
 Returns the conjugate transpose (dagger) of a given operator matrix.
 
-### `CTL(opMatrix)`
+#### `CTL(opMatrix)`
 Utility function to add a control bit to an operator matrix (`opMatrix`).
 
 Returns the generated operator matrix.
 
 # Package qckt.backend (Backend framework)
 
-### Backend Services Registry
-This is an API for accessing the registry of Quantum Computing Services registered at your installation's 
-configuration. The examples of services that could be registered are IBM quantum computing, Ionq quantum 
-computing, local qsim simulator listSvc() returns a list of tuples (name, description) of all services 
-available (i.e. registered in the installation's configuration) getSvc(svcName) returns handle to the named 
-backend service
+## Backend Services Registry
+This is an API for accessing the registry of Quantum Computing Services registered at your installation's configuration. `listSvc()` returns a list of tuples (name, description) of all services available (i.e. registered in the installation's configuration) `getSvc(svcName)` returns handle to the named backend service.
 
 Example usage:
 
@@ -265,14 +262,14 @@ Example usage:
 	svcTuples = reg.listSvc()
 	svc = reg.getSvc("QSystems")
 
-### Backend Service
-Backend service implments the methods to connect with the quantum computing service (through 
-authentication/authorization as required). The service provides methods to discover backend engines under that service, 
-and get the handles to them to run the quantum computing circuits/programs.
-listInstances() returns a list of tuples (name, description) of all instances (quamtum computers) available 
-at this service getInstance(name) returns an object representation of the named instance (quantum computer)
+## Backend Service
+Backend service implments the methods to connect with the quantum computing service (through authentication/authorization as required). The service provides methods to discover backend engines under that service, and get the handles to them to run the quantum computing circuits/programs.
 
-Example usage: Going through the Registry
+`listInstances()` returns a list of tuples (name, description) of all instances (quamtum computers) available at this service.
+
+`getInstance(name)` returns an object representation of the named instance (quantum computer).
+
+Example usage: Going through the `Registry`
 
 	import qckt.backend as bknd
 	reg = bknd.Registry()
@@ -281,17 +278,17 @@ Example usage: Going through the Registry
 	engine_list = svc.listInstances()
 	bk_engine = svc.getInstance("local")
 
-Example usage: Directly accessing the QSystems engines
+Example usage: Directly accessing the engines from `QSystems` service
 
 	import qckt.backend as bknd
 	bk_debugging_engine = bknd.Qdeb() # same as svc.getInstance("local")
 	bk_engine = bknd.Qeng() # same as svc.getInstance("qsim")
 
-### Backend engines
-The adaptor for the backend needs to interpret the operations sequence in the qckt representation.
-At the end of the job execution (all the shots), the backend adaptor populates the results in the job object, 
-as mentioned above. runjob(job) this is the only function impleented by the backend adaptor. It runs the given 
-job on the backend execution engine. Returns the backend adaptor object itself.
+## Backend engines
+The adaptor for the backend needs to interpret the operations sequence in the `qckt` representation.
+At the end of the job execution (all the shots), the backend adaptor populates the results in the `job` object, as mentioned above.
+
+`runjob(job)` - this is the only function implemented by the backend adaptor. It runs the given `job` on the backend execution engine. It returns the backend adaptor object itself.
 
 Example usage: Directly accessing the QSystems engines
 
@@ -301,19 +298,20 @@ Example usage: Directly accessing the QSystems engines
 	job = qckt.Job(somecircuit, initstate=somestate, shots=100)
 	bk_engine.runjob(job)
 
+## Backend results classes
+
 ### `class Cregister`
-An object of this class is returned by job.get_creg(), and holds the classical register value got from the measurement 
-operation. It provides method to convert that to pretty printable string, e.g., str(cregister), print(cregister).
-The classical bits array can be accessed through the .value field and its integer value through .intvalue field of the 
-returned object. This class is available in qckt.backend.
+An object of this class is returned by `job.get_creg()`, and holds the classical register value got from the measurement operations. It provides method to convert that to pretty printable string, e.g., in `str(cregister)`, `print(cregister)`.
+The classical bits array can be accessed through the `.value` field and its integer value through `.intvalue` field of the returned object.
+
+This class is available in `qckt.backend`.
 
 ### `class StateVector`
-An object of this class is returned by job.get_svec(), and holds the statevector value from the simulator backend engine.
-Note that state is available only when you run on a simulator, not on an actual QC hardware.
-In case of NISQ simulator, the diagonal of the density operator is returned.
-It provides methods to convert that to pretty printable string, e.g., str(statevector), print(statevector).
-The state-vector array can be accessed through the .value field of the object
-The returned object also supports a method StateVector.verbose(boolean), which affects the string conversion such that 
-it includes all states even those with an amplitude of 0. Svec.verbose(boolean) returns the same state-vector object
-This class is available in qckt.backend.
+An object of this class is returned by `job.get_svec()`, and holds the *statevector* value from the simulator backend engine. Note that state is available only when you run on a simulator, not on an actual QC hardware. In case of NISQ simulator, the diagonal of the density operator is returned.
+
+It provides methods to convert that to pretty printable string, e.g., in `str(statevector)`, `print(statevector)`.
+The *statevector* array can be accessed through the `.value` field of the object
+The returned object also supports a method `StateVector.verbose(boolean)`, which affects the string conversion such that it includes all states even those with an amplitude of 0. `StateVector.verbose(boolean)` returns the same state-vector object.
+
+This class is available in `qckt.backend`.
 
