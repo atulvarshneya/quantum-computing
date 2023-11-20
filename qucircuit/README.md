@@ -7,26 +7,23 @@ Install using pip command -
 
 ## Convention for arguments for quantum gates API
 * All single qubit gates, such as, `X`, `Y`, `Z`, `H`, `P`, `UROTk`, `RND`, accept a list of qubits as argument, e.g., `circuit.H([3,2,1])` applies hadamard gate to each of these qubits individually. As a shortcut a single integer can also be provided as input argument to apply the gate to that sigle qubit.
-* parameterized quantum gates such as phase-rotation gate `P`, takes the frst argument the phase value, and the second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., `circuit.P(numpy.pi/4,[3,2,1,0])`, `circuit.P(numpy.pi,3)`, `circuit.UROTk(4,[7,6,5,4])`
+* parameterized quantum gates such as phase-rotation gate, `P`, takes the frst argument the phase value, and the second argument is either a list of qubits or a singe qubit index, as mentioned above. E.g., `circuit.P(numpy.pi/4,[3,2,1,0])`, `circuit.P(numpy.pi,3)`, `circuit.UROTk(4,[7,6,5,4])`
 * Gates that inherently take variable number of qubits as arguments, such as `QFT`, inputs to those are provided as multiple input arguments, e.g., `circuit.QFT(7,6,5,4,3,2,1,0)`. `QFT` also accepts a list of qubits as the one argument, e.g., `circuit.QFT([i for i in range(8)])`
-* All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the last one is the target qubit and all other preceding ones are control qubits. E.g., `circuit.CX(ctrl1, ctrl2, ctrl3, target)`, `circuit.CP(numpy.pi/8,control, target)`.
-* Please note the following about control gates. Package qckt.gatesutils allow addition of a control qubit (MSB) to a gate. Note the original gate can be a multi-qubit gate. So it is more accurate to say that all control gates use as many MSBs as control qubits as is per their operation.
+* All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the target qubit(s) are the LSB(s) and all other preceding ones are control qubits. E.g., `circuit.CX(ctrl1, ctrl2, ctrl3, target)`, `circuit.CP(numpy.pi/8,control, target)`. Specifically, a controlled single-qubit gate will have the target qubit as the lowest LSB, and, for instance, a controlled 2-qubit gate will have target qubits as the lowest 2 LSBs.
 
 ## A note about MSB - LSB ordering
-qckt as well as qsim follow the convention that when providing arguments to any of the functions the list argument representing qubits or clbits is ordered as `[MSB, ...., LSB]`. Yes, :-), the 0th index element is MSB!
+`qckt`, as well as `qsim`, follow the convention that when providing arguments to any of the functions the list argument representing `qubits` or `clbits` is ordered as `[MSB, ...., LSB]`. Yes, :-), the 0th index element is MSB!
 
-Note that in many gates the order is either explicit, e.g., in `CX` the arguments are explicitly (control, and target), and in many others it does not matter, e.g., in `M` the qubits will be measured irrespective of the order. But in some gates, such as `QFT` it very much *does* matter.
+Note that in many gates the order is either explicit, e.g., in `CX` the arguments are explicitly (control, and target), and in some others it does not matter, e.g., in `M` the qubits will be measured with the same outcome irrespective of the order. But in some gates, such as `QFT` it very much *does* matter.
 
 ## Using Registers
-The use of registers simplifies, and can help in generalizing the quantum circuit.
+The use of registers simplifies, and can help in readability of the quantum circuit.
 
-When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program.
+When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program. While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it easier to read.
 
-While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it somewhat more streamlined.
+There are two classes of registers - `QRegister` and `CRegister`. the former for quantum bits, and the latter for classical bits. The distiction is for assigning the actual `qubits` and `clbits` to these registers.
 
-There are two classes of registers - `QRegister` and `CRegister`. the former for quantum bits, and the latter for classical bits. The distiction is for assigning the actual qubits and clbits to these registers.
-
-At the end of the day, both the registers are subclasses of list data type. So, operations as indexing (`qreg[2]`), concatenating `(qreg1 + qreg2)`, etc., can be freely performed on the registers. Just note that the result turns out to be of list data type (not the original `QRegister` or `CRegister` type, *this needs to be fixed in subsequent releases*). The assignment of qubits and clbits to the registers follows the MSB...LSB convention as mentioned in the section above.
+At the end of the day, both the registers are subclasses of list data type. So, operations as indexing (`qreg[2]`), concatenating `(qreg1 + qreg2)`, etc., can be freely performed on the registers. Just note that the result turns out to be of list data type (not the original `QRegister` or `CRegister` type, *this will be fixed in subsequent releases*). The assignment of qubits and clbits to the registers follows the MSB...LSB convention as mentioned in the section above.
 
 Example uses of registers:
 
@@ -80,41 +77,41 @@ Appends a `HADAMARD` gate to the quantum circuit
 Returns the gate object.
 
 #### `X(qubit)`
-Appends a NOT gate to the quantum circuit
+Appends a `NOT` gate to the quantum circuit
 
 Returns the gate object.
 
 #### `Y(qubit)`
-Appends a PAULI-Y gate to the quantum circuit
+Appends a `PAULI-Y` gate to the quantum circuit
 
 Returns the gate object.
 
 #### `Z(qubit)`
-Appends a PAULI-Z gate to the quantum circuit
+Appends a `PAULI-Z` gate to the quantum circuit
 
 Returns the gate object.
 
 #### `T(control1, control2, target)`
-Appends a TOFFOLI gate to the quantum circuit
+Appends a `TOFFOLI` gate to the quantum circuit
 
 Returns the gate object.
 
 #### `M(qubitslist, clbitslist=None)`
-Appends MEASUREMENT gates for measuring given qubits list into classical bits list
+Appends `MEASUREMENT` gates for measuring given qubits list into classical bits list
 
 Returns the gate object.
 
 #### `QFT(qubitslist)`
-Appends a QFT gate across the given qubits list
+Appends a `QFT` gate across the given qubits list
 
-The drawn circuit depicts multiple QFT gates, but it is 1 QFT gate acting on those qubits
+The drawn circuit depicts multiple `QFT` gates, but it is 1 `QFT` gate acting on those qubits
 
 Returns the gate object.
 
 #### `custom_gate(gatename, op_matrix)`
 To add user defined custom gates
 
-`gatename` should be per the syntax of a Python variable; op_matrix is the operator matrix in form of `numpy.matrix([...],dtype=complex)`
+`gatename` is a string; op_matrix is the operator matrix in form of `numpy.matrix([...],dtype=complex)`
 
 Returns the gate object.
 
@@ -142,9 +139,7 @@ Returns the gate object.
 #### `Probe(header,probestates)`
 This is a debuggig aid. Its execution gets skipped on backends which are actual quantum computers.
 
-`header` is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's
-printout. `probestates` is either `None` or a list of states, if `None`, probe prints amplitude of all 
-the states, else prints the amplitudes of only the specified states.
+`header` is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout. `probestates` is either `None` or a list of states, if `None`, probe prints amplitude of all the states, else prints the amplitudes of only the specified states.
 
 Returns the gate object.
 
@@ -165,17 +160,17 @@ Parameters `newnq` and `newnc` are the sizes of the new (larger or equal sized) 
 `inpqubits` is a vector that specifies how the old circuit's qubits be replaced in the new circuit
 As an example see the circuits below --
 
-	                        current circuit                   new circuit
-			q000 ----[H]-[.]----------     q000 --------------------------
-				      |                                               
-			q001 --------[X]----------     q001 -----------[H]------------
-                                                                                      
-			q002 ------------[H]------     q002 --------[X]---------------
-								     |                
-						       q003 ----[H]-[.]---------------
+                            current circuit                   new circuit
+            q000 ----[H]-[.]----------     q000 --------------------------
+                          |                                               
+            q001 --------[X]----------     q001 -----------[H]------------
+            
+            q002 ------------[H]------     q002 --------[X]---------------
+                                                         |                
+                                           q003 ----[H]-[.]---------------
 	     
 For this realignment, this vector basically answers the questions `[q002 -> q?, q001 -> q?, q000 -> q?]`
-so, the vector should be `[1,2,3]`, and the realign call should be `realign(4,4,[1,2,3])`
+so, the vector should be `[1,2,3]`, and the realign call should be `realign(4,4,[1,2,3])`.
 
 In much simpler terms, consider the current circuit as a large gate, and inpqubits vector basically is 
 the way you would use that gate. E.g., `CX` is defined as MSB = control, LSB as target, but if you 
@@ -271,10 +266,10 @@ Example usage:
 	svc = reg.getSvc("QSystems")
 
 ### Backend Service
-Backend service implments the methods to connect with the quantum computing service, using the required 
-authentication/authorization. The service provides methods to discover backend engines under that service, 
+Backend service implments the methods to connect with the quantum computing service (through 
+authentication/authorization as required). The service provides methods to discover backend engines under that service, 
 and get the handles to them to run the quantum computing circuits/programs.
-listInstances() returns a list of tuples (name, description) of all instances (quamtum computer) available 
+listInstances() returns a list of tuples (name, description) of all instances (quamtum computers) available 
 at this service getInstance(name) returns an object representation of the named instance (quantum computer)
 
 Example usage: Going through the Registry
@@ -310,7 +305,7 @@ Example usage: Directly accessing the QSystems engines
 An object of this class is returned by job.get_creg(), and holds the classical register value got from the measurement 
 operation. It provides method to convert that to pretty printable string, e.g., str(cregister), print(cregister).
 The classical bits array can be accessed through the .value field and its integer value through .intvalue field of the 
-returned object. This class is defined in qckt.backend.BackendAPI
+returned object. This class is available in qckt.backend.
 
 ### `class StateVector`
 An object of this class is returned by job.get_svec(), and holds the statevector value from the simulator backend engine.
@@ -320,5 +315,5 @@ It provides methods to convert that to pretty printable string, e.g., str(statev
 The state-vector array can be accessed through the .value field of the object
 The returned object also supports a method StateVector.verbose(boolean), which affects the string conversion such that 
 it includes all states even those with an amplitude of 0. Svec.verbose(boolean) returns the same state-vector object
-This class is defined in BackendAPI.py
+This class is available in qckt.backend.
 
