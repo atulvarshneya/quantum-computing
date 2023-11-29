@@ -2,7 +2,7 @@
 
 select=${1:-all}
 
-if [ $select == "all" ] || [ $select == "qsim" ]; then
+if [ $select == "all" ] || [ $select == "qusimulator" ]; then
 	pushd qusimulator
 	pip install .
 	rm -r build
@@ -12,7 +12,7 @@ if [ $select == "all" ] || [ $select == "qsim" ]; then
 	echo '-----------------------------------------------------'
 fi
 
-if [ $select == "all" ] || [ $select == "qckt" ]; then
+if [ $select == "all" ] || [ $select == "qucircuit" ]; then
 	pushd qucircuit
 	pip install .
 	rm -r build
