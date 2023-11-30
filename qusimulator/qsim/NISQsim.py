@@ -8,11 +8,7 @@ import numpy as np
 import random as rnd
 from copy import deepcopy
 import types
-from qsim.qSimException import QSimError
 import time
-import qsim.qgates as qgt
-from qsim.qgatesUtils import *
-import math
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
 ##            NOTE: when refering to bits by position numbers, MSB would be 7, in an 8-qubit machine
@@ -36,7 +32,7 @@ class NISQSimulator:
 		self.verbose = verbose
 		self.validation = validation
 		self.visualize = visualize
-		self.kraus_chan = []
+		self.global_kraus_channel = []
 
 		# runstats
 		self.qsteps = 0
@@ -57,7 +53,7 @@ class NISQSimulator:
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
 
-		# runstats
+		# clear the runstats
 		self.qsteps = 0
 		self.op_times = {}
 		self.op_counts = {}
@@ -70,26 +66,26 @@ class NISQSimulator:
 			# check if the state is np.matrix type
 			if not type(self.initstate) is np.matrixlib.defmatrix.matrix:
 				errmsg = "User Error. Wrong type. Initstate must be a numpy.matrix."
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 			# check if the size of the passed state is 2**nqbits
 			(rows,cols) = self.initstate.shape
 			if rows != 2**self.nqbits or cols != 1:
 				errmsg = "User Error. wrong dimensions. Initstate shape must be (2^nqbits,1)."
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 			# check if normalized
 			p = 0
 			for i in range(2**self.nqbits):
 				p += np.absolute(self.initstate[i].item(0))**2
 			if np.absolute(p-1.0) > self.maxerr:
 				errmsg = "User Error. Initial state not normalized."
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 			self.sys_state = deepcopy(self.initstate)
 			# Now convert the state vector to density matrix
 			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
 		elif not self.prepqubits is None:
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 			pqbit = np.transpose(np.matrix(self.prepqubits[self.nqbits-1],dtype=complex))
 			prepstate = pqbit
 			for i in reversed(range(self.nqbits-1)):
@@ -116,68 +112,9 @@ class NISQSimulator:
 		if self.trace:
 			self.qreport(header="Initial State")
 
-	## Noise
-	# kraus channel is specified as a sequence of pairs of series of operations, and a state probability multiplier
-	# 	= (operations_seq,state_prob_multiplier)
-	#	= (
-	#		  [ (op1,prob1_mult), (op2,prob2_mult), ...  ],
-	#		  state_prob_multiplier
-	#	  )
-	#
-	# operations_seq = [(op1,op_prob_multiplier), (op2,op_prob_multiplier), ...]
-	#	op is in the same format as gates, i.e., ['name', opmatrix]
-	#		note that mostly the opmatrix is unitary, but cases such as Amplitude Damping is not [[1.0, 0.0],[0.0, sqrt(gamma)]]
-	#	op_prob_multiplier is gives the noise contribution by this op, i.e., = op_prob_multiplier * (op * state * op.dagger)
-	# state_prob_multiplier is the factor by which state is multiplied when noise is added
-	#	typically, state_prob_multiplier = 1 - sum(op_prob_multiplier)
-	#	however, in some cases, e.g., Amplitude Damping, the operator itself gives the state with noise added
-	#   	so in those cases the state_prob_multiplier will be 0.0; and op_orob_multiplier for those ops will be 1.0
-	#
-	# so, in math terms, rho = state_prob_multiplier * rho + prob1_mult * (op1 * rho * op1.dag) + prob2_mult * (op2 * rho * op2.dag) + ...
-	#
-	#                                                        |---------------------------- noise_add --------------------------------------|
-
-	def qsim_noise_spec(self, kraus_spec):
+	def kraus_global(self, kraus_spec):
 		# argument validation TODO
-		self.kraus_chan = kraus_spec
-
-	# Canned noise profiles
-	def qsim_noise_profile(self, profile_id=None,p1=0.10,p2=0.10,p3=0.10):
-		s = p1 # used in BitFlip, PhaseFlip, Depolarizing
-		gamma = p1 # used in AmplitudeDamping, GeneralizedApmplitudeDamping, PhaseDamping
-		p = p2 # used in GeneralizedAmplitudeDamping
-		px,py,pz = p1,p2,p3
-
-		AD_K1 = ['K1',np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
-		AD_K2 = ['K2',np.matrix([[0.0,math.sqrt(gamma)],[0.0,0.0]], dtype=complex)]
-
-		# !!! Kraus operators normalization condition fails for Generalized Amplitude Damping
-		GAD_K0 = ['K0',math.sqrt(p)*np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
-		GAD_K1 = ['K1',math.sqrt(p)*np.matrix([[1.0,math.sqrt(gamma)],[0.0,0.0]], dtype=complex)]
-		GAD_K2 = ['K2',math.sqrt(1-p)*np.matrix([[math.sqrt(1-gamma),0.0],[0.0,1.0]], dtype=complex)]
-		GAD_K3 = ['K3',math.sqrt(1-p)*np.matrix([[0.0,0.0],[math.sqrt(gamma),0.0]], dtype=complex)]
-
-		PD_K0 = ['K0',np.matrix([[1.0,0.0],[0.0,math.sqrt(1-gamma)]], dtype=complex)]
-		PD_K1 = ['K1',np.matrix([[0.0,0.0],[0.0,math.sqrt(gamma)]], dtype=complex)]
-
-		noise_profile = {
-			'BitFlip': ([(qgt.X(),s)],(1-s)),
-			'PhaseFlip': ([(qgt.Z(),s)],(1-s)),
-			'Depolarizing': ([(qgt.X(),s/3.0),(qgt.Y(),s/3.0),(qgt.Z(),s/3.0)],(1-s)),
-			'AmplitudeDamping': ([(AD_K1,1.0),(AD_K2,1.0)],0.0),
-			# 'GeneralizedAmplitudeDamping': ([(GAD_K0,1.0),(GAD_K1,1.0),(GAD_K2,1.0),(GAD_K3,1.0)],0.0),
-			'PhaseDamping':([(PD_K0,1.0),(PD_K1,1.0)],0.0),
-			'PauliChannel':([(qgt.X(),px),(qgt.Y(),py),(qgt.Z(),pz)],(1-px-py-pz))
-			}
-
-		if profile_id == 'LIST':
-			return noise_profile.keys()
-
-		kraus_spec = noise_profile.get(profile_id, None)
-		if kraus_spec is None:
-			errmsg = f'Unknown noise profile: {profile_id}'
-			raise QSimError(errmsg)
-		return kraus_spec
+		self.global_kraus_channel = kraus_spec
 
 	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
 		# runstats - sim cpu time
@@ -188,28 +125,28 @@ class NISQSimulator:
 			# check the validity of the ifcbit[0] (reapeated cbits, all cbits within self.ncbits)
 			if not self.__valid_bit_list([ifcbit[0]],self.ncbits):
 				errmsg = "Error: the ifcbit[0] value is not valid."
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 			if ifcbit[1] != 0 and ifcbit[1] != 1:
 				errmsg = "Error: the ifcbit[1] value is not valid."
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 			cbit_cond = ( self.cregister[self.ncbits-1-ifcbit[0]] == ifcbit[1] )
 
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 		if self.validation:
 			if not self.qisunitary(oper):
 				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
-				raise QSimError(errmsg)
+				raise qsim.QSimError(errmsg)
 		# perform the gate operation if cbits condition is satisfied
 		if cbit_cond:
 			a_op = self.__stretched_mat(oper,qbit_list)
 			self.sys_state = a_op * self.sys_state * np.transpose(np.conjugate(a_op))
 
 			# add noise if kraus_chan present
-			if len(self.kraus_chan) > 0:
-				op_seq, state_prob_mult = self.kraus_chan
+			if len(self.global_kraus_channel) > 0:
+				op_seq, state_prob_mult = self.global_kraus_channel
 
 				# calculate the noise to be added for all qubits
 				noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
@@ -247,23 +184,23 @@ class NISQSimulator:
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 
 		if cbit_list is None:
 			cbit_list = qbit_list
 		# check the validity of the cbit_list (reapeated cbits, all cbits within self.ncbits)
 		if not self.__valid_bit_list(cbit_list,self.ncbits):
-			errmsg = "Error: the list of cubits is not valid."
-			raise QSimError(errmsg)
+			errmsg = "Error: the list of cbits is not valid."
+			raise qsim.QSimError(errmsg)
 		# check if equal number of qbits and cbits are passed
 		if len(qbit_list) != len(cbit_list):
 			errmsg = "Error: number of qbits and cbits passed are unequal."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 
 		# align the qbits-to-measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
 		(rmat,rrmat) = self.__rmat_rrmat(qbit_reorder)
-		# we have density amtrix, so alignment for rows as well as columns
+		# we have density matrix, so alignment for rows as well as columns
 		self.sys_state = rmat * self.sys_state
 		self.sys_state = np.transpose(rmat * np.transpose(self.sys_state))
 
@@ -308,7 +245,7 @@ class NISQSimulator:
 		eta = Mmats[sel] * self.sys_state * Mmats[sel]
 		self.sys_state = eta/prob_val
 
-		# restore the alignment of sys_state
+		# align the qbits back to original
 		self.sys_state = np.transpose(rrmat * np.transpose(self.sys_state))
 		self.sys_state = rrmat * self.sys_state
 
@@ -327,6 +264,7 @@ class NISQSimulator:
 		self.qsteps += 1
 
 		return meas_val
+
 
 	def qreport(self, header="State", state=None, probestates=None, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
@@ -410,9 +348,9 @@ class NISQSimulator:
 		# this is the counting with the given bit ordering
 		rr = self.__shuffled_count(qbit_reorder)
 		## create the rmat and rrmat
-		imat = np.array(np.eye(2**self.nqbits))
-		rmat = np.array(np.eye(2**self.nqbits))
-		rrmat = np.array(np.eye(2**self.nqbits))
+		imat = np.matrix(np.eye(2**self.nqbits))
+		rmat = np.matrix(np.eye(2**self.nqbits))
+		rrmat = np.matrix(np.eye(2**self.nqbits))
 		for i in range(2**self.nqbits):
 			s = rr[i]
 			rmat[i] = imat[s]
@@ -502,10 +440,10 @@ class NISQSimulator:
 		opargs = str(qbit_list)
 		if (op.shape)[1] != (op.shape)[0]:
 			errmsg = "Error. Operator is not a square matrix. "+orignm+"'s dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 		if (2**len(qbit_list)) != (op.shape)[0]:
 			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 		c_op = np.kron(op,np.eye(2**(self.nqbits-len(qbit_list))))
 		a_op = self.__aligned_op(c_op,qbit_list)
 		return a_op

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import qsim
+import qsim.kraus
 import numpy as np
 
-noise_profiles_list = [
+kraus_channels = [
 	'BitFlip',
 	'PhaseFlip',
 	'Depolarizing',
@@ -15,20 +16,20 @@ noise_profiles_list = [
 
 # print the list of canned kraus channels
 q = qsim.NISQSimulator(1,qtrace=False, verbose=False)
-kraus_spec = list(q.qsim_noise_profile('LIST'))
-kraus_spec.sort()
-print(kraus_spec)
+kraus_chans = list(qsim.kraus.kraus_channel_list())
+kraus_chans.sort()
+print(kraus_chans)
 print()
 
-for prname in noise_profiles_list:
+for kchanname in kraus_channels:
 	print('==========================================================================')
-	print('Kraus Channel: ',prname)
+	print('Kraus Channel: ',kchanname)
 	print('--------------------------------------------------------------------------')
 
 	q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
 
-	kraus_spec = q.qsim_noise_profile(prname, p1=0.05, p2=0.05, p3=0.05)
-	q.qsim_noise_spec(kraus_spec)
+	kraus_spec = qsim.kraus.kraus_channel_spec(kchanname)
+	q.kraus_global(kraus_spec())
 
 	q.qgate(qsim.X(),[0])
 	_,state,_ = q.qsnapshot()
