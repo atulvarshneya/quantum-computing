@@ -78,4 +78,6 @@ def kraus_channel_list():
 
 
 def kraus_channel_spec(kraus_channel_name):
+    if kraus_channel_name not in kraus_channels.keys():
+        raise qsim.QSimError(f'{kraus_channel_name} not a valid pre-prepared kraus channel.')
     return kraus_channels[kraus_channel_name]

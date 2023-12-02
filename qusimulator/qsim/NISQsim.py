@@ -114,6 +114,15 @@ class NISQSimulator:
 
 	def kraus_global(self, kraus_spec):
 		# argument validation TODO
+		# all ops in kraus spec MUST be 1-qubit operators
+		# print('validating kraus operator ...')
+		for elem in kraus_spec[0]:
+			op,s = elem
+			r,c = op[1].shape
+			if r != c or r != 2:
+				raise qsim.QSimError(f'only 1-qubit kraus operators expected, {op[0]} not so.')
+			# print(f'{op[0]} OK')
+		# print('validation done.')
 		self.global_kraus_channel = kraus_spec
 
 	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
@@ -148,17 +157,16 @@ class NISQSimulator:
 			if len(self.global_kraus_channel) > 0:
 				op_seq, state_prob_mult = self.global_kraus_channel
 
-				# calculate the noise to be added for all qubits
-				noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
-				for op,prob in op_seq:
-					for qbit in range(self.nqbits):
+				for qbit in range(self.nqbits):
+					# calculate the noise to be added for this qubit
+					noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
+					for op,prob in op_seq:
 						a_op = self.__stretched_mat(op,[qbit])
-						noise_component = (prob/float(self.nqbits)) * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
+						noise_component = prob * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
 						noise_add = noise_add + noise_component
-					# self.qreport(header='cumulative noise_add '+op[0],state=noise_add)
-
-				# add noise to sys_state per the probability weights in kraus_chan
-				self.sys_state = state_prob_mult * self.sys_state + noise_add
+						# self.qreport(header=f'cumulative noise_add {op[0]}',state=noise_add)
+					# add noise to sys_state per the probability weights in kraus_chan
+					self.sys_state = state_prob_mult * self.sys_state + noise_add
 
 		if qtrace or self.trace:
 			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
@@ -478,3 +486,15 @@ class NISQSimulator:
 
 if __name__ == "__main__":
 	pass
+	import qsim
+	import qsim.kraus
+	q = NISQSimulator(2,qtrace=True, verbose=False)
+
+	# q.qgate(qsim.X(),[0])
+
+	kraus_spec = qsim.kraus.kraus_channel_spec('Depolarizing')
+	q.kraus_global(kraus_spec(0.1))
+
+	I = ['Identity',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
+	q.qgate(I,[0])
+	q.qgate(I,[0])
