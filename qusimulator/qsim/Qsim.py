@@ -4,10 +4,10 @@
 # See the full license in the file LICENSE
 # Author: Atul Varshneya
 
+from qsim.qSimException import QSimError
 import numpy as np
 import random as rnd
 from copy import deepcopy
-import types
 import time
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
@@ -65,24 +65,24 @@ class QSimulator:
 			# check if the state is np.matrix type
 			if not type(self.initstate) is np.matrixlib.defmatrix.matrix:
 				errmsg = "User Error. Wrong type. Initstate must be a numpy.matrix."
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 			# check if the size of the passed state is 2**nqbits
 			(rows,cols) = self.initstate.shape
 			if rows != 2**self.nqbits or cols != 1:
 				errmsg = "User Error. wrong dimensions. Initstate shape must be (2^nqbits,1)."
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 			# check if normalized
 			p = 0
 			for i in range(2**self.nqbits):
 				p += np.absolute(self.initstate[i].item(0))**2
 			if np.absolute(p-1.0) > self.maxerr:
 				errmsg = "User Error. Initial state not normalized."
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 			self.sys_state = deepcopy(self.initstate)
 		elif not self.prepqubits is None:
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 			pqbit = np.transpose(np.matrix(self.prepqubits[self.nqbits-1],dtype=complex))
 			prepstate = pqbit
 			for i in reversed(range(self.nqbits-1)):
@@ -107,7 +107,7 @@ class QSimulator:
 
 	def kraus_global(self, kraus_spec):
 		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
-		raise qsim.QSimError(errmsg)
+		raise QSimError(errmsg)
 
 	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
 		# runstats - sim cpu time
@@ -118,20 +118,20 @@ class QSimulator:
 			# check the validity of the ifcbit[0] (reapeated cbits, all cbits within self.ncbits)
 			if not self.__valid_bit_list([ifcbit[0]],self.ncbits):
 				errmsg = "Error: the ifcbit[0] value is not valid."
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 			if ifcbit[1] != 0 and ifcbit[1] != 1:
 				errmsg = "Error: the ifcbit[1] value is not valid."
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 			cbit_cond = ( self.cregister[self.ncbits-1-ifcbit[0]] == ifcbit[1] )
 
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 		if self.validation:
 			if not self.qisunitary(oper):
 				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
-				raise qsim.QSimError(errmsg)
+				raise QSimError(errmsg)
 		# perform the gate operation if cbits condition is satisfied
 		if cbit_cond:
 			a_op = self.__stretched_mat(oper,qbit_list)
@@ -161,18 +161,18 @@ class QSimulator:
 		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
 		if not self.__valid_bit_list(qbit_list,self.nqbits):
 			errmsg = "Error: the list of qubits is not valid."
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 
 		if cbit_list is None:
 			cbit_list = qbit_list
 		# check the validity of the cbit_list (reapeated cbits, all cbits within self.ncbits)
 		if not self.__valid_bit_list(cbit_list,self.ncbits):
 			errmsg = "Error: the list of cbits is not valid."
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 		# check if equal number of qbits and cbits are passed
 		if len(qbit_list) != len(cbit_list):
 			errmsg = "Error: number of qbits and cbits passed are unequal."
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 
 		# align the qbits-to-measure to the MSB
 		qbit_reorder = self.__qbit_realign_list(qbit_list)
@@ -196,7 +196,7 @@ class QSimulator:
 			totprob += p
 		if np.absolute(totprob - 1.0) > self.maxproberr:
 			errmsg = "Internal error, total probability != 1  (total prob = {:f}".format(totprob)
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 
 		# OK, now see which one should be selected
 		toss = rnd.random()
@@ -408,10 +408,10 @@ class QSimulator:
 		opargs = str(qbit_list)
 		if (op.shape)[1] != (op.shape)[0]:
 			errmsg = "Error. Operator is not a square matrix. "+orignm+"'s dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 		if (2**len(qbit_list)) != (op.shape)[0]:
 			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
-			raise qsim.QSimError(errmsg)
+			raise QSimError(errmsg)
 		c_op = np.kron(op,np.eye(2**(self.nqbits-len(qbit_list))))
 		a_op = self.__aligned_op(c_op,qbit_list)
 		return a_op
