@@ -129,6 +129,9 @@ If visualize=True, the qreport() displays an additional bar graph showing the ma
 
 Brings the simulator to the same state as after QSimulator() call - initial state, qtrace, qzeros, ... everything.
 
+qreset() has been deprecated. Just re-instantiate the simulator object instead.
+
+
 2.3	**qc.qgate(quantum_gate, list_of_qubits, ifcbit=None, qtrace=False)**
 
 qgate() is used to perform quantum gate operations, quantum_gate, on a set of qubits, list_of_qubits.
