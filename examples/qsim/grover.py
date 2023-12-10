@@ -74,7 +74,7 @@ def main(n):
 
 	print("Take from the following, best of 5 results...")
 	for m in range(5):  # Look for best of 5
-		q.qreset()
+		q = qsim.QSimulator(n)
 		# Hn on x-register
 		q.qgate(qsim.Hn(n-1), list(range(n-1,0,-1)))
 		# prepare b as |->

@@ -83,20 +83,17 @@ for e in range(11):
 	istarr = istarr/norm
 	ist = np.transpose(np.matrix(istarr,dtype=complex))
 
-	# 2. Initialize the QSIM with that as the initial state
-	q = qsim.QSimulator(2,initstate=ist,validation=True)
-
-	# 3. now run the test 'sample' number of times to get statistics
+	# 2. now run the test 'sample' number of times to get statistics
 	samples = 1000
 	dist = [0]*2
 	for i in range(samples):
-		q.qreset()
+		q = qsim.QSimulator(2,initstate=ist,validation=True)
 		q.qgate(qsim.H(),[0])
 		m = q.qmeasure([0])
 		v = m[0]
 		dist[v] += 1
 
-	# 4. Pretty print the results
+	# 3. Pretty print the results
 	str_dist = ""
 	for i in range(2):
 		str_dist += "	|"+str(i)+"> "+str(np.round(100.0*float(dist[i])/float(samples),decimals=2))+"%"

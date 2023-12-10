@@ -20,8 +20,8 @@ print("Psst ... f(x) defined as having period of 4\n")
 idx = 0
 vals = [0,0]
 while idx < 2:
-	# Restart the QC machine
-	q.qreset()
+	# Get a fresh QC machine
+	q = qsim.QSimulator(nqbits)
 
 	# QFT(x) - F(x) - QFT(x) - Measure
 	q.qgate(qsim.QFT(nqbits-2),list(range(nqbits-1,1,-1)))
