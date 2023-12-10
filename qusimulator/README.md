@@ -396,7 +396,6 @@ Type a ? to get help, and that is all you will need to know about using the cli.
 	  i nqbits             -- Initialize QC
 	  m bit1 bit2 ...      -- Measure qubits
 	  q                    -- Quit
-	  r                    -- Reset to init
 	Gates:
 	  c cbit bit           -- CNOT Gate
 	  csw cbit bit1 bit2   -- C-SWAP Gate
