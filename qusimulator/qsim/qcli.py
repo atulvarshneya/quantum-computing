@@ -46,7 +46,7 @@ def help():
 
 clidata = {
 	"i":	[initqc,		"nqbits",	"args:i",		"Initialize QC"],
-	"r":	[qsim.QSimulator.qreset,	"",		"qsim:",		"Reset to init"],
+	# "r":	[qsim.QSimulator.qreset,	"",		"qsim:",		"Reset to init"],
 	"q":	[quit,			"",		"",			"Quit"],
 	"m":	[qsim.QSimulator.qmeasure,	"bit1 bit2 ...","qsim:,qlist:*",	"Measure qubits"],
 	"?":	[help,			"",		"",			"Help"],
@@ -64,7 +64,7 @@ clidata = {
 	"sw":	[qsim.SWAP,	"bit1 bit2",		"qgate:,qlist:2","SWAP Gate"],
 	"rnd":	[qsim.RND,	"bit",		"qgate:,qlist:1","Random aplitude Gate"],
 	"qft":	[qsim.QFT,	"n n-bits ...",	"args:i,qgate:,qlist:*","QFT(n) Gate"],
-	"hn":	[qsim.Hn,	"n n-bits ...",	"args:i,qgate:,qlist:*","Simultabeous n-HADAMARD Gates"]
+	"hn":	[qsim.Hn,	"n n-bits ...",	"args:i,qgate:,qlist:*","Simultaneous n-HADAMARD Gates"]
 	}
 
 def parse_aspec(aspec):
