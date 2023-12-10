@@ -9,6 +9,7 @@ import numpy as np
 import random as rnd
 from copy import deepcopy
 import time
+import sys
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
 ##            NOTE: when refering to bits by position numbers, MSB would be 7, in an 8-qubit machine
@@ -18,7 +19,17 @@ import time
 
 class NISQSimulator:
 
-	def __init__(self, nqbits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
+	def __init__(self,
+			nqbits,
+			ncbits=None,
+			initstate=None,
+			prepqubits=None,
+			noise_model=None,
+			qtrace=False,
+			qzeros=False,
+			verbose=False,
+			validation=False,
+			visualize=False):
 		# record input variables for reset
 		self.nqbits = nqbits
 		self.ncbits = ncbits
@@ -32,7 +43,30 @@ class NISQSimulator:
 		self.verbose = verbose
 		self.validation = validation
 		self.visualize = visualize
-		self.global_kraus_channel = []
+
+		# noise model
+		self.noise_opseq_allgates = None
+		self.noise_opseq_init = None
+		self.noise_opseq_qubits = None
+		if noise_model is not None:
+			noise_opseq_allgates = noise_model.get('noise_opseq_allgates', None)
+			# self.noise_opseq_all_gates => apply this noise to qubits of all gates
+			# all ops in noise spec MUST have 1-qubit operators
+			if noise_opseq_allgates is not None:
+				for noise_op in noise_opseq_allgates:
+					for elem in noise_op['operator'][0]:
+						op,s = elem
+						r,c = op[1].shape
+						if r != c or r != 2:
+							raise QSimError(f'only 1-qubit noise operators expected, {noise_opseq_allgates["name"]}:{op[0]} not so.')
+			self.noise_opseq_allgates = noise_opseq_allgates
+
+			self.noise_opseq_init = noise_model.get('noise_opseq_init', None)
+			# the noise will be applied in __initialize_sim() after creating self.sys_state
+
+			self.noise_opseq_qubits = noise_model.get('noise_opseq_qubits',None)
+			# this is used in qgate()
+
 
 		# runstats
 		self.qsteps = 0
@@ -46,9 +80,12 @@ class NISQSimulator:
 		self.probprec = 6 # number of digits after decimal
 		self.maxproberr = 10**(-self.probprec)
 
-		self.qreset()
+		self.__initialize_sim()
 
 	def qreset(self):
+		print(f'qreset() is deprecated. Reinstantiate the NISQsimulator object instead.', file=sys.stderr)
+		self.__initialize_sim()
+	def __initialize_sim(self):
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
@@ -83,6 +120,7 @@ class NISQSimulator:
 			# Now convert the state vector to density matrix
 			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
 		elif not self.prepqubits is None:
+			print('WARNINGS: prepqubits is deprecated. Use initstate instead.')
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QSimError(errmsg)
@@ -109,25 +147,154 @@ class NISQSimulator:
 				self.sys_state = np.kron(qbit[i],self.sys_state)
 			# Now convert the state vector to density matrix
 			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
+
+		# Now apply noise_opseq_init
+		if self.noise_opseq_init is not None:
+			all_qbits = list(range(self.nqbits))
+			noise_opseq_init_applier = [[op,all_qbits] for op in self.noise_opseq_init]
+			self.__apply_noise(noise_opseq_init_applier)
+
 		if self.trace:
 			self.qreport(header="Initial State")
 
-	def kraus_global(self, kraus_spec):
-		# argument validation TODO
-		# all ops in kraus spec MUST be 1-qubit operators
-		# print('validating kraus operator ...')
-		for elem in kraus_spec[0]:
-			op,s = elem
-			r,c = op[1].shape
-			if r != c or r != 2:
-				raise QSimError(f'only 1-qubit kraus operators expected, {op[0]} not so.')
-			# print(f'{op[0]} OK')
-		# print('validation done.')
-		self.global_kraus_channel = kraus_spec
 
-	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
+	# following are the structures explained wrt the noise in quantum operations
+	# 
+	# quantum operation:
+	#     qop = [name, opmatrix]
+	# 
+	# noise operator (kraus operator): this is returned by the functions in qnoise.py. 
+	# Users can construct custom noise_ops and use them.
+	#     noise_op = {
+	#         'name: name,
+	#         'operator': (
+	#             [(qop, prob), (qop,prob), ...],
+	#             state_prob
+	#          )
+	#      }
+	#
+	# noise operator sequence: this structure is provided as arguments to QC constructor, qnoise() 
+	# and qgate() functions.
+	#      noise_op_seq = [noise_op, noise_op, ...]
+	# 
+	# noise op seq applier: this is used in QC constructor to specify noise for specific qubits.
+	#      noise_op_seq_applier = [[noise_op, qbit_list], [noise_op, qbit_list], ...]
+	# 
+	# noise model: 
+	#      noise_model = {
+	# 			'noise_opseq_allgates': noise_opseq,       # e.g., [bit_flip(0.1), amplitude_damping(0.15), phase_damping(0.1)]
+	# 			'noise_opseq_init': noise_opseq,           # e.g., [bit_flip(0.1), phase_flip(0.1)]
+	# 			'noise_opseq_qubits': noise_opseq_applier  # e.g., [(depolarizing(0.1),[0,1]), ()]
+	# 	}
+	# 
+	# 
+	# 
+	# The rationale is as following -
+	# 1. noise is expected to be applied as a sequence of noise/kraus operators, hence that represents 
+	#    a unit of noise application
+	# 2. qnoise() therefore takes noise_op_seq as the input, along with the qubits list to which 
+	#    it is applied.
+	# 3. qgate() also takes noise arguments exactly the same as qnoise.
+	#    qgate() combines the noise_op_seq specified as a default for all gates, and the specific
+	#    noise_op_seq specified for this qgate invokation, and constructs the noise_op_seq_applier 
+	#    for the combined noise
+	# 4. __apply_noise() takes noise_op_seq_applier as the argument. The calling function must 
+	#    construct this sequence of elements.
+	#    NOTE: noise_op_seq_applier can take a hetrogeneous mix of 1-qubit and 2-qubit noise operators
+	#    as long as they are matched with the valid number of qubits
+	#    NOTE: (TODO) If the noise_op_seq_applier includes a 2-qubit kraus operator, the corresponding
+	#    qubit list argument must be exactly 2 qubits, else an exception will be raised
+
+	def qnoise(self, noise_op_sequence, qbit_list, qtrace=False):
+		# TODO check for 1-qubit noise op => variable num of qubits allowed.
+		# If 2-qubit noise op, then only 2 qubits allowed
+
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits)
+		if not self.__valid_bit_list(qbit_list,self.nqbits):
+			errmsg = f"Error: the list of qubits {qbit_list} is not valid."
+			raise QSimError(errmsg)
+
+		# check input argument
+		pass
+
+		noise_op_applier_sequence = []
+		for noise_operator in noise_op_sequence:
+			noise_op_applier_sequence.append([noise_operator, qbit_list])
+
+		self.__apply_noise(noise_op_applier_sequence=noise_op_applier_sequence)
+		# noise operators are trace preserving, so check that here
+		assert(abs(np.trace(self.sys_state) - 1.0) < self.maxerr)
+
+		# get the name of the noise
+		noise_name = self.__noise_applier_name(noise_op_applier_sequence)
+
+		if qtrace or self.trace:
+			opname = f'NOISE:[{noise_name}]'
+			opargs = str(qbit_list)
+			hdr = opname
+			self.qreport(header=hdr)
+
+
+	def __noise_applier_name(self, noise_op_applier_sequence):
+		noise_names_list = []
+		for nos_appl,q_appl in noise_op_applier_sequence:
+			noise_names_list.append(f"({nos_appl['name']},{q_appl})")
+		noise_name = ",".join(noise_names_list)
+		return noise_name
+
+
+	# noise_op_applier_seuence = (noise_op,qbit_list), (noise_op,qbit_list), ...
+	def __apply_noise(self, noise_op_applier_sequence):
+		for noise_op_applier in noise_op_applier_sequence:
+			noise_operator, qbit_list = noise_op_applier
+			# apply the noise on the specified qubits
+			op_seq, state_prob_mult = noise_operator['operator']
+			for qbit in qbit_list:
+				# calculate the noise to be added for this qubit
+				noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
+				for op,prob in op_seq:
+					a_op = self.__stretched_mat(op,[qbit])
+					noise_component = prob * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
+					noise_add = noise_add + noise_component
+				# add noise to sys_state per the probability weights in noise spec
+				self.sys_state = state_prob_mult * self.sys_state + noise_add
+				# self.qreport(header=f'state after noise added to qubit {qbit}',state=self.sys_state)
+
+
+	def qgate(self, oper, qbit_list, ifcbit=None, noise_op_sequence=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
 		# runstats - sim cpu time
 		st = time.process_time()
+
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+		if not self.__valid_bit_list(qbit_list,self.nqbits):
+			errmsg = "Error: the list of qubits is not valid."
+			raise QSimError(errmsg)
+		if self.validation:
+			if not self.qisunitary(oper):
+				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+				raise QSimError(errmsg)
+
+		# Put together noise applier: 
+		# 1. noise on specific qubits
+		noise_op_applier_sequence_qubits = []
+		if self.noise_opseq_qubits is not None:
+			for noise_operator,qb in self.noise_opseq_qubits:
+				applier_qbits = [q for q in qb if q in qbit_list]
+				if len(applier_qbits) > 0:
+					noise_op_applier_sequence_qubits.append([noise_operator,applier_qbits])
+		# 2. self.noise_all_gates
+		noise_op_applier_sequence_all_gates = []
+		if self.noise_opseq_allgates is not None:
+			for noise_operator in self.noise_opseq_allgates:
+				noise_op_applier_sequence_all_gates.append([noise_operator, qbit_list])
+		# 3. current gate noise
+		noise_op_applier_sequence_this_gate = []
+		if noise_op_sequence is not None:
+			for noise_operator in noise_op_sequence:
+				noise_op_applier_sequence_this_gate.append([noise_operator, qbit_list])
+		noise_op_applier_sequence_overall = noise_op_applier_sequence_all_gates + noise_op_applier_sequence_qubits + noise_op_applier_sequence_this_gate
+		# get the name of the noise
+		noise_name = self.__noise_applier_name(noise_op_applier_sequence_overall)
 
 		cbit_cond = True
 		if not ifcbit is None:
@@ -140,39 +307,23 @@ class NISQSimulator:
 				raise QSimError(errmsg)
 			cbit_cond = ( self.cregister[self.ncbits-1-ifcbit[0]] == ifcbit[1] )
 
-		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		if not self.__valid_bit_list(qbit_list,self.nqbits):
-			errmsg = "Error: the list of qubits is not valid."
-			raise QSimError(errmsg)
-		if self.validation:
-			if not self.qisunitary(oper):
-				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
-				raise QSimError(errmsg)
 		# perform the gate operation if cbits condition is satisfied
 		if cbit_cond:
 			a_op = self.__stretched_mat(oper,qbit_list)
 			self.sys_state = a_op * self.sys_state * np.transpose(np.conjugate(a_op))
 
-			# add noise if kraus_chan present
-			if len(self.global_kraus_channel) > 0:
-				op_seq, state_prob_mult = self.global_kraus_channel
+			# and, apply noise
+			self.__apply_noise(noise_op_applier_sequence=noise_op_applier_sequence_overall)
 
-				for qbit in range(self.nqbits):
-					# calculate the noise to be added for this qubit
-					noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
-					for op,prob in op_seq:
-						a_op = self.__stretched_mat(op,[qbit])
-						noise_component = prob * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
-						noise_add = noise_add + noise_component
-						# self.qreport(header=f'cumulative noise_add {op[0]}',state=noise_add)
-					# add noise to sys_state per the probability weights in kraus_chan
-					self.sys_state = state_prob_mult * self.sys_state + noise_add
+		# overall gate application, including noise operators, is trace preserving, so check that here
+		assert(abs(np.trace(self.sys_state) - 1.0) < self.maxerr)
 
 		if qtrace or self.trace:
-			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
 			opname = oper[0]
 			opargs = str(qbit_list)
-			hdr = opname + " Qubit" + opargs + cond_cbit_arg
+			noise_part = "" if noise_name == "" else f' NOISE:[{noise_name}]'
+			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
+			hdr = opname + " Qubit" + opargs + noise_part + cond_cbit_arg
 			self.qreport(header=hdr)
 
 		#update runstats
@@ -486,15 +637,3 @@ class NISQSimulator:
 
 if __name__ == "__main__":
 	pass
-	import qsim
-	import qsim.kraus
-	q = NISQSimulator(2,qtrace=True, verbose=False)
-
-	# q.qgate(qsim.X(),[0])
-
-	kraus_spec = qsim.kraus.kraus_channel_spec('Depolarizing')
-	q.kraus_global(kraus_spec(0.1))
-
-	I = ['Identity',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
-	q.qgate(I,[0])
-	q.qgate(I,[0])

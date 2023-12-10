@@ -12,6 +12,7 @@ CNOT Qubit[1, 0]
 000000    0.70710678+0.00000000j
 000011    0.70710678+0.00000000j
 CREGISTER: 000000
+WARNINGS: prepqubits is deprecated. Use initstate instead.
 
 Initial State
 000101    1.00000000+0.00000000j

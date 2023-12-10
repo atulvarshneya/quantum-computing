@@ -9,6 +9,7 @@ import numpy as np
 import random as rnd
 from copy import deepcopy
 import time
+import sys
 
 ## IMPORTANT: The qubit/clbit ordering convention is -- [MSB, ..., LSB]. Yes, :-), [0] is MSB.
 ##            NOTE: when refering to bits by position numbers, MSB would be 7, in an 8-qubit machine
@@ -18,7 +19,16 @@ import time
 
 class QSimulator:
 
-	def __init__(self, nqbits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, verbose=False, validation=False, visualize=False):
+	def __init__(self,
+			nqbits,
+			ncbits=None,
+			initstate=None,
+			prepqubits=None,
+			qtrace=False,
+			qzeros=False,
+			verbose=False,
+			validation=False,
+			visualize=False):
 		# record input variables for reset
 		self.nqbits = nqbits
 		self.ncbits = ncbits
@@ -45,9 +55,12 @@ class QSimulator:
 		self.probprec = 6 # number of digits after decimal
 		self.maxproberr = 10**(-self.probprec)
 
-		self.qreset()
+		self.__initialize_sim()
 
 	def qreset(self):
+		print(f'qreset() is deprecated. Reinstantiate the Qsimulator object instead.')
+		self.__initialize_sim()
+	def __initialize_sim(self):
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
 		self.disp_zeros = self.disp_zerosINP
@@ -80,6 +93,7 @@ class QSimulator:
 				raise QSimError(errmsg)
 			self.sys_state = deepcopy(self.initstate)
 		elif not self.prepqubits is None:
+			print('WARNINGS: prepqubits is deprecated. Use initstate instead.')
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QSimError(errmsg)
@@ -105,13 +119,23 @@ class QSimulator:
 		if self.trace:
 			self.qreport(header="Initial State")
 
-	def kraus_global(self, kraus_spec):
+
+	def qkraus(self, kraus_op, qbit_list, qtrace=False):
 		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
 		raise QSimError(errmsg)
 
 	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
 		# runstats - sim cpu time
 		st = time.process_time()
+
+		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
+		if not self.__valid_bit_list(qbit_list,self.nqbits):
+			errmsg = "Error: the list of qubits is not valid."
+			raise QSimError(errmsg)
+		if self.validation:
+			if not self.qisunitary(oper):
+				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
+				raise QSimError(errmsg)
 
 		cbit_cond = True
 		if not ifcbit is None:
@@ -124,23 +148,15 @@ class QSimulator:
 				raise QSimError(errmsg)
 			cbit_cond = ( self.cregister[self.ncbits-1-ifcbit[0]] == ifcbit[1] )
 
-		# check the validity of the qbit_list (reapeated qbits, all qbits within self.nqbits
-		if not self.__valid_bit_list(qbit_list,self.nqbits):
-			errmsg = "Error: the list of qubits is not valid."
-			raise QSimError(errmsg)
-		if self.validation:
-			if not self.qisunitary(oper):
-				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
-				raise QSimError(errmsg)
 		# perform the gate operation if cbits condition is satisfied
 		if cbit_cond:
 			a_op = self.__stretched_mat(oper,qbit_list)
 			self.sys_state = a_op * self.sys_state
 
 		if qtrace or self.trace:
-			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
 			opname = oper[0]
 			opargs = str(qbit_list)
+			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
 			hdr = opname + " Qubit" + opargs + cond_cbit_arg
 			self.qreport(header=hdr)
 

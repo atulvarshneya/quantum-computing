@@ -1,60 +1,71 @@
 #!/usr/bin/env python
 
 import qsim
-import qsim.kraus
-import numpy as np
+import qsim.qnoisemodel as nmdl
 
-kraus_channels = [
-	'BitFlip',
-	'PhaseFlip',
-	'Depolarizing',
-	'AmplitudeDamping',
-	# 'GeneralizedAmplitudeDamping',
-	'PhaseDamping',
-	'PauliChannel'
-	]
 
 # print the list of canned kraus channels
-q = qsim.NISQSimulator(1,qtrace=False, verbose=False)
-kraus_chans = list(qsim.kraus.kraus_channel_list())
-kraus_chans.sort()
-print(kraus_chans)
+noise_channels = list(nmdl.noise_operator_list().keys())
+noise_channels.sort()
+print(noise_channels)
 print()
 
-for kchanname in kraus_channels:
-	print('==========================================================================')
-	print('Kraus Channel: ',kchanname)
-	print('--------------------------------------------------------------------------')
+# test 01 - without any noise model
+print('test 01 - without any noise model')
+q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
+q.qgate(qsim.X(),[0])
+q.qgate(qsim.C(),[0,1])
+q.qgate(qsim.X(),[2])
+q.qgate(qsim.H(),[2])
 
-	q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
+# test 02 - direct call to qnoise
+print('test 02 - direct call to qnoise')
+q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
+q.qgate(qsim.X(),[0])
+q.qnoise(noise_op_sequence=[nmdl.bit_flip(probability=0.1)], qbit_list=[0,1,2], qtrace=True)
+q.qgate(qsim.C(),[0,1])
+q.qgate(qsim.X(),[2])
+q.qgate(qsim.H(),[2])
 
-	kraus_spec = qsim.kraus.kraus_channel_spec(kchanname)
-	q.kraus_global(kraus_spec())
+# test 03 - adding noise applied to a gate invokation
+print('test 03 - adding noise applied to a gate invokation')
+q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
+q.qgate(qsim.X(),[0])
+q.qnoise(noise_op_sequence=[nmdl.bit_flip(probability=0.1)], qbit_list=[0,1,2], qtrace=True)
+q.qgate(qsim.C(),[0,1])
+q.qgate(qsim.X(),[2], noise_op_sequence=[nmdl.phase_flip(probability=0.1)])
+q.qgate(qsim.H(),[2])
 
+# test 04 - adding noise applied to all gates
+print('test 04 - adding noise at init, applied to specifc qubits, all gates')
+noise_model = {
+	'noise_pseq_init': [nmdl.phase_flip(probability=0.2)],
+	'noise_opseq_allgates': [nmdl.depolarizing(probability=0.1)],
+	'noise_opseq_qubits': [[nmdl.bit_flip(probability=0.3),[1]]],
+}
+q = qsim.NISQSimulator(3, noise_model=noise_model, qtrace=True, verbose=True)
+q.qgate(qsim.X(),[0])
+q.qnoise(noise_op_sequence=[nmdl.bit_flip(probability=0.1)], qbit_list=[0,1,2], qtrace=True)
+q.qgate(qsim.C(),[0,1])
+q.qgate(qsim.X(),[2], noise_op_sequence=[nmdl.phase_flip(probability=0.1)])
+q.qgate(qsim.H(),[2])
+
+# test 05 - a blanket test for all noise operators applied to all gates, using their default arguments
+for nchanid in noise_channels:
+	print(f'test 05 - Blanket test - {nchanid}')
+	krfn = nmdl.noise_operator_lookup(nchanid)
+	noise_model = {
+		'noise_opseq_allgates': [krfn()],
+		'noise_pseq_init': None
+	}
+	q = qsim.NISQSimulator(3, noise_model=noise_model, qtrace=True, verbose=True)
 	q.qgate(qsim.X(),[0])
-	_,state,_ = q.qsnapshot()
-	print(state)
-	print(f'State trace {np.trace(state):.4f}')
-	print()
+	q.qnoise(noise_op_sequence=[nmdl.bit_flip(probability=0.1)], qbit_list=[0,1,2], qtrace=True)
+	q.qgate(qsim.C(),[0,1])
+	q.qgate(qsim.X(),[2], noise_op_sequence=[nmdl.phase_flip(probability=0.1)])
+	q.qgate(qsim.H(),[2])
 
-	q.qgate(qsim.H(),[0])
-	_,state,_ = q.qsnapshot()
-	print(state)
-	print(f'State trace {np.trace(state):.4f}')
-	print()
-
-	q.qgate(qsim.X(),[1])
-	_,state,_ = q.qsnapshot()
-	print(state)
-	print(f'State trace {np.trace(state):.4f}')
-	print()
-
-	q.qgate(qsim.H(),[1])
-	_,state,_ = q.qsnapshot()
-	print(state)
-	print(f'State trace {np.trace(state):.4f}')
-	print()
-
-	# I = ['Identity',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
-	# q.qgate(I,[0])
-	# q.qmeasure([0])
+# test06 - list noise channel/operator signatures
+noise_chans_list = nmdl.noise_operator_list()
+for nchanid in noise_chans_list.keys():
+	print(f'{nchanid:30s}  {noise_chans_list[nchanid]}')

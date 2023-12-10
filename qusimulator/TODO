@@ -1,0 +1,4 @@
+1. Add 2-qubit noise channels.
+2. Nice to have: Support for a final readout of state (a measurement at the end of execution) - readout specified qubits, or all if not specified.
+    Does not affect the regular measurement which can be performed during the run (e.g., in teleportaion), this one is in addition to it.
+    Make sure there are no cases in examples and tests where qmeasure reads qubits into clbits not naturally aligned, e.g., qmeasure([0,1,2],[2,1,0]).
