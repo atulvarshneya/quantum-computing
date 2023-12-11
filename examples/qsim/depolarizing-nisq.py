@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import qsim
-import qsim.qnoisemodel
+import qsim.noisemodel as nmdl
 import numpy as np
 
 print('Adding noise channel to all gates')
@@ -15,9 +15,11 @@ print()
 
 # with probabilty = 0.75, the bell-state gets completely depolarized (TODO source of this info?)
 # i.e., becomes 1/4*I
-noise_op = qsim.qnoisemodel.depolarizing(probability=0.75)
+noise_allgates = nmdl.NoiseOperatorSequence(
+    nmdl.depolarizing(probability=0.75),
+)
 noise_model = {
-    'noise_opseq_allgates': [noise_op]
+    'noise_opseq_allgates': noise_allgates,
 }
 q = qsim.NISQSimulator(2, noise_model=noise_model, qtrace=True, verbose=False)
 

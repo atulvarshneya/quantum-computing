@@ -5,6 +5,7 @@
 # Author: Atul Varshneya
 
 from qsim.qSimException import QSimError
+import qsim.noisemodel as nmdl
 import numpy as np
 import random as rnd
 from copy import deepcopy
@@ -50,21 +51,29 @@ class NISQSimulator:
 		self.noise_opseq_qubits = None
 		if noise_model is not None:
 			noise_opseq_allgates = noise_model.get('noise_opseq_allgates', None)
-			# self.noise_opseq_all_gates => apply this noise to qubits of all gates
-			# all ops in noise spec MUST have 1-qubit operators
 			if noise_opseq_allgates is not None:
+				if type(noise_opseq_allgates) is not nmdl.NoiseOperatorSequence:
+					raise QSimError(f'ERROR: noise_opseq_allgates must be an object of class NoiseOperatorSequence')
 				for noise_op in noise_opseq_allgates:
-					for elem in noise_op['operator'][0]:
+					for elem in noise_op:
 						op,s = elem
 						r,c = op[1].shape
 						if r != c or r != 2:
 							raise QSimError(f'only 1-qubit noise operators expected, {noise_opseq_allgates["name"]}:{op[0]} not so.')
 			self.noise_opseq_allgates = noise_opseq_allgates
+			# self.noise_opseq_all_gates used in qgate() to apply this noise to qubits of every gates
+			# TODO: check that all ops self.noise_opseq_all_gates MUST have 1-qubit operators
 
 			self.noise_opseq_init = noise_model.get('noise_opseq_init', None)
-			# the noise will be applied in __initialize_sim() after creating self.sys_state
+			if self.noise_opseq_init is not None:
+				if type(self.noise_opseq_init) is not nmdl.NoiseOperatorSequence:
+					raise QSimError(f'ERROR: noise_opseq_init must be an object of class NoiseOperatorSequence')
+			# the noise is applied in __initialize_sim() after creating self.sys_state
 
 			self.noise_opseq_qubits = noise_model.get('noise_opseq_qubits',None)
+			if self.noise_opseq_qubits is not None:
+				if type(self.noise_opseq_qubits) is not nmdl.NoiseOperatorApplierSequense:
+					raise QSimError(f'ERROR: noise_opseq_init must be an object of class NoiseOperatorApplierSequense')
 			# this is used in qgate()
 
 
@@ -214,19 +223,20 @@ class NISQSimulator:
 			errmsg = f"Error: the list of qubits {qbit_list} is not valid."
 			raise QSimError(errmsg)
 
-		# check input argument
-		pass
+		# check noie_op_sequence argument
+		if type(noise_op_sequence) is not nmdl.NoiseOperatorSequence:
+			raise qsim.QSimError('ERROR: NoiseOperatorSequence object expected.')
 
-		noise_op_applier_sequence = []
+		noise_op_applier_sequence = nmdl.NoiseOperatorApplierSequense()
 		for noise_operator in noise_op_sequence:
-			noise_op_applier_sequence.append([noise_operator, qbit_list])
+			noise_op_applier_sequence.add(noise_operator, qbit_list)
 
 		self.__apply_noise(noise_op_applier_sequence=noise_op_applier_sequence)
 		# noise operators are trace preserving, so check that here
 		assert(abs(np.trace(self.sys_state) - 1.0) < self.maxerr)
 
 		# get the name of the noise
-		noise_name = self.__noise_applier_name(noise_op_applier_sequence)
+		noise_name = noise_op_applier_sequence.name
 
 		if qtrace or self.trace:
 			opname = f'NOISE:[{noise_name}]'
@@ -235,29 +245,23 @@ class NISQSimulator:
 			self.qreport(header=hdr)
 
 
-	def __noise_applier_name(self, noise_op_applier_sequence):
-		noise_names_list = []
-		for nos_appl,q_appl in noise_op_applier_sequence:
-			noise_names_list.append(f"({nos_appl['name']},{q_appl})")
-		noise_name = ",".join(noise_names_list)
-		return noise_name
-
-
 	# noise_op_applier_seuence = (noise_op,qbit_list), (noise_op,qbit_list), ...
 	def __apply_noise(self, noise_op_applier_sequence):
 		for noise_op_applier in noise_op_applier_sequence:
 			noise_operator, qbit_list = noise_op_applier
 			# apply the noise on the specified qubits
-			op_seq, state_prob_mult = noise_operator['operator']
+			# op = noise_operator.operator_prob_pair
 			for qbit in qbit_list:
 				# calculate the noise to be added for this qubit
-				noise_add = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
-				for op,prob in op_seq:
+				state_noise_cumulative = np.matrix(np.zeros((2**self.nqbits, 2**self.nqbits)), dtype=complex)
+				for op,prob in noise_operator:
 					a_op = self.__stretched_mat(op,[qbit])
-					noise_component = prob * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
-					noise_add = noise_add + noise_component
-				# add noise to sys_state per the probability weights in noise spec
-				self.sys_state = state_prob_mult * self.sys_state + noise_add
+					state_noise_component = prob * (a_op * self.sys_state * np.transpose(np.conjugate(a_op)))
+					state_noise_cumulative = state_noise_cumulative + state_noise_component
+				# OLD - add noise to sys_state per the probability weights in noise spec
+				# OLD - self.sys_state = state_prob_mult * self.sys_state + state_noise_cumulative
+				# update sys state
+				self.sys_state = state_noise_cumulative
 				# self.qreport(header=f'state after noise added to qubit {qbit}',state=self.sys_state)
 
 
@@ -274,27 +278,33 @@ class NISQSimulator:
 				errmsg = "Error: Operator {:s} is not Unitary".format(oper[0])
 				raise QSimError(errmsg)
 
-		# Put together noise applier: 
+		# Put together noise applier:
+		noise_op_applier_sequence_overall = nmdl.NoiseOperatorApplierSequense()
 		# 1. noise on specific qubits
-		noise_op_applier_sequence_qubits = []
+		noise_op_applier_sequence_qubits = nmdl.NoiseOperatorApplierSequense()
 		if self.noise_opseq_qubits is not None:
 			for noise_operator,qb in self.noise_opseq_qubits:
 				applier_qbits = [q for q in qb if q in qbit_list]
 				if len(applier_qbits) > 0:
-					noise_op_applier_sequence_qubits.append([noise_operator,applier_qbits])
+					noise_op_applier_sequence_qubits.add(noise_operator,applier_qbits)
+		noise_op_applier_sequence_overall.extend(noise_op_applier_sequence_qubits)
 		# 2. self.noise_all_gates
-		noise_op_applier_sequence_all_gates = []
+		noise_op_applier_sequence_all_gates = nmdl.NoiseOperatorApplierSequense()
 		if self.noise_opseq_allgates is not None:
 			for noise_operator in self.noise_opseq_allgates:
-				noise_op_applier_sequence_all_gates.append([noise_operator, qbit_list])
+				noise_op_applier_sequence_all_gates.add(noise_operator, qbit_list)
+		noise_op_applier_sequence_overall.extend(noise_op_applier_sequence_all_gates)
 		# 3. current gate noise
-		noise_op_applier_sequence_this_gate = []
+		noise_op_applier_sequence_this_gate = nmdl.NoiseOperatorApplierSequense()
+		## TODO validate noise_op_seqience is NoiseOperatorSequence object
 		if noise_op_sequence is not None:
+			if type(noise_op_sequence) is not nmdl.NoiseOperatorSequence:
+				raise qsim.QSimError('ERROR: NoiseOperatorSequence object expected.')
 			for noise_operator in noise_op_sequence:
-				noise_op_applier_sequence_this_gate.append([noise_operator, qbit_list])
-		noise_op_applier_sequence_overall = noise_op_applier_sequence_all_gates + noise_op_applier_sequence_qubits + noise_op_applier_sequence_this_gate
+				noise_op_applier_sequence_this_gate.add(noise_operator, qbit_list)
+		noise_op_applier_sequence_overall.extend(noise_op_applier_sequence_this_gate)
 		# get the name of the noise
-		noise_name = self.__noise_applier_name(noise_op_applier_sequence_overall)
+		noise_name = noise_op_applier_sequence_overall.name
 
 		cbit_cond = True
 		if not ifcbit is None:
@@ -321,7 +331,7 @@ class NISQSimulator:
 		if qtrace or self.trace:
 			opname = oper[0]
 			opargs = str(qbit_list)
-			noise_part = "" if noise_name == "" else f' NOISE:[{noise_name}]'
+			noise_part = '' if noise_name == '' else f' NOISE:[{noise_name}]'
 			cond_cbit_arg = '' if ifcbit is None else ' if Cbit'+str(ifcbit[0])+'='+str(ifcbit[1])
 			hdr = opname + " Qubit" + opargs + noise_part + cond_cbit_arg
 			self.qreport(header=hdr)
@@ -637,3 +647,23 @@ class NISQSimulator:
 
 if __name__ == "__main__":
 	pass
+
+	import qsim
+	import qsim.noisemodel as nmdl
+
+	noise_op1 = nmdl.bit_flip(0.1)
+	noise_op2 = nmdl.phase_flip(0.2)
+	noise_opseq = nmdl.NoiseOperatorSequence(noise_op1)
+	noise_opseq_applier = nmdl.NoiseOperatorApplierSequense(noise_opseq,[0])
+	print(noise_opseq.noise_operator_sequence)
+	noise_model = {
+		'noise_opseq_qubits': noise_opseq_applier,
+	}
+	q = NISQSimulator(2, qtrace=True, verbose=False)
+	q.qgate(qsim.H(),[0])
+	q.qgate(qsim.C(),[0,1], noise_op_sequence=noise_opseq)
+
+	noise_op1 = nmdl.depolarizing(probability=0.3)
+	noise_op2 = nmdl.generalized_amplitude_damping(probability=0.4, gamma=0.1)
+	noise_opseq = nmdl.NoiseOperatorSequence(noise_op1, noise_op2)
+	q.qnoise(noise_opseq,[1])
