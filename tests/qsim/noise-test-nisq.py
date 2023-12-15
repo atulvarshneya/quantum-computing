@@ -39,7 +39,7 @@ q.qgate(qsim.H(),[2])
 # test 04 - adding noise applied to all gates
 print('test 04 - adding noise at init, applied to specifc qubits, all gates')
 noise_model = {
-	'noise_pseq_init': nmdl.NoiseOperatorSequence(nmdl.phase_flip(probability=0.2)),
+	'noise_opseq_init': nmdl.NoiseOperatorSequence(nmdl.phase_flip(probability=0.2)),
 	'noise_opseq_allgates': nmdl.NoiseOperatorSequence(nmdl.depolarizing(probability=0.1)),
 	'noise_opseq_qubits': nmdl.NoiseOperatorApplierSequense(nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.3)),[1]),
 }
@@ -56,7 +56,7 @@ for nchanid in noise_channels:
 	krfn = nmdl.noise_operator_lookup(nchanid)
 	noise_model = {
 		'noise_opseq_allgates': nmdl.NoiseOperatorSequence(krfn()),
-		'noise_pseq_init': None
+		'noise_opseq_init': None
 	}
 	q = qsim.NISQSimulator(3, noise_model=noise_model, qtrace=True, verbose=True)
 	q.qgate(qsim.X(),[0])

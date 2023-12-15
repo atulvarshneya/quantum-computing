@@ -50,6 +50,10 @@ class NISQSimulator:
 		self.noise_opseq_init = None
 		self.noise_opseq_qubits = None
 		if noise_model is not None:
+			noise_model_keys = ['noise_opseq_init', 'noise_opseq_allgates', 'noise_opseq_qubits']
+			for k in noise_model.keys():
+				if k not in noise_model_keys:
+					raise QSimError(f'ERROR: incorrect key name {k} in noise_model')
 			noise_opseq_allgates = noise_model.get('noise_opseq_allgates', None)
 			if noise_opseq_allgates is not None:
 				if type(noise_opseq_allgates) is not nmdl.NoiseOperatorSequence:
