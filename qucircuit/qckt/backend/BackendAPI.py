@@ -46,20 +46,21 @@ class StateVector:
 
 	def __str__(self):
 		svec_str = ""
-		if len(self.value.shape) > 1:
+		dispvalue = self.value
+		if len(dispvalue.shape) > 1:
 			svec_str = "Density matrix DIAGONAL\n"
-			self.value = np.diagonal(self.value)
+			dispvalue = np.diagonal(self.value)
 
 		### wonky way to find number of qubits
 		nq = 0
-		n = len(self.value) - 1
+		n = len(dispvalue) - 1
 		while n > 0:
 			nq = nq + 1
 			n = n >> 1
 
 		statefmt = "{0:"+"0{0:d}b".format(nq)+"}"
 		s = 0
-		for i in self.value:
+		for i in dispvalue:
 			if self.verbosity or np.absolute(i) > 10**(-6):
 				svec_str = svec_str + statefmt.format(s) + "  " + "{:.8f}".format(i) + "\n"
 			s += 1
