@@ -1,0 +1,132 @@
+test 01 - custom gate
+q000 -[H]-[myCX M]-[myX M]-----------------
+          |      |                         
+q001 -----|------|---------[myX M]---------
+          |      |                         
+q002 -----[myCX L]-----------------[myX M]-
+                                           
+creg ======================================
+                                           
+Initial State
+000    1.00+0.00j  | 1.0000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+H Qubit[0]
+000    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+001    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myCX Qubit[0, 2]
+000    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+101    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[0]
+001    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+100    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[1]
+011    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+110    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[2]
+010    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+111    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+test 02 - realign should preserve the custom gate definitions
+q000 -[H]-[myCX M]-[myX M]-----------------[myX M]-
+          |      |                                 
+q001 -----[myCX L]-----------------[myX M]---------
+                                                   
+q002 ----------------------[myX M]-----------------
+                                                   
+creg ==============================================
+                                                   
+Initial State
+000    1.00+0.00j  | 1.0000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+H Qubit[0]
+000    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+001    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myCX Qubit[0, 1]
+000    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+011    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[0]
+001    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+010    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[2]
+101    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+110    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[1]
+100    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+111    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[0]
+101    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+110    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+test 03 - append should preserve custom gate definitions
+q000 -[H]-[myCX M]---------[myCX M]-
+          |      |         |      | 
+q001 -----[myCX L]---------[myCX L]-
+                                    
+q002 --------------[myX M]----------
+                                    
+creg ===============================
+                                    
+Initial State
+000    1.00+0.00j  | 1.0000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+H Qubit[0]
+000    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+001    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myCX Qubit[0, 1]
+000    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+011    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myX Qubit[2]
+100    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+111    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+
+myCX Qubit[0, 1]
+100    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+101    0.50+0.00j 0.50+0.00j  | 0.5000+0.0000j
+Mixed State Purity: 1.0000
+CREGISTER: 000
+

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import qckt.Gates
+
 class Canvas:
 
 	def __init__(self,circuit):
@@ -127,10 +129,23 @@ class Canvas:
 		list.append(col)
 		return self
 
-	def draw(self):
+	def draw(self,show_noise=True):
 		self._initcanvas()
+		### draw the init noise
+		noise_model = self.circuit.noise_model
+		circuit_qubits = [i for i in range(self.circuit.nqubits)]
+		if (noise_model is not None) and show_noise:
+			if noise_model.kraus_opseq_init is not None:
+				init_noise_list = []
+				for op in noise_model.kraus_opseq_init:
+					init_noise_list.append(op.name)
+				init_noise_label = 'INIT:'+','.join(init_noise_list)
+				self._add_simple(circuit_qubits,init_noise_label)
 		### run through the circuit
 		for g in self.circuit:
-			g.addtocanvas(self)
+			if (not issubclass(type(g), qckt.Gates.NOISE)) or show_noise:
+				g.addtocanvas(self)
+			if show_noise:
+				g.addtocanvas_gatenoise(self, noise_model=self.circuit.noise_model)
 		self._paint()
 

@@ -1,8 +1,34 @@
 #!/usr/bin/env python
-import numpy as np
+import sys
 import qsim
+import qsim.noisemodel as nmdl
+import qckt.noisemodel as ns
 from qckt.backend.BackendAPI import *
 from qckt.qException import QCktException
+
+def convert_to_qsim_noise_op_applier_seq(qckt_kraus_op_applier_seq):
+	qsim_noise_applier_seq = None
+	if qckt_kraus_op_applier_seq is not None:
+		qsim_noise_applier_seq = nmdl.NoiseOperatorApplierSequense()
+		for op,qbits in qckt_kraus_op_applier_seq:
+			opname = op.name
+			kraus_op = op.kraus_op
+			nqubits = op.nqubits
+			qsim_op = nmdl.NoiseOperator(name=opname,operator_prob_set=kraus_op,nqubits=nqubits)
+			qsim_noise_applier_seq.add(noise_ops=qsim_op,qubit_list=qbits)
+	return qsim_noise_applier_seq
+
+def convert_to_qsim_noise_op_sequence(qckt_kraus_op_sequence):
+	qsim_noise_opseq = None
+	if qckt_kraus_op_sequence is not None:
+		qsim_noise_opseq = nmdl.NoiseOperatorSequence()
+		for op in qckt_kraus_op_sequence:
+			opname = op.name
+			opprobset = op.kraus_op
+			nqubits = op.nqubits
+			qsim_op = nmdl.NoiseOperator(name=opname,operator_prob_set=opprobset,nqubits=nqubits)
+			qsim_noise_opseq.add_noise_operator(qsim_op)
+	return qsim_noise_opseq
 
 
 class NISQeng:
@@ -12,30 +38,41 @@ class NISQeng:
 	def runjob(self, job):
 		cregres_list = [None]*job.shots
 		for shot_count in range(job.shots):
-			qc = qsim.NISQSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
-			if not job.noise_profile is None:
-				kraus_spec = qc.qsim_noise_profile(**job.noise_profile)
-				qc.qsim_noise_spec(kraus_spec)
+			qc = qsim.NISQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=False,verbose=job.verbose)
+			if job.noise_model is not None and job.noise_model.kraus_opseq_init is not None:
+				noise_opseq_init = convert_to_qsim_noise_op_sequence(job.noise_model.kraus_opseq_init)
+				qc.qnoise(noise_op_sequence=noise_opseq_init, qbit_list=list(range(job.nqubits)))
 			for op in job.assembledCkt:
 				if op["op"] == "gate":
-					if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
-						for q in op["qubits"][0]:
-							qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
-					else:
-						qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
+					qckt_noise_op = op['krausOps']
+					qsim_noise_opseq = convert_to_qsim_noise_op_applier_seq(qckt_noise_op)
+					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"],noise_op_sequence=qsim_noise_opseq)
 				elif op["op"] == "measure":
 					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+				elif op["op"] == "noise":
+					qckt_noise_op = op['krausOps']
+					if type(op["krausOps"]) is ns.KrausOperator:
+						qsim_noise_op = nmdl.NoiseOperator(qckt_noise_op.name, qckt_noise_op.kraus_op)
+						qsim_noise_opseq = nmdl.NoiseOperatorSequence(qsim_noise_op)
+					elif type(op["krausOps"]) is ns.KrausOperatorSequence:
+						qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["krausOps"])
+					else:
+						raise QCktException('ERROR: krausOps should be KrausOperator or NoiseOperatorSequence')
+					qc.qnoise(qsim_noise_opseq, op['qubits'])
 				elif op["op"] == "probe":
 					pass
 				elif op["op"] == "noop":
 					pass
 				else:
 					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-			cregvec,statevec,runstats = qc.qsnapshot()
+			cregvec,statevecarr,runstats = qc.qsnapshot()
 			cregres = Cregister()
 			cregres.setvalue_vec(cregvec)
 			cregres_list[shot_count] = cregres
-		job.result = Result(cregvals=cregres_list)
+		# store the last statevec as well, helps with debugging
+		statevec = StateVector()
+		statevec.value = statevecarr
+		job.result = Result(cregvals=cregres_list,svecvals=statevec)
 		job.runstats = runstats
 		return self
 
@@ -47,19 +84,27 @@ class NISQdeb:
 		cregres_list = [None]*job.shots
 		if job.shots != 1:
 			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
-		qc = qsim.NISQSimulator(job.nqubits,job.nclbits,qtrace=job.qtrace,verbose=job.verbose)
-		if not job.noise_profile is None:
-			kraus_spec = qc.qsim_noise_profile(**job.noise_profile)
-			qc.qsim_noise_spec(kraus_spec)
+		qc = qsim.NISQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=job.qtrace,verbose=job.verbose)
+		if job.noise_model is not None and job.noise_model.kraus_opseq_init is not None:
+			noise_opseq_init = convert_to_qsim_noise_op_sequence(job.noise_model.kraus_opseq_init)
+			qc.qnoise(noise_op_sequence=noise_opseq_init, qbit_list=list(range(job.nqubits)))
 		for op in job.assembledCkt:
 			if op["op"] == "gate":
-				if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
-					for q in op["qubits"][0]:
-						qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
-				else:
-					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
+				qckt_noise_op = op['krausOps']
+				qsim_noise_opseq = convert_to_qsim_noise_op_applier_seq(qckt_noise_op)
+				qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"],noise_op_sequence=qsim_noise_opseq)
 			elif op["op"] == "measure":
 				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+			elif op["op"] == "noise":
+				qckt_noise_op = op['krausOps']
+				if type(op["krausOps"]) is ns.KrausOperator:
+					qsim_noise_op = nmdl.NoiseOperator(qckt_noise_op.name, qckt_noise_op.kraus_op)
+					qsim_noise_opseq = nmdl.NoiseOperatorSequence(qsim_noise_op)
+				elif type(op["krausOps"]) is ns.KrausOperatorSequence:
+					qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["krausOps"])
+				else:
+					raise QCktException('ERROR: krausOps should be KrausOperator or NoiseOperatorSequence')
+				qc.qnoise(qsim_noise_opseq, op['qubits'])
 			elif op["op"] == "probe":
 				nqbits = job.nqubits
 				ncbits = job.nclbits
@@ -105,6 +150,8 @@ class Qeng:
 						qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
 				elif op["op"] == "measure":
 					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+				elif op["op"] == "noise":
+					pass
 				elif op["op"] == "probe":
 					pass
 				elif op["op"] == "noop":
@@ -137,6 +184,8 @@ class Qdeb:
 					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
 			elif op["op"] == "measure":
 				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+			elif op["op"] == "noise":
+				pass
 			elif op["op"] == "probe":
 				nqbits = job.nqubits
 				ncbits = job.nclbits

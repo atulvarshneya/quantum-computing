@@ -20,7 +20,8 @@ svec1 = job1.get_svec()
 print("====================================")
 
 ck2 = qckt.QCkt(4)
-ck2.CUSTOM("CKT",op,[3,2,1,0])
+ck2.custom_gate("CKT",op)
+ck2.CKT(3,2,1,0)
 ck2.Probe("Circuit to_opMatrix()")
 ck2.draw()
 

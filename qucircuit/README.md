@@ -23,7 +23,7 @@ When writing reusable subroutines the assignment of qubits for various uses, e.g
 
 There are two classes of registers - `QRegister` and `CRegister`. the former for quantum bits, and the latter for classical bits. The distiction is for assigning the actual `qubits` and `clbits` to these registers.
 
-At the end of the day, both the registers are subclasses of list data type. So, operations as indexing (`qreg[2]`), concatenating `(qreg1 + qreg2)`, etc., can be freely performed on the registers. Just note that the result turns out to be of list data type (not the original `QRegister` or `CRegister` type, *this will be fixed in subsequent releases*). The assignment of qubits and clbits to the registers follows the MSB...LSB convention as mentioned in the section above.
+At the end of the day, both the registers are subclasses of `list` data type. So, operations as indexing (`qreg[2]`), concatenating `(qreg1 + qreg2)`, etc., can be freely performed on the registers. Just note that the result turns out to be of `list` data type (not the original `QRegister` or `CRegister` type, *this will be fixed in subsequent releases*). The assignment of qubits and clbits to the registers follows the MSB...LSB convention as mentioned in the section above.
 
 Example uses of registers:
 
@@ -65,6 +65,24 @@ the `nq` and `nc` should be used while creating the circuit --
 Returns an empty quantum circuit
 
 ### Methods - Gates:
+These gate methods instantiate a gate object of the specific type and append it to the quantum circuit. 
+
+For instance,
+
+	import qckt
+	circuit = qckt.QCkt(nqubits=2, nclbits=2, name='Example Ckt')
+	circuit.H(0)
+	circuit.CX(0,1)
+	circuit.draw()
+
+would draw the following circuit -
+
+	Example Ckt
+	q000 -[H]-[.]-
+    	       |  
+	q001 -----[X]-
+	
+	creg =========
 
 #### `CX(control, target)`
 Appends a `CNOT` gate to the quantum circuit.
@@ -109,14 +127,52 @@ The drawn circuit depicts multiple `QFT` gates, but it is 1 `QFT` gate acting on
 Returns the gate object.
 
 #### `custom_gate(gatename, op_matrix)`
-To add user defined custom gates
+To add user defined custom gates. 
 
-`gatename` is a string; op_matrix is the operator matrix in form of `numpy.matrix([...],dtype=complex)`
+`gatename` is a string; `op_matrix` is the operator matrix in form of `numpy.matrix([...],dtype=complex)`.
+
+The custom gate can then be used as `circuit.gatename(qubits)`. Note that custom gates always accept the target qubits as appropriate number of arguments in the function call, such as `circuit.myCX(0,1)`.
+
+As an example the following circuit -
+
+	import qckt
+	import qckt.backend as bknd
+	import numpy as np
+	ck = qckt.QCkt(3,3)
+	ck.custom_gate('myX', np.matrix([[0.0,1.0],[1.0,0.0]],dtype=complex))
+	ck.custom_gate('myCX', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,0.0,1.0],[0.0,0.0,1.0,0.0]],dtype=complex))
+	ck.H(0)
+	ck.myCX(0,1)
+	ck.myX(2)
+	ck.draw()
+
+creates the following circuit -
+
+	q000 -[H]-[myCX M]---------
+			  |      |         
+	q001 -----[myCX L]---------
+							
+	q002 --------------[myX M]-
+							
+	creg ======================
+
+
+#### `Border()`
+Places a vertical line in the drawing of the quantum circuit. Has effect only in the drawing of the circuit.
 
 Returns the gate object.
 
+#### `Probe(header,probestates)`
+This is a debuggig aid. Its execution gets skipped on backends which are actual quantum computers.
+
+`header` is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout. `probestates` is either `None` or a list of states, if `None`, probe prints amplitude of all the states, else prints the amplitudes of only the specified states.
+
+Returns the gate object.
+
+### Methods - Gate modifier
+
 #### `ifcbit(cbit, value)`
-Configures the gate object for the operator to be applied only if the mentioned `cbit` has the mentioned value (0 or 1). `ifcbit` is not supported by `M`, `Border`, and `Probe`.
+Configures the gate object for the operator to be applied only if the mentioned classical bit, `cbit`, has the mentioned value (0 or 1). `ifcbit` is not supported by `M`, `Border`, and `Probe`.
 
 Exampe usage: apply `X` on `qubit` 4 only if `cbit` 2 has value 0.
 
@@ -131,32 +187,20 @@ OR
 	xgate = ckt.X(4)
 	xgate.ifcbit(2,0)
 
-#### `Border()`
-Places a vertical line in the drawing of the quantum circuit. Has effect only in the drawing of the circuit.
-
-Returns the gate object.
-
-#### `Probe(header,probestates)`
-This is a debuggig aid. Its execution gets skipped on backends which are actual quantum computers.
-
-`header` is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout. `probestates` is either `None` or a list of states, if `None`, probe prints amplitude of all the states, else prints the amplitudes of only the specified states.
-
-Returns the gate object.
-
 ### Methods - circuit operations:
 
 #### `get_size()`
 Returns as a tuple `(nqubits, nclbits)`, the size of quantum and classical registers in the circuit.
 
 #### `realign(newnq, newnc, inpqubits)`
-Creates a potentially larger new circuit from the current circuit with a changed order of the 
-qubits. The original circuitis left intact.
+Creates a potentially wider (more qubits) new circuit from the current circuit with a changed order of the 
+qubits. The original circuit is left intact.
 
 All the custom gate definitions from the circuit are copied over to the new circuit.
 
 Returns the new circuit
 
-Parameters `newnq` and `newnc` are the sizes of the new (larger or equal sized) circuit
+Parameters `newnq` and `newnc` are the sizes of the new (wider or equal sized) circuit
 `inpqubits` is a vector that specifies how the old circuit's qubits be replaced in the new circuit.
 
 As an example see the circuits below --

@@ -26,17 +26,21 @@ class QPE:
 		cuop = gutils.CTL(self.uop)
 		len_measq = len(compact_measqubits)
 		repetitions = 1
+		qc.custom_gate("UOP", cuop)
 		for ctrl_qubit in range(len_measq):
 			for r in range(repetitions):
-				qc.CUSTOM("UOP", cuop, ([compact_measqubits[len_measq-ctrl_qubit-1]] + compact_uopqubits))
+				qc.UOP(*([compact_measqubits[len_measq-ctrl_qubit-1]] + compact_uopqubits))
 			repetitions *= 2
 
 		# Apply the inverse quantum Fourier transform
 		qftckt_qubits = qckt.QRegister(len(self.measurement_qubits))
 		nq,_,_,_ = qckt.placement(qftckt_qubits)
-		QFTinvOp = gutils.opmat_dagger(qckt.QCkt(nq).QFT(qftckt_qubits).to_opMatrix())
+		ckt = qckt.QCkt(nq)
+		ckt.QFT(qftckt_qubits)
+		mat = ckt.to_opMatrix()
+		QFTinvOp = gutils.opmat_dagger(mat)
 
-		qc.CUSTOM("QFTinv", QFTinvOp, compact_measqubits)
+		qc.custom_gate("QFTinv", QFTinvOp).QFTinv(*compact_measqubits)
 		qc = qc.realign(self.nqubits, 0, self.uop_qubits+self.measurement_qubits)
 
 		self.qpe_circuit = qc

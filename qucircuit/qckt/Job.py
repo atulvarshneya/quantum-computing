@@ -2,12 +2,12 @@ import sys
 
 class Job:
 	'just a packet of all job attributes. Is a qckt concept, so is '
-	def __init__(self, circuit, noise_profile=None, qtrace=False, verbose=False, shots=1):
+	def __init__(self, circuit, qtrace=False, verbose=False, shots=1):
 		'Job is a qckt concept to encapsulate the work packet that is to be submitted to the quantum computer to execute'
 		self.circuit = circuit
 		self.nqubits, self.nclbits = circuit.get_size()
 		self.assembledCkt = circuit.assemble()
-		self.noise_profile = noise_profile
+		self.noise_model = circuit.noise_model
 		self.qtrace = qtrace
 		self.verbose = verbose
 		self.shots = shots

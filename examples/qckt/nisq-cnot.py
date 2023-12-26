@@ -2,6 +2,7 @@
 
 import qckt
 from qckt.backend import *
+import qckt.noisemodel as ns
 
 cnotckt = qckt.QCkt(2, 2)
 
@@ -11,8 +12,10 @@ cnotckt.M([0,1],[0,1])
 
 cnotckt.draw()
 
-noise_profile = {'profile_id':'BitFlip', 'p1':0.05}
-job = qckt.Job(cnotckt, noise_profile=noise_profile, shots=1000)
+noise_model = ns.NoiseModel(kraus_opseq_allgates=ns.KrausOperatorSequence(ns.bit_flip(0.1)))
+cnotckt.add_noise_model(noise_model=noise_model)
+
+job = qckt.Job(cnotckt, shots=1000)
 
 print('Backends:',qsimSvc().listInstances())
 bk = qsimSvc().getInstance('nisqsim-eng') # NISQeng()

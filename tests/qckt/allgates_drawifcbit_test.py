@@ -143,5 +143,6 @@ opmat = np.matrix([
 	[0,1,0,0],
 	[0,0,0,1],
 	[0,0,1,0]],dtype=complex)
-ck.CUSTOM("CUST",opmat,[0,2]).ifcbit(3,1)
+ck.custom_gate("CUST",opmat)
+ck.CUST(0,2).ifcbit(3,1)
 ck.draw()

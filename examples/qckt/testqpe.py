@@ -15,7 +15,9 @@ measurement_clbits = qckt.CRegister(n_counting_qubits)
 nqubits,nclbits,qplaced,_ = qckt.placement(gap1, target_qubit, measurement_qubits, gap2, measurement_clbits)
 
 theta = 6.0/8.0
-uop = qckt.QCkt(1).P(2*np.pi*theta,0).to_opMatrix()
+ckt = qckt.QCkt(1)
+ckt.P(2*np.pi*theta,0)
+uop = ckt.to_opMatrix()
 mycircuit = qckt.QCkt(nqubits,nclbits)
 mycircuit.X(target_qubit)
 qpeckt = qpe.QPE(uop, target_qubit, measurement_qubits).getckt()

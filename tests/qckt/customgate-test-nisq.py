@@ -12,7 +12,8 @@ opmat = np.matrix([
 
 
 ck.H(0)
-ck.CUSTOM("CNOT",opmat,[0,2])
+ck.custom_gate("CNOT",opmat)
+ck.CNOT(0,2)
 ck.draw()
 inpqubits = [3,1,2,0]
 ck = ck.realign(4,4,inpqubits)
@@ -23,7 +24,8 @@ ck.draw()
 ckt = qckt.QCkt(6)
 ckt = ckt.append(ck)
 ckt = ckt.append(ck)
-ckt.CUSTOM("CNOT",opmat,[1,3])
+ckt.custom_gate("CNOT",opmat)
+ckt.CNOT(1,3)
 ckt.draw()
 job = qckt.Job(ckt,qtrace=True)
 NISQdeb().runjob(job)
@@ -36,9 +38,11 @@ opmatx = np.matrix([
 	[0,0,0,1],
 	[0,0,1,0]],dtype=complex)
 ckt = qckt.QCkt(6)
-ckt.CUSTOM("CuCX",opmat,[1,3])
+ckt.custom_gate("CuCX",opmat)
+ckt.CuCX(1,3)
 try:
-	ckt.CUSTOM("CuCXx",opmatx,[1,3])
+	ckt.custom_gate("CuCXx",opmatx)
+	# ckt.CuCXx(1,3)
 except QCktException as e:
 	print(e)
 ckt.draw()

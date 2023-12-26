@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
+import sys
 import numpy as np
 import random as rnd
 import qckt.gatesutils as gutils
+import qckt.noisemodel as ns
 from qckt.qException import QCktException
 
 class QGate:
+	gatecls_kraus_ops = None
+
 	def __init__(self):
 		self.qbits = None
 		self.cbits = None
@@ -13,6 +17,7 @@ class QGate:
 		self.name = None
 		self.opMatrix = None
 		self.cbit_cond = None
+		self.kraus_ops = None
 
 	def _reorderlist(self,oseq,nseq):
 		newseq = []
@@ -30,8 +35,21 @@ class QGate:
 			self.cbits = self._reorderlist(self.cbits,newseq)
 		return self
 
-	def assemble(self):
-		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond}
+	def __check_and_update_opmatrix_for_qubitlist__(self):
+		ret_opMatrix = self.opMatrix
+		ret_qbits = self.qbits
+		if issubclass(type(self.qbits[0]),list):
+			# combine_par to create opMatrix to convert from 1-qubit to multiple qubits
+			opMatList = [self.opMatrix for _ in range(len(self.qbits[0]))]
+			ret_opMatrix = gutils.combine_par(op_list=opMatList)
+			ret_qbits = self.qbits[0]
+			# print(f'gate {self.name} shape {opMatrix.shape} qubits are a list = {qbits}', file=sys.stderr)
+		return ret_opMatrix, ret_qbits
+
+	def assemble(self, noise_model):
+		kraus_ops = self.get_gate_noise()
+		noise_opseq = ns.consolidate_gate_noise(noise_model=noise_model, gate_noise=kraus_ops, qubit_list=self.qbits)
+		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond, 'krausOps':noise_opseq}
 
 	def to_fullmatrix(self,nqbits):
 		oplist = []
@@ -47,6 +65,38 @@ class QGate:
 	def ifcbit(self,cbit,val):
 		self.cbit_cond = (cbit,val)
 		return self
+	
+	def add_noise(self, kraus_ops):  # kraus_ops can be KrausOperator or KrausOperatorSequence
+		self.kraus_ops = kraus_ops
+		if self.check_noise_op_qubits() == False:
+			raise QCktException(f"Error: multi-qubit noise operator can't be used here. {self.name} {self.kraus_ops.name}")
+		return self
+	
+	def check_noise_op_qubits(self):
+		if self.kraus_ops is not None:
+			if type(self.kraus_ops) is not ns.KrausOperator and type(self.kraus_ops) is not ns.KrausOperatorSequence:
+				raise QCktException(f"ERROR: KrausOperator or KrausOperatorSequence object or None expected.")
+			if type(self.kraus_ops) is ns.KrausOperator:
+				if self.kraus_ops.nqubits != 1 and len(self.qbits) != self.kraus_ops.nqubits:
+					return False
+			else:  # type is ns.KrausOperatorSequence
+				for op in self.kraus_ops:
+					if op.nqubits != 1 and len(self.qbits) != op.nqubits:
+						return False
+		return True
+
+	def addtocanvas_gatenoise(self, canvas, noise_model):
+		kraus_ops = self.get_gate_noise()
+		noise_opseq = ns.consolidate_gate_noise(noise_model=noise_model, gate_noise=kraus_ops, qubit_list=self.qbits)
+		for kop,qbt in noise_opseq:
+			canvas._add_simple(qbt,f'{self.name}:{kop.name}')
+
+	def get_gate_noise(self):
+		# pick from noise on gate type, and noise on gate instance
+		kraus_ops = self.__class__.gatecls_kraus_ops
+		if self.kraus_ops is not None:
+			kraus_ops = self.kraus_ops
+		return kraus_ops
 
 	def __str__(self):
 		stringify = self.name
@@ -152,19 +202,46 @@ def registerGate(gateclass):
 	return gateclass
 
 @registerGate
+class NOISE(QGate):
+	def __init__(self, kraus_ops, qbit):
+		super().__init__()
+		self.qbits = qbit
+		self.krausOps = kraus_ops
+		self.name = self.krausOps.name
+
+	def addtocanvas(self,canvas):
+		canvas._add_simple(self.qbits, f'NS:{self.name}')
+
+	def addtocanvas_gatenoise(self, canvas, noise_model):
+		pass
+
+	def check_qbit_args(self,nqbits):
+		return self.varqbit_args(nqbits,1)
+
+	def assemble(self,noise_model):
+		return {"op":"noise","name":self.name,"krausOps":self.krausOps,"qubits":self.qbits}
+
+	def to_fullmatrix(self,nqbits):
+		return None
+
+	# INHERIT def realign(self,newseq):
+	# INHERIT def __str__(self):
+
+@registerGate
 class X(QGate):
 	def __init__(self, qbit):
 		super().__init__()
 		self.qbits = [qbit]
 		self.name = "X"
 		self.opMatrix = np.matrix([[0,1],[1,0]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"X", self.cbit_cond)
+		canvas._add_simple(self.qbits,"X", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -176,13 +253,14 @@ class Y(QGate):
 		self.qbits = [qbit]
 		self.name = "Y"
 		self.opMatrix = np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Y", self.cbit_cond)
+		canvas._add_simple(self.qbits,"Y", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -194,13 +272,14 @@ class Z(QGate):
 		self.qbits = [qbit]
 		self.name = "Z"
 		self.opMatrix = np.matrix([[1,0],[0,-1]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Z", self.cbit_cond)
+		canvas._add_simple(self.qbits,"Z", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -213,13 +292,14 @@ class H(QGate):
 		self.qbits = [qbit]
 		self.name = "H"
 		self.opMatrix = np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"H", self.cbit_cond)
+		canvas._add_simple(self.qbits,"H", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -354,6 +434,9 @@ class M(QGate):
 			canvas._extend()
 		return self
 
+	def addtocanvas_gatenoise(self, canvas, noise_model):
+		pass
+
 	def check_qbit_args(self,nqbits):
 		retval = True
 		if len(self.qbits) != len(self.cbits):
@@ -375,7 +458,7 @@ class M(QGate):
 		errmsg = "Measure gate cannot be converted to opmatrix."
 		raise QCktException(errmsg)
 
-	def assemble(self):
+	def assemble(self,noise_model):
 		return {"op":"measure", "qubits":self.qbits, "clbits":self.cbits}
 
 @registerGate
@@ -397,6 +480,9 @@ class Border(QGate):
 		canvas._extend()
 		return self
 
+	def addtocanvas_gatenoise(self, canvas, noise_model):
+		pass
+
 	def check_qbit_args(self,nqbits):
 		pass
 
@@ -408,7 +494,7 @@ class Border(QGate):
 	def to_fullmatrix(self,nqbits):
 		return None
 
-	def assemble(self):
+	def assemble(self,noise_model):
 		return {"op":"noop"}
 
 	# OVERRIDE __str__(self) - no [qbits]
@@ -437,6 +523,9 @@ class Probe(QGate):
 		canvas._extend()
 		return self
 
+	def addtocanvas_gatenoise(self, canvas, noise_model):
+		pass
+
 	def check_qbit_args(self,nqbits):
 		pass
 
@@ -448,7 +537,7 @@ class Probe(QGate):
 	def to_fullmatrix(self,nqbits):
 		return None
 
-	def assemble(self):
+	def assemble(self,noise_model):
 		return {"op":"probe","header":self.header,"probestates":self.probestates}
 
 	# OVERRIDE __str__(self) - no [qbits]
@@ -513,13 +602,14 @@ class RND(QGate):
 		re2 = samp*np.cos(phi)
 		im2 = samp*np.sin(phi)
 		self.opMatrix = np.matrix([[complex(-re1,-im1),complex(re2,im2)],[complex(re2,im2),complex(re1,im1)]],dtype=complex)
-	
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
+
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"RND", self.cbit_cond)
+		canvas._add_simple(self.qbits,"RND", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -536,13 +626,14 @@ class P(QGate):
 		cphi = np.cos(phi)
 		sphi = np.sin(phi)
 		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"P", self.cbit_cond)
+		canvas._add_simple(self.qbits,"P", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -585,13 +676,14 @@ class UROTk(QGate):
 		ck = np.cos(2*np.pi/(2**k))
 		sk = np.sin(2*np.pi/(2**k))
 		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"UROTk", self.cbit_cond)
+		canvas._add_simple(self.qbits,"UROTk", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -634,13 +726,14 @@ class Rx(QGate):
 		ck = np.cos(rot/2)
 		sk = np.sin(rot/2)
 		self.opMatrix = np.matrix([ [complex(ck,0),complex(0,-sk)], [complex(0,-sk),complex(ck,0)]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Rx", self.cbit_cond)
+		canvas._add_simple(self.qbits,"Rx", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -684,13 +777,14 @@ class Ry(QGate):
 		ck = np.cos(rot/2)
 		sk = np.sin(rot/2)
 		self.opMatrix = np.matrix([ [complex(ck,0),complex(-sk,0)], [complex(sk,0),complex(ck,0)]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Ry", self.cbit_cond)
+		canvas._add_simple(self.qbits,"Ry", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -734,13 +828,14 @@ class Rz(QGate):
 		ck = np.cos(rot/2)
 		sk = np.sin(rot/2)
 		self.opMatrix = np.matrix([ [complex(ck,-sk),complex(0,0)], [complex(0,0),complex(ck,sk)]],dtype=complex)
+		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
 	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits[0],"Rz", self.cbit_cond)
+		canvas._add_simple(self.qbits,"Rz", self.cbit_cond)
 		return self
 
 	def check_qbit_args(self,nqbits):
-		return self.oneqbit_args(nqbits)
+		return self.varqbit_args(nqbits,1)
 
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
@@ -772,28 +867,48 @@ class CRz(QGate):
 	# INHERIT def __str__(self):
 
 
-@registerGate
-class CUSTOM(QGate):
+def fetch_custom_gateclass(cgate_name, opMatrix):
+	class CUSTOM(QGate):
+		def __init__(self, *qbits):
+			super().__init__()
+			self.name = cgate_name
+			if not gutils.isunitary(opMatrix):
+				errmsg = f"Custom gate, {self.name}, operator matrix is not unitary."
+				raise QCktException(errmsg)
+			self.opMatrix = opMatrix
+			self.qbits = [q for q in qbits]
+		def addtocanvas(self,canvas):
+			canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
+			return self
+		def check_qbit_args(self,nqbits):
+			r,c = self.opMatrix.shape
+			if 2**len(self.qbits) != r:
+				return False
+			return self.varqbit_args(nqbits,1)
+		# INHERIT def realign(self,newseq):
+		# INHERIT def __str__(self):
+	return CUSTOM
 
-	def __init__(self, name, opMatrix, qbits):
-		super().__init__()
-		self.name = name
-		if not gutils.isunitary(opMatrix):
-			errmsg = "Custom gate, "+self.name+", operator matrix is not unitary."
-			raise QCktException(errmsg)
-		self.opMatrix = opMatrix
-		self.qbits = qbits
+def fetch_deprecated_custom_gateclass():
+	class CUSTOM(QGate):
+		def __init__(self, name, opMatrix, qbits):
+			print('CUSTOM gate deprecated, does not support noise_to_each(). Uee QCkt.custom_gate() to register a custom gate.', file=sys.stderr)
+			super().__init__()
+			self.name = name
+			if not gutils.isunitary(opMatrix):
+				errmsg = "Custom gate, "+self.name+", operator matrix is not unitary."
+				raise QCktException(errmsg)
+			self.opMatrix = opMatrix
+			self.qbits = qbits
+		def addtocanvas(self,canvas):
+			canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
+			return self
+		def check_qbit_args(self,nqbits):
+			r,c = self.opMatrix.shape
+			if 2**len(self.qbits) != r:
+				return False
+			return self.varqbit_args(nqbits,1)
+		# INHERIT def realign(self,newseq):
+		# INHERIT def __str__(self):
 
-	def addtocanvas(self,canvas):
-		canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
-		return self
-
-	def check_qbit_args(self,nqbits):
-		r,c = self.opMatrix.shape
-		if 2**len(self.qbits) != r:
-			return False
-		return self.varqbit_args(nqbits,1)
-
-	# INHERIT def realign(self,newseq):
-	# INHERIT def __str__(self):
-
+	return CUSTOM
