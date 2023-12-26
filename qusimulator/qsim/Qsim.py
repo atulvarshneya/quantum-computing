@@ -120,7 +120,7 @@ class QSimulator:
 			self.qreport(header="Initial State")
 
 
-	def qkraus(self, kraus_op, qbit_list, qtrace=False):
+	def qnoise(self, noise_op_sequence, qbit_list, qtrace=False):
 		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
 		raise QSimError(errmsg)
 
