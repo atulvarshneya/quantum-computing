@@ -1,6 +1,7 @@
 from .noiseUtils import NoiseOperator, \
     NoiseOperatorSequence, \
-    NoiseOperatorApplierSequense
+    NoiseOperatorApplierSequense, \
+    consolidate_gate_noise
 
 from .noiseOperators import bit_flip, \
     phase_flip, \

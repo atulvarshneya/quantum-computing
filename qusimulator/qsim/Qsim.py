@@ -58,7 +58,7 @@ class QSimulator:
 		self.__initialize_sim()
 
 	def qreset(self):
-		print(f'qreset() is deprecated. Reinstantiate the Qsimulator object instead.')
+		print(f'WARNING: qreset() is deprecated. Reinstantiate the Qsimulator object instead.', file=sys.stderr)
 		self.__initialize_sim()
 	def __initialize_sim(self):
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
@@ -93,7 +93,7 @@ class QSimulator:
 				raise QSimError(errmsg)
 			self.sys_state = deepcopy(self.initstate)
 		elif not self.prepqubits is None:
-			print('WARNINGS: prepqubits is deprecated. Use initstate instead.')
+			print('WARNING: prepqubits is deprecated. Use initstate instead.', file=sys.stderr)
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QSimError(errmsg)

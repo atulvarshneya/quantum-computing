@@ -1,5 +1,6 @@
 
 import numpy as np
+import qsim
 
 ## qcombine_seq(name,op_list):
 ##
@@ -13,10 +14,10 @@ def qcombine_seq(name,op_list):
 		c = op.shape[1]
 		if r != c:
 			errmsg = "Operation is not a square matrix."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 		if r != d:
 			errmsg = "Operation matrices not the same size."
-			raise QSimError(errmsg)
+			raise qsim.QSimError(errmsg)
 		res = op*res # remember order of multiplication is opposite of the visual order
 	return [name,res]
 

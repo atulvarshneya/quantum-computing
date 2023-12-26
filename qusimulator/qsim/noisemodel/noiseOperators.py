@@ -3,7 +3,7 @@ import qsim
 from qsim.noisemodel.noiseUtils import *
 import numpy as np
 
-
+# Identity gate
 I = ['I',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
 
 
@@ -12,6 +12,7 @@ def bit_flip(probability=0.05):
     noise_operator = NoiseOperator(
         name=f'BF({probability:.2f})',
         operator_prob_set=[(qsim.X(),probability),(I,(1-probability))],
+        nqubits=1,
         )
     return noise_operator
     # return {'name': f'BF({probability:.2f})', 'operator': [[(qsim.X(),probability),(I,(1-probability))], 0.0]}
@@ -21,6 +22,7 @@ def phase_flip(probability=0.05):
     noise_operator = NoiseOperator(
         name=f'PF({probability:.2f})',
         operator_prob_set=[(qsim.Z(),probability),(I,(1-probability))],
+        nqubits=1,
         )
     return noise_operator
     # return {'name': f'PF({probability:.2f})', 'operator':[[(qsim.Z(),probability),(I,(1-probability))], 0.0]}
@@ -30,6 +32,7 @@ def depolarizing(probability=0.05):
     noise_operator = NoiseOperator(
         name=f'Dep({probability:.2f})',
         operator_prob_set=[(qsim.X(),probability/3.0),(qsim.Y(),probability/3.0),(qsim.Z(),probability/3.0),(I,(1-probability))],
+        nqubits=1,
         )
     return noise_operator
     # return {'name':f'Dep({probability:.2f})', 'operator':[[(qsim.X(),probability/3.0),(qsim.Y(),probability/3.0),(qsim.Z(),probability/3.0),(I,(1-probability))], 0.0]}
@@ -41,6 +44,7 @@ def amplitude_damping(gamma=0.05):
     noise_operator = NoiseOperator(
         name=f'AD({gamma:.2f})',
         operator_prob_set=[(AD_K1,1.0),(AD_K2,1.0)],
+        nqubits=1,
         )
     return noise_operator
     # return {'name':f'AD({gamma:.2f})', 'operator':[[(AD_K1,1.0),(AD_K2,1.0)], 0.0]}
@@ -52,6 +56,7 @@ def phase_damping(gamma=0.05):
     noise_operator = NoiseOperator(
         name=f'PD({gamma:.2f})',
         operator_prob_set=[(PD_K0,1.0),(PD_K1,1.0)],
+        nqubits=1,
         )
     return noise_operator
     # return {'name':f'PD({gamma:.2f})', 'operator':[[(PD_K0,1.0),(PD_K1,1.0)], 0.0]}
@@ -61,6 +66,7 @@ def pauli_channel(probx=0.05, proby=0.05, probz=0.05):
     noise_operator = NoiseOperator(
         name=f'PC({probx:.2f},{proby:.2f},{probz:.2f})',
         operator_prob_set=[(qsim.X(),probx),(qsim.Y(),proby),(qsim.Z(),probz),(I,(1-probx-proby-probz))],
+        nqubits=1,
         )
     return noise_operator
     # return {'name': f'PC({probx:.2f},{proby:.2f},{probz:.2f})', 'operator':[[(qsim.X(),probx),(qsim.Y(),proby),(qsim.Z(),probz),(I,(1-probx-proby-probz))], 0.0]}
@@ -74,9 +80,19 @@ def generalized_amplitude_damping(probability=0.05, gamma=0.05):
     noise_operator = NoiseOperator(
         name=f'GAD({probability:.2f},{gamma:.2f})',
         operator_prob_set=[(GAD_K0,1.0),(GAD_K1,1.0),(GAD_K2,1.0),(GAD_K3,1.0)],
+        nqubits=1,
         )
     return noise_operator
     # return {'name': f'GAD({probability:.2f},{gamma:.2f})', 'operator':[[(GAD_K0,1.0),(GAD_K1,1.0),(GAD_K2,1.0),(GAD_K3,1.0)], 0.0]}
+
+def dummy_2qubit_noiseop(probability=0.05):
+    I2 = ['I2', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]],dtype=complex)]
+    noise_operator = NoiseOperator(
+        name=f'DUMMY-KOP({probability})',
+        operator_prob_set=[(I2,probability),(I2,(1-probability))],
+        nqubits=2,
+        )
+    return noise_operator
 
 
 def noise_operator_list():
@@ -96,6 +112,7 @@ noise_operators = {
     'GeneralizedAmplitudeDamping': generalized_amplitude_damping,
     'PhaseDamping': phase_damping,
     'PauliChannel': pauli_channel,
+    'DUMMY-NOISEOP': dummy_2qubit_noiseop,
     }
 noise_op_signature = {}
 

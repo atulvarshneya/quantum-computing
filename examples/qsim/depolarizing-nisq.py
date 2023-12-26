@@ -7,12 +7,6 @@ import numpy as np
 print('Adding noise channel to all gates')
 print()
 
-# noise_model = {
-# 	'noise_opseq_allgates': noise_opseq,       # e.g., [bit_flip(0.1), amplitude_damping(0.15), phase_damping(0.1)]
-# 	'noise_opseq_init': noise_opseq,           # e.g., [bit_flip(0.1), phase_flip(0.1)]
-# 	'noise_opseq_qubits': noise_opseq_applier  # e.g., [(depolarizing(0.1),[0,1]), ()]
-# }
-
 # with probabilty = 0.75, the bell-state gets completely depolarized (TODO source of this info?)
 # i.e., becomes 1/4*I
 noise_allgates = nmdl.NoiseOperatorSequence(

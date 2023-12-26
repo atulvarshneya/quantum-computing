@@ -1,4 +1,4 @@
-['AmplitudeDamping', 'BitFlip', 'Depolarizing', 'GeneralizedAmplitudeDamping', 'PauliChannel', 'PhaseDamping', 'PhaseFlip']
+['AmplitudeDamping', 'BitFlip', 'DUMMY-NOISEOP', 'Depolarizing', 'GeneralizedAmplitudeDamping', 'PauliChannel', 'PhaseDamping', 'PhaseFlip']
 
 test 01 - without any noise model
 Initial State
@@ -146,7 +146,7 @@ Mixed State Purity: 0.5514
 CREGISTER: 000
 
 test 04 - adding noise at init, applied to specifc qubits, all gates
-Initial State
+Initial State NOISE:[(PF(0.20),[0, 1, 2])]
 000    1.00+0.00j  | 1.0000+0.0000j
 Mixed State Purity: 1.0000
 CREGISTER: 000
@@ -630,3 +630,4 @@ AmplitudeDamping                amplitude_damping(gamma=0.05)
 GeneralizedAmplitudeDamping     generalized_amplitude_damping(probability=0.05, gamma=0.05)
 PhaseDamping                    phase_damping(gamma=0.05)
 PauliChannel                    pauli_channel(probx=0.05, proby=0.05, probz=0.05)
+DUMMY-NOISEOP                   dummy_2qubit_noiseop(probability=0.05)

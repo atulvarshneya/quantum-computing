@@ -5,7 +5,7 @@ with open('README.md', 'r') as file:
 
 setup(
     name='qusimulator',
-    version='1.5.1.1',
+    version='2.0',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',

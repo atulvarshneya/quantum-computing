@@ -52,6 +52,9 @@ q.qgate(qsim.H(),[2])
 
 # test 05 - a blanket test for all noise operators applied to all gates, using their default arguments
 for nchanid in noise_channels:
+	if nmdl.noise_operator_lookup(nchanid)().nqubits != 1:
+		# print(f'skipped {nchanid}')
+		continue
 	print(f'test 05 - Blanket test - {nchanid}')
 	krfn = nmdl.noise_operator_lookup(nchanid)
 	noise_model = {
