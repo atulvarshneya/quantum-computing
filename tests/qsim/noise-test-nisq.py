@@ -22,7 +22,7 @@ q.qgate(qsim.H(),[2])
 print('test 02 - direct call to qnoise')
 q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
 q.qgate(qsim.X(),[0])
-q.qnoise(noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
+q.qnoise(noise_op=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
 q.qgate(qsim.C(),[0,1])
 q.qgate(qsim.X(),[2])
 q.qgate(qsim.H(),[2])
@@ -31,7 +31,7 @@ q.qgate(qsim.H(),[2])
 print('test 03 - adding noise applied to a gate invokation')
 q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
 q.qgate(qsim.X(),[0])
-q.qnoise(noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
+q.qnoise(noise_op=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
 q.qgate(qsim.C(),[0,1])
 q.qgate(qsim.X(),[2], noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.phase_flip(probability=0.1)))
 q.qgate(qsim.H(),[2])
@@ -45,7 +45,7 @@ noise_model = {
 }
 q = qsim.NISQSimulator(3, noise_model=noise_model, qtrace=True, verbose=True)
 q.qgate(qsim.X(),[0])
-q.qnoise(noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
+q.qnoise(noise_op=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
 q.qgate(qsim.C(),[0,1])
 q.qgate(qsim.X(),[2], noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.phase_flip(probability=0.1)))
 q.qgate(qsim.H(),[2])
@@ -63,12 +63,24 @@ for nchanid in noise_channels:
 	}
 	q = qsim.NISQSimulator(3, noise_model=noise_model, qtrace=True, verbose=True)
 	q.qgate(qsim.X(),[0])
-	q.qnoise(noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
+	q.qnoise(noise_op=nmdl.NoiseOperatorSequence(nmdl.bit_flip(probability=0.1)), qbit_list=[0,1,2], qtrace=True)
 	q.qgate(qsim.C(),[0,1])
 	q.qgate(qsim.X(),[2], noise_op_sequence=nmdl.NoiseOperatorSequence(nmdl.phase_flip(probability=0.1)))
 	q.qgate(qsim.H(),[2])
 
-# test06 - list noise channel/operator signatures
+# test 06 - 2-qubit noise op - two_qubit_dephasing
+print('test 06 - adding noise at init, applied to specifc qubits, all gates')
+q = qsim.NISQSimulator(3, noise_model=None, qtrace=True, verbose=True)
+q.qgate(qsim.H(),[0])
+q.qgate(qsim.C(),[0,1], noise_op_sequence=nmdl.two_qubit_dephasing(probability=0.1))
+
+# test 07 - 2-qubit noise op - two_qubit_depolarizing
+print('test 07 - adding noise at init, applied to specifc qubits, all gates')
+q = qsim.NISQSimulator(3, noise_model=None, qtrace=True, verbose=True)
+q.qgate(qsim.H(),[0])
+q.qgate(qsim.C(),[0,1], noise_op_sequence=nmdl.two_qubit_depolarizing(probability=0.1))
+
+# test0x - list noise channel/operator signatures
 noise_chans_list = nmdl.noise_operator_list()
 for nchanid in noise_chans_list.keys():
 	print(f'{nchanid:30s}  {noise_chans_list[nchanid]}')

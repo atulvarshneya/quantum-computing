@@ -1,10 +1,14 @@
 import math
 import qsim
-from qsim.noisemodel.noiseUtils import *
+from qsim.noisemodel.noiseUtils import NoiseOperator
 import numpy as np
 
 # Identity gate
 I = ['I',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
+X = ['X', np.matrix([[0,1],[1,0]],dtype=complex)]
+Y = ['Y', np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
+Z = ['Z', np.matrix([[1,0],[0,-1]],dtype=complex)]
+I2 = ['I2', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]],dtype=complex)]
 
 
 # Canned noise operators (noise channels)
@@ -86,12 +90,44 @@ def generalized_amplitude_damping(probability=0.05, gamma=0.05):
     # return {'name': f'GAD({probability:.2f},{gamma:.2f})', 'operator':[[(GAD_K0,1.0),(GAD_K1,1.0),(GAD_K2,1.0),(GAD_K3,1.0)], 0.0]}
 
 def dummy_2qubit_noiseop(probability=0.05):
-    I2 = ['I2', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]],dtype=complex)]
     noise_operator = NoiseOperator(
         name=f'DUMMY-KOP({probability})',
         operator_prob_set=[(I2,probability),(I2,(1-probability))],
         nqubits=2,
         )
+    return noise_operator
+
+def two_qubit_dephasing(probability=0.05):
+    IZ = qsim.qcombine_par('IZ',[I,Z])
+    ZI = qsim.qcombine_par('ZI',[Z,I])
+    ZZ = qsim.qcombine_par('ZZ',[Z,Z])
+    opprob_set = [
+        (I2, (1-probability)),
+        (IZ,probability/3.0),
+        (ZI,probability/3.0),
+        (ZZ,probability/3.0),
+        ]
+    noise_operator = NoiseOperator(
+        name=f'2DPH({probability})',
+        operator_prob_set=opprob_set,
+        nqubits=2,
+        )
+    return noise_operator
+
+def two_qubit_depolarizing(probability=0.05):
+    opprob_set = [(I2,(1-probability))]
+    for op1 in [I,X,Y,Z]:
+        for op2 in [I,X,Y,Z]:
+            if op1[0] == 'I' and op2[0] == 'I':
+                continue
+            opname = f'{op1[0]}{op2[0]}'
+            twoqbitop = qsim.qcombine_par(opname,[op1,op2])
+            opprob_set.append((twoqbitop, (probability/15.0)))
+    noise_operator = NoiseOperator(
+        name=f'2DEP({probability})',
+        operator_prob_set=opprob_set,
+        nqubits=2,
+    )
     return noise_operator
 
 
@@ -113,6 +149,8 @@ noise_operators = {
     'PhaseDamping': phase_damping,
     'PauliChannel': pauli_channel,
     'DUMMY-NOISEOP': dummy_2qubit_noiseop,
+    'TwoQubitDephasing': two_qubit_dephasing,
+    'TwoQubitDepolarizing': two_qubit_depolarizing,
     }
 noise_op_signature = {}
 
@@ -135,14 +173,7 @@ for krname in noise_operators:
 
 
 if __name__ == '__main__':
-    nop1 = bit_flip(0.2)
-    for op,prob in nop1:
+    noiseop = two_qubit_depolarizing(probability=0.1)
+    for op,prob in noiseop:
         print(op)
-    nop2 = phase_flip(0.3)
-    nop3 = bit_flip(0.4)
-    noseq1 = NoiseOperatorSequence(nop1)
-    noseq2 = NoiseOperatorSequence(nop2,nop3)
-    noseq = NoiseOperatorSequence(noseq1, noseq2)
-    for nop in noseq:
-        print('----------------------------')
-        print(nop)
+        print(prob)

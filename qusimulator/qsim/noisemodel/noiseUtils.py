@@ -174,10 +174,14 @@ def consolidate_gate_noise(noise_model, gate_noise, qubit_list):
     # Qckt uses its own noise_model and passes a consolidated noise_applier at qgate invokation
     noise_op_applier_sequence_this_gate = NoiseOperatorApplierSequense()
     if gate_noise is not None:
-        if type(gate_noise) is NoiseOperatorSequence:
+        if type(gate_noise) is NoiseOperator:
+            gate_noise_as_opseq = NoiseOperatorSequence(gate_noise)
+            noise_op_applier_sequence_this_gate.add(noise_ops=gate_noise_as_opseq, qubit_list=qubit_list)
+        elif type(gate_noise) is NoiseOperatorSequence:
             noise_op_applier_sequence_this_gate.add(noise_ops=gate_noise, qubit_list=qubit_list)
         elif type(gate_noise) is NoiseOperatorApplierSequense:
-            ## TODO if NoiseOperatorApplierSequense is provide, should it replace noise_model (qubits, allgaes?)
+            # quantum computing programming frameworks (e.g., qckt) can combine any noise models into 'applier sequences'
+            # new_with_filtered_qubits() is just a defensive check, it is expected to be a NO-OP if qckt works correctly
             noise_op_applier_sequence_this_gate = gate_noise.new_with_filtered_qubits(qubit_list=qubit_list)
         else:
             raise qsim.QSimError('ERROR: NoiseOperatorSequence or NoiseOperatorApplierSequense object or None expected.')

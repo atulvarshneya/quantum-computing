@@ -55,24 +55,34 @@ class NISQSimulator:
 
 			noise_opseq_allgates = self.noise_model.get('noise_opseq_allgates', None)
 			if noise_opseq_allgates is not None:
-				if type(noise_opseq_allgates) is not nmdl.NoiseOperatorSequence:
+				if type(noise_opseq_allgates) is nmdl.NoiseOperator:
+					self.noise_model['noise_opseq_allgates'] = nmdl.NoiseOperatorSequence(noise_opseq_allgates)
+				elif type(noise_opseq_allgates) is nmdl.NoiseOperatorSequence:
+					pass
+				else:
 					raise QSimError(f'ERROR: noise_opseq_allgates must be an object of class NoiseOperatorSequence')
-			# self.noise_opseq_all_gates used in qgate() to apply this noise to qubits of every gates
+			# self.noise_model['noise_opseq_allgates'] used in qgate() to apply this noise to qubits of every gates
 
 			noise_opseq_init = self.noise_model.get('noise_opseq_init', None)
 			if noise_opseq_init is not None:
-				if type(noise_opseq_init) is not nmdl.NoiseOperatorSequence:
+				if type(noise_opseq_init) is nmdl.NoiseOperator:
+					self.noise_model['noise_opseq_init'] = nmdl.NoiseOperatorSequence(noise_opseq_init)
+				elif type(noise_opseq_init) is nmdl.NoiseOperatorSequence:
+					pass
+				else:
 					raise QSimError(f'ERROR: noise_opseq_init must be an object of class NoiseOperatorSequence')
+				# check that noise_opseq_init has only 1-qubit NoiseOperator objects
+				noise_opseq_init = self.noise_model['noise_opseq_init']
 				for op in noise_opseq_init:
 					if op.nqubits != 1:
 						raise QSimError(f'ERROR: noise_opseq_init must use 1-qubit kraus operators')
-			# the noise is applied in __initialize_sim() after creating self.sys_state
+			# the self.noise_model['noise_opseq_init'] noise is applied in __initialize_sim() after creating self.sys_state
 
 			noise_opseq_qubits = self.noise_model.get('noise_opseq_qubits',None)
 			if noise_opseq_qubits is not None:
 				if type(noise_opseq_qubits) is not nmdl.NoiseOperatorApplierSequense:
 					raise QSimError(f'ERROR: noise_opseq_init must be an object of class NoiseOperatorApplierSequense')
-			# this is used in qgate()
+			# this is used in qgate() to apply this noise to qubits of every gates where the qubits are used
 
 
 		# runstats
@@ -127,7 +137,6 @@ class NISQSimulator:
 			# Now convert the state vector to density matrix
 			self.sys_state = np.matrix(np.outer(self.sys_state, np.conjugate(self.sys_state)))
 		elif not self.prepqubits is None:
-			print('WARNING: prepqubits is deprecated. Use initstate instead.', file=sys.stderr)
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QSimError(errmsg)
@@ -216,7 +225,7 @@ class NISQSimulator:
 	#    NOTE: (TODO) If the noise_op_seq_applier includes a 2-qubit kraus operator, the corresponding
 	#    qubit list argument must be exactly 2 qubits, else an exception will be raised
 
-	def qnoise(self, noise_op_sequence, qbit_list, qtrace=False):
+	def qnoise(self, noise_op, qbit_list, qtrace=False):
 		# TODO check for 1-qubit noise op => variable num of qubits allowed.
 		# If 2-qubit noise op, then only 2 qubits allowed
 
@@ -225,11 +234,15 @@ class NISQSimulator:
 			errmsg = f"Error: the list of qubits {qbit_list} is not valid."
 			raise QSimError(errmsg)
 
-		# check noie_op_sequence argument
-		if type(noise_op_sequence) is not nmdl.NoiseOperatorSequence:
-			raise qsim.QSimError('ERROR: NoiseOperatorSequence object expected.')
+		# check noie_op argument
+		if type(noise_op) is nmdl.NoiseOperator:
+			noise_opseq = nmdl.NoiseOperatorSequence(noise_op)
+		elif type(noise_op) is nmdl.NoiseOperatorSequence:
+			noise_opseq = noise_op
+		else:
+			raise QSimError('ERROR: NoiseOperatorSequence or NoiseOperator object expected.')
 
-		noise_op_applier_sequence = nmdl.NoiseOperatorApplierSequense(noise_ops=noise_op_sequence, qubit_list=qbit_list)
+		noise_op_applier_sequence = nmdl.NoiseOperatorApplierSequense(noise_ops=noise_opseq, qubit_list=qbit_list)
 
 		self.__apply_noise(noise_op_applier_sequence=noise_op_applier_sequence)
 		# noise operators are trace preserving, so check that here
@@ -596,10 +609,10 @@ class NISQSimulator:
 		op = oper[1]
 		opargs = str(qbit_list)
 		if (op.shape)[1] != (op.shape)[0]:
-			errmsg = "Error. Operator is not a square matrix. "+orignm+"'s dimension = ("+str((op.shape)[0])+","+str((op.shape)[1])+")."
+			errmsg = f"Error. Operator is not a square matrix. {orignm}'s dimension = {op.shape}."
 			raise QSimError(errmsg)
 		if (2**len(qbit_list)) != (op.shape)[0]:
-			errmsg = "User Error. Wrong number of qbit args for operator "+orignm+". Provided arguments = "+opargs+"."
+			errmsg = f"User Error. Wrong number of qbit args for operator {orignm}. Provided arguments = {opargs}."
 			raise QSimError(errmsg)
 		c_op = np.kron(op,np.eye(2**(self.nqbits-len(qbit_list))))
 		a_op = self.__aligned_op(c_op,qbit_list)

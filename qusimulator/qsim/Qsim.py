@@ -93,7 +93,6 @@ class QSimulator:
 				raise QSimError(errmsg)
 			self.sys_state = deepcopy(self.initstate)
 		elif not self.prepqubits is None:
-			print('WARNING: prepqubits is deprecated. Use initstate instead.', file=sys.stderr)
 			if len(self.prepqubits) != self.nqbits:
 				errmsg = "User Error. wrong dimensions. prepqubits has incorrect number of qbits."
 				raise QSimError(errmsg)

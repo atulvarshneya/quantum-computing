@@ -45,7 +45,8 @@ ck = qckt.QCkt(3,3)
 ck.X([0])
 ck.NOISE(kraus_ops=ns.KrausOperatorSequence(ns.bit_flip(probability=0.1)),qbit=[0,1,2])
 ck.CX(0,1)
-ck.X([2]).add_noise(ns.KrausOperatorSequence(ns.phase_flip(probability=0.1)))
+# ck.X([2]).add_noise(ns.KrausOperatorSequence(ns.phase_flip(probability=0.1)))
+ck.X([2]).add_noise(ns.phase_flip(probability=0.1))
 ck.H([2])
 ck.draw(show_noise=False)
 ck.draw()
@@ -109,12 +110,12 @@ job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.NISQdeb()
 bk.runjob(job)
 
-# test07 - custom gates with noise_to_each(), add_noise()
-print('test07 - custom gates with noise_to_each()')
+# test07 - custom gates with add_noise_to_all(), add_noise()
+print('test07 - custom gates with add_noise_to_all()')
 ck = qckt.QCkt(3,3)
 ck.custom_gate('myX', np.matrix([[0.0,1.0],[1.0,0.0]],dtype=complex))
 ck.custom_gate('myCX', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,0.0,1.0],[0.0,0.0,1.0,0.0]],dtype=complex))
-ck.myX.noise_to_each(ns.bit_flip(0.2))
+ck.myX.add_noise_to_all(ns.bit_flip(0.2))
 ck.myX(0)
 ck.H(0)
 ck.CX(0,1)
@@ -126,6 +127,25 @@ job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.NISQdeb()
 bk.runjob(job)
 
+# test08 - catch error on multi-quibit KrausOperator on mismatched qubit gate
+print('test08 - catch error on multi-quibit KrausOperator on mismatched qubit gate')
+ck = qckt.QCkt(3,3)
+try:
+    ck.H(0).add_noise(ns.two_qubit_dephasing(0.2))
+except Exception as e:
+    print(e)
+ck.H.add_noise_to_all(ns.two_qubit_dephasing(0.3))
+try:
+    ck.draw()
+except Exception as e:
+    print(e)
+try:
+    job = qckt.Job(ck,qtrace=True, verbose=True)
+    bk = bknd.NISQdeb()
+    bk.runjob(job)
+except Exception as e:
+    print(e)
+print()
 
 # test0x - list noise channel/operator signatures
 noise_chans_list = ns.noise_operator_list()

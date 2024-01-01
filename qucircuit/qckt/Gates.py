@@ -41,7 +41,7 @@ class QGate:
 		if issubclass(type(self.qbits[0]),list):
 			# combine_par to create opMatrix to convert from 1-qubit to multiple qubits
 			opMatList = [self.opMatrix for _ in range(len(self.qbits[0]))]
-			ret_opMatrix = gutils.combine_par(op_list=opMatList)
+			ret_opMatrix = gutils.combine_opmatrices_par(op_list=opMatList)
 			ret_qbits = self.qbits[0]
 			# print(f'gate {self.name} shape {opMatrix.shape} qubits are a list = {qbits}', file=sys.stderr)
 		return ret_opMatrix, ret_qbits
@@ -57,7 +57,7 @@ class QGate:
 			for q in self.qbits[0]:
 				op = gutils.stretched_opmatrix(nqbits,self.opMatrix,[q])
 				oplist.append(op)
-			opmat = gutils.combine_seq(oplist)
+			opmat = gutils.combine_opmatrices_seq(oplist)
 		else:
 			opmat = gutils.stretched_opmatrix(nqbits,self.opMatrix,self.qbits)
 		return opmat
@@ -67,20 +67,21 @@ class QGate:
 		return self
 	
 	def add_noise(self, kraus_ops):  # kraus_ops can be KrausOperator or KrausOperatorSequence
+		# don't need to check KrausOperator or KrausOperatorSequence, consolidate_gate_noise() checks that and converts
+		if self.check_noise_op_multi_qubits(kraus_ops) == False:
+			raise QCktException(f"Error: add_noise() - multi-qubit noise operator, {kraus_ops.name},  can't be used on gate {self.name}")
 		self.kraus_ops = kraus_ops
-		if self.check_noise_op_qubits() == False:
-			raise QCktException(f"Error: multi-qubit noise operator can't be used here. {self.name} {self.kraus_ops.name}")
 		return self
 	
-	def check_noise_op_qubits(self):
-		if self.kraus_ops is not None:
-			if type(self.kraus_ops) is not ns.KrausOperator and type(self.kraus_ops) is not ns.KrausOperatorSequence:
+	def check_noise_op_multi_qubits(self, kraus_ops):
+		if kraus_ops is not None:
+			if type(kraus_ops) is not ns.KrausOperator and type(kraus_ops) is not ns.KrausOperatorSequence:
 				raise QCktException(f"ERROR: KrausOperator or KrausOperatorSequence object or None expected.")
-			if type(self.kraus_ops) is ns.KrausOperator:
-				if self.kraus_ops.nqubits != 1 and len(self.qbits) != self.kraus_ops.nqubits:
+			if type(kraus_ops) is ns.KrausOperator:
+				if kraus_ops.nqubits != 1 and len(self.qbits) != kraus_ops.nqubits:
 					return False
 			else:  # type is ns.KrausOperatorSequence
-				for op in self.kraus_ops:
+				for op in kraus_ops:
 					if op.nqubits != 1 and len(self.qbits) != op.nqubits:
 						return False
 		return True
@@ -94,6 +95,8 @@ class QGate:
 	def get_gate_noise(self):
 		# pick from noise on gate type, and noise on gate instance
 		kraus_ops = self.__class__.gatecls_kraus_ops
+		if self.check_noise_op_multi_qubits(kraus_ops) == False:
+			raise QCktException(f"Error: add_noise_to_all() - multi-qubit noise operator, {kraus_ops.name},  can't be used on gate {self.name}")
 		if self.kraus_ops is not None:
 			kraus_ops = self.kraus_ops
 		return kraus_ops
@@ -206,8 +209,10 @@ class NOISE(QGate):
 	def __init__(self, kraus_ops, qbit):
 		super().__init__()
 		self.qbits = qbit
-		self.krausOps = kraus_ops
-		self.name = self.krausOps.name
+		if type(kraus_ops) is ns.KrausOperator:
+			kraus_ops = ns.KrausOperatorSequence(kraus_ops)
+		self.kraus_ops = kraus_ops
+		self.name = self.kraus_ops.name
 
 	def addtocanvas(self,canvas):
 		canvas._add_simple(self.qbits, f'NS:{self.name}')
@@ -219,7 +224,11 @@ class NOISE(QGate):
 		return self.varqbit_args(nqbits,1)
 
 	def assemble(self,noise_model):
-		return {"op":"noise","name":self.name,"krausOps":self.krausOps,"qubits":self.qbits}
+		kraus_ops = self.kraus_ops
+		if type(kraus_ops) is ns.KrausOperator:
+			print('Internal warning: found NOISE kraus_op of class NoiseOperator', file=sys.stderr)
+			kraus_ops = ns.KrausOperatorSequence(self.kraus_ops)
+		return {"op":"noise","name":self.name,"krausOps":kraus_ops,"qubits":self.qbits}
 
 	def to_fullmatrix(self,nqbits):
 		return None

@@ -39,9 +39,6 @@ class NISQeng:
 		cregres_list = [None]*job.shots
 		for shot_count in range(job.shots):
 			qc = qsim.NISQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=False,verbose=job.verbose)
-			if job.noise_model is not None and job.noise_model.kraus_opseq_init is not None:
-				noise_opseq_init = convert_to_qsim_noise_op_sequence(job.noise_model.kraus_opseq_init)
-				qc.qnoise(noise_op_sequence=noise_opseq_init, qbit_list=list(range(job.nqubits)))
 			for op in job.assembledCkt:
 				if op["op"] == "gate":
 					qckt_noise_op = op['krausOps']
@@ -51,13 +48,7 @@ class NISQeng:
 					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
 				elif op["op"] == "noise":
 					qckt_noise_op = op['krausOps']
-					if type(op["krausOps"]) is ns.KrausOperator:
-						qsim_noise_op = nmdl.NoiseOperator(qckt_noise_op.name, qckt_noise_op.kraus_op)
-						qsim_noise_opseq = nmdl.NoiseOperatorSequence(qsim_noise_op)
-					elif type(op["krausOps"]) is ns.KrausOperatorSequence:
-						qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["krausOps"])
-					else:
-						raise QCktException('ERROR: krausOps should be KrausOperator or NoiseOperatorSequence')
+					qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["krausOps"])
 					qc.qnoise(qsim_noise_opseq, op['qubits'])
 				elif op["op"] == "probe":
 					pass
@@ -85,9 +76,6 @@ class NISQdeb:
 		if job.shots != 1:
 			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
 		qc = qsim.NISQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=job.qtrace,verbose=job.verbose)
-		if job.noise_model is not None and job.noise_model.kraus_opseq_init is not None:
-			noise_opseq_init = convert_to_qsim_noise_op_sequence(job.noise_model.kraus_opseq_init)
-			qc.qnoise(noise_op_sequence=noise_opseq_init, qbit_list=list(range(job.nqubits)))
 		for op in job.assembledCkt:
 			if op["op"] == "gate":
 				qckt_noise_op = op['krausOps']
@@ -97,13 +85,7 @@ class NISQdeb:
 				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
 			elif op["op"] == "noise":
 				qckt_noise_op = op['krausOps']
-				if type(op["krausOps"]) is ns.KrausOperator:
-					qsim_noise_op = nmdl.NoiseOperator(qckt_noise_op.name, qckt_noise_op.kraus_op)
-					qsim_noise_opseq = nmdl.NoiseOperatorSequence(qsim_noise_op)
-				elif type(op["krausOps"]) is ns.KrausOperatorSequence:
-					qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["krausOps"])
-				else:
-					raise QCktException('ERROR: krausOps should be KrausOperator or NoiseOperatorSequence')
+				qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["krausOps"])
 				qc.qnoise(qsim_noise_opseq, op['qubits'])
 			elif op["op"] == "probe":
 				nqbits = job.nqubits

@@ -1,6 +1,6 @@
 import math
-import qckt
-from qckt.noisemodel.noiseUtils import *
+import qckt.gatesutils as gutils
+from qckt.noisemodel.noiseUtils import KrausOperator
 import numpy as np
 
 
@@ -8,6 +8,7 @@ I = ['I',np.matrix([[1.0,0.0],[0.0,1.0]],dtype=complex)]
 X = ['X', np.matrix([[0,1],[1,0]],dtype=complex)]
 Y = ['Y', np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)]
 Z = ['Z', np.matrix([[1,0],[0,-1]],dtype=complex)]
+I2 = ['I2', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]],dtype=complex)]
 
 # Canned noise operators (noise channels)
 def bit_flip(probability=0.05):
@@ -88,13 +89,49 @@ def generalized_amplitude_damping(probability=0.05, gamma=0.05):
     # return {'name': f'GAD({probability:.2f},{gamma:.2f})', 'operator':[[(GAD_K0,1.0),(GAD_K1,1.0),(GAD_K2,1.0),(GAD_K3,1.0)], 0.0]}
 
 def dummy_2qubit_kop(probability=0.05):
-    I2 = ['I2', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]],dtype=complex)]
     noise_operator = KrausOperator(
         name=f'DUMMY-KOP({probability})',
         kraus_op=[(I2,probability),(I2,(1-probability))],
         nqubits=2,
         )
     return noise_operator
+
+def two_qubit_dephasing(probability=0.05):
+    zop = Z[1]
+    iop = I[1]
+    IZ = ['IZ',gutils.combine_opmatrices_par([iop,zop])]
+    ZI = ['ZI',gutils.combine_opmatrices_par([zop,iop])]
+    ZZ = ['ZZ',gutils.combine_opmatrices_par([zop,zop])]
+    kraus_op = [
+        (I2, (1-probability)),
+        (IZ,probability/3.0),
+        (ZI,probability/3.0),
+        (ZZ,probability/3.0),
+        ]
+    noise_operator = KrausOperator(
+        name=f'2DPH({probability})',
+        kraus_op=kraus_op,
+        nqubits=2,
+        )
+    return noise_operator
+
+def two_qubit_depolarizing(probability=0.05):
+    kraus_op = [(I2,(1-probability))]
+    for op1 in [I,X,Y,Z]:
+        for op2 in [I,X,Y,Z]:
+            if op1[0] == 'I' and op2[0] == 'I':
+                continue
+            opname = f'{op1[0]}{op2[0]}'
+            opmatrix = gutils.combine_opmatrices_par([op1[1],op2[1]])
+            twoqbitop = [opname,opmatrix]
+            kraus_op.append((twoqbitop, (probability/15.0)))
+    noise_operator = KrausOperator(
+        name=f'2DEP({probability})',
+        kraus_op=kraus_op,
+        nqubits=2,
+    )
+    return noise_operator
+
 
 def noise_operator_list():
     return noise_op_signature
@@ -113,7 +150,8 @@ noise_operators = {
     'GeneralizedAmplitudeDamping': generalized_amplitude_damping,
     'PhaseDamping': phase_damping,
     'PauliChannel': pauli_channel,
-    'DummyKop': dummy_2qubit_kop,
+    'TwoQubitDephasing': two_qubit_dephasing,
+    'TwoQubitDepolarizing': two_qubit_depolarizing,
     }
 
 noise_op_signature = {}
@@ -134,17 +172,3 @@ for krname in noise_operators:
     signature += ')'
     noise_op_signature[krname] = signature
 
-
-if __name__ == '__main__':
-    print(noise_op_signature)
-    nop1 = bit_flip(0.2)
-    for op,prob in nop1:
-        print(op)
-    nop2 = phase_flip(0.3)
-    nop3 = bit_flip(0.4)
-    noseq1 = KrausOperatorSequence(nop1)
-    noseq2 = KrausOperatorSequence(nop2,nop3)
-    noseq = KrausOperatorSequence(noseq1, noseq2)
-    for nop in noseq:
-        print('----------------------------')
-        print(nop)

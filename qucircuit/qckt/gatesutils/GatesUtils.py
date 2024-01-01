@@ -50,7 +50,7 @@ def stretched_opmatrix(nqbits,oper,qbit_list):
 	a_op = _aligned_op(nqbits,c_op,qbit_list)
 	return a_op
 
-def combine_par(op_list):
+def combine_opmatrices_par(op_list):
 	res = None
 	first = True
 	for op in op_list:
@@ -62,7 +62,7 @@ def combine_par(op_list):
 			res = np.kron(res,op)
 	return res
 
-def combine_seq(op_list):
+def combine_opmatrices_seq(op_list):
 	d = (op_list[0]).shape[0]
 	res = np.matrix(np.eye(d),dtype=complex)
 	for op in op_list:

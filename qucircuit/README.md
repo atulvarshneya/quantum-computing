@@ -271,12 +271,12 @@ Converts the quantum gate's operator matrix into a matrix for a system with larg
 The qubits on which the gate operates are kept as the highest order qubits, the additional qubits are 
 left unchanged by the *stretched* operator.
 
-#### `combine_par(op_list)`
+#### `combine_opmatrices_par(op_list)`
 Combines two or more operator matrices into one when they act on separate set of qubits simultaneously.
 
 Returns the generated operator matrix.
 
-#### `combine_seq(op_list)`
+#### `combine_opmatrices_seq(op_list)`
 Combines two or more operator matrices into one when they act on the same set of qubits sequentially.
 
 Returns the generated operator matrix.

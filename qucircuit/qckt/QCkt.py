@@ -19,8 +19,10 @@ class GateWrapper:
 		if gateObj.check_qbit_args(self.qckt.nqubits) == False:
 			raise QCktException(f"Error: qubit arguments incorrect. {gateObj.name}{str(gateObj.qbits)}")
 		return gateObj
-	def noise_to_each(self, kraus_ops):
+	def add_noise_to_all(self, kraus_ops):
+		# don't need to check KrausOperator or KrausOperatorSequence, consolidate_gate_noise() checks that and converts
 		self.GateCls.gatecls_kraus_ops = kraus_ops
+
 
 class QCkt:
 
@@ -88,8 +90,15 @@ class QCkt:
 
 	def assemble(self):
 		assembled = []
+		if self.noise_model is not None and self.noise_model.kraus_opseq_init is not None:
+			noise_wrapper = self.NOISE
+			noise_cls = noise_wrapper.GateCls
+			noise_gate = noise_cls(self.noise_model.kraus_opseq_init, list(range(self.nqubits)))
+			assembled.append(noise_gate.assemble(self.noise_model))
 		for gt in self.circuit:
 			assembled.append(gt.assemble(self.noise_model))
+			if type(gt) is not gts.NOISE:
+				pass # add NOISE gate if noise_model.kraus_opseq_allsteps is not None
 		return assembled
 
 	def to_opMatrix(self):
@@ -98,37 +107,49 @@ class QCkt:
 			op = q.to_fullmatrix(self.nqubits)
 			if op is not None: ## Border, Probe gates return None
 				oplist.append(op)
-		opmat = gutils.combine_seq(oplist)
+		opmat = gutils.combine_opmatrices_seq(oplist)
 		return opmat
 
 	def add_noise_model(self, noise_model=None):
+		fixed_noise_model = noise_model
 		if noise_model is not None:
 			# validate the keys in the dict for noise_model argument
 			if type(noise_model) is not ns.NoiseModel:
 				raise QCktException(f'ERROR: noise_model expected to be NoiseMdel object or None')
 
 			# validate the kraus_opseq_init field
-			keyval = noise_model.kraus_opseq_init
-			if keyval is not None:
-				if type(keyval) is not ns.KrausOperatorSequence:
-					raise QCktException('ERROR: noise_model.kraus_opseq_init must be KrausOperatorSequence object.')
+			opseq_init = noise_model.kraus_opseq_init
+			if opseq_init is not None:
+				if type(opseq_init) is ns.KrausOperatorSequence:
+					pass
+				elif type(opseq_init) is ns.KrausOperator:
+					opseq_init = ns.KrausOperatorSequence(opseq_init)
+				else:
+					raise QCktException('ERROR: noise_model.kraus_opseq_init must be KrausOperatorSequence or KrausOperator object.')
 				# if kraus_opseq_init is specified, it must have only 1-qubit kraus operators
-				if keyval is not None:
-					for op in keyval:
-						if op.nqubits != 1:
-							raise QCktException(f'ERROR: noise_opseq_init must use 1-qubit kraus operators')
+				for op in opseq_init:
+					if op.nqubits != 1:
+						raise QCktException(f'ERROR: noise_opseq_init must use 1-qubit kraus operators')
+
 			# validate the kraus_opseq_allgates field
-			keyval = noise_model.kraus_opseq_allgates
-			if keyval is not None:
-				if type(keyval) is not ns.KrausOperatorSequence:
-					raise QCktException('ERROR: noise_model["kraus_opseq_allgates"] must be KrausOperatorSequence object.')
+			opseq_allgates = noise_model.kraus_opseq_allgates
+			if opseq_allgates is not None:
+				if type(opseq_allgates) is ns.KrausOperatorSequence:
+					pass
+				elif type(opseq_allgates) is ns.KrausOperator:
+					opseq_allgates = ns.KrausOperatorSequence(opseq_allgates)
+				else:
+					raise QCktException('ERROR: noise_model.kraus_opseq_allgates must be KrausOperatorSequence or KrausOperator object.')
+
 			# validate the kraus_opseq_qubits field
-			keyval = noise_model.kraus_opseq_qubits
-			if keyval is not None:
-				if type(keyval) is not ns.KrausOperatorApplierSequense:
+			opseq_qubits = noise_model.kraus_opseq_qubits
+			if opseq_qubits is not None:
+				if type(opseq_qubits) is not ns.KrausOperatorApplierSequense:
 					raise QCktException('ERROR: noise_model["kraus_opseq_qubits"] must be KrausOperatorApplierSequense object.')
+
+			fixed_noise_model = ns.NoiseModel(kraus_opseq_init=opseq_init, kraus_opseq_allgates=opseq_allgates, kraus_opseq_qubits=opseq_qubits)
 		# save the noise_model
-		self.noise_model = noise_model
+		self.noise_model = fixed_noise_model
 
 	def get_size(self):
 		return self.nqubits, self.nclbits
