@@ -12,7 +12,6 @@ class GateWrapper:
 	def __init__(self, qckt, gateCls):
 		self.qckt = qckt
 		self.GateCls = gateCls
-		# self.GateClsKraus = None
 	def __call__(self, *args, **kwargs):
 		gateObj = self.GateCls(*args, **kwargs)
 		self.qckt.circuit.append(gateObj)
@@ -21,7 +20,7 @@ class GateWrapper:
 		return gateObj
 	def add_noise_to_all(self, kraus_ops):
 		# don't need to check KrausOperator or KrausOperatorSequence, consolidate_gate_noise() checks that and converts
-		self.GateCls.gatecls_kraus_ops = kraus_ops
+		self.qckt.noise_model_gates[self.GateCls] = kraus_ops
 
 
 class QCkt:
@@ -33,6 +32,8 @@ class QCkt:
 		self.custom_gatescls_list = []
 		self.name = name
 		self.canvas = cnv.Canvas(self)
+		self.noise_model_gates = {}  # this stores a map with gateCls as key, and noise spec as value
+		self.noise_model = None  # add_noise_model() below updates it
 		self.add_noise_model(noise_model)
 
 		for gclass in gts.GatesList:
@@ -58,6 +59,9 @@ class QCkt:
 		newckt.__copyover_custom_gatedefs__(srcckt=self)
 		newckt.__copyover_custom_gatedefs__(srcckt=otherckt)
 
+		newckt.__copyover_noise_model_gates__(srcckt=self)
+		newckt.__copyover_noise_model_gates__(srcckt=otherckt)
+
 		# copy circuits over to the new circuit
 		for g in self.circuit:
 			newckt.circuit.append(g)
@@ -75,7 +79,10 @@ class QCkt:
 			errmsg = "Error: error aligning qubits, number of qubits do not match"
 			raise QCktException(errmsg)
 		newckt = QCkt(newnq, newnc, name=self.name)
+
 		newckt.__copyover_custom_gatedefs__(srcckt=self)
+		newckt.__copyover_noise_model_gates__(srcckt=self)
+
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
 			newckt.circuit.append(galigned)
@@ -87,6 +94,12 @@ class QCkt:
 			self.custom_gatescls_list.append(gcls)
 			setattr(self, gcls.__name__, GateWrapper(self,gcls))
 
+	def __copyover_noise_model_gates__(self, srcckt):
+		# copy over noise_model_gates from source circuit
+		for gcls in srcckt.noise_model_gates:
+			self.noise_model_gates[gcls] = srcckt.noise_model_gates[gcls]
+
+
 
 	def assemble(self):
 		assembled = []
@@ -94,11 +107,17 @@ class QCkt:
 			noise_wrapper = self.NOISE
 			noise_cls = noise_wrapper.GateCls
 			noise_gate = noise_cls(self.noise_model.kraus_opseq_init, list(range(self.nqubits)))
-			assembled.append(noise_gate.assemble(self.noise_model))
+			assembled.append(noise_gate.assemble(self.noise_model, self.noise_model_gates))
 		for gt in self.circuit:
-			assembled.append(gt.assemble(self.noise_model))
+			assembled.append(gt.assemble(self.noise_model, self.noise_model_gates))
 			if type(gt) is not gts.NOISE:
-				pass # add NOISE gate if noise_model.kraus_opseq_allsteps is not None
+				if self.noise_model is not None and self.noise_model.kraus_opseq_allsteps is not None and gt.is_noise_step():
+					noise_wrapper = self.NOISE
+					noise_cls = noise_wrapper.GateCls
+					for kop,qbt in self.noise_model.kraus_opseq_allsteps:
+						noise_gate = noise_cls(kop, qbt)
+						assembled.append(noise_gate.assemble(self.noise_model, self.noise_model_gates))
+					pass # add NOISE gate if noise_model.kraus_opseq_allsteps is not None
 		return assembled
 
 	def to_opMatrix(self):
@@ -145,9 +164,15 @@ class QCkt:
 			opseq_qubits = noise_model.kraus_opseq_qubits
 			if opseq_qubits is not None:
 				if type(opseq_qubits) is not ns.KrausOperatorApplierSequense:
-					raise QCktException('ERROR: noise_model["kraus_opseq_qubits"] must be KrausOperatorApplierSequense object.')
+					raise QCktException('ERROR: noise_model.kraus_opseq_qubits must be KrausOperatorApplierSequense object.')
 
-			fixed_noise_model = ns.NoiseModel(kraus_opseq_init=opseq_init, kraus_opseq_allgates=opseq_allgates, kraus_opseq_qubits=opseq_qubits)
+			# validate the kraus_opseq_allsteps field
+			opseq_allsteps = noise_model.kraus_opseq_allsteps
+			if opseq_allsteps is not None:
+				if type(opseq_allsteps) is not ns.KrausOperatorApplierSequense:
+					raise QCktException('ERROR: noise_model.kraus_opseq_allsteps must be KrausOperatorApplierSequense object.')
+
+			fixed_noise_model = ns.NoiseModel(kraus_opseq_init=opseq_init, kraus_opseq_allgates=opseq_allgates, kraus_opseq_qubits=opseq_qubits, kraus_opseq_allsteps=opseq_allsteps)
 		# save the noise_model
 		self.noise_model = fixed_noise_model
 

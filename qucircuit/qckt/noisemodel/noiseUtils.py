@@ -54,6 +54,7 @@ class KrausOperatorSequence:
             raise qckt.QCktException('ERROR: KrausOperatorSequence object or None expected')
         self.kraus_op_sequence.extend(addition)
         self.name = self.__name__()
+        return self
 
     def add_kraus_op(self, kraus_op):
         if kraus_op is None:
@@ -63,6 +64,7 @@ class KrausOperatorSequence:
         else:
             raise qckt.QCktException('ERROR: KrausOperator object expected')
         self.name = self.__name__()
+        return self
 
     def __iter__(self):
         self.it = iter(self.kraus_op_sequence)
@@ -96,6 +98,7 @@ class KrausOperatorApplierSequense:
             raise qckt.QCktException('ERROR: KrausOperatorSequence, KrausOperator object or None expected.')
         self.kraus_op_sequence_applier.extend(addition)
         self.name = self.__name__()
+        return self
 
     def extend(self, kraus_op_applier_seq):
         if kraus_op_applier_seq is None:
@@ -106,6 +109,7 @@ class KrausOperatorApplierSequense:
             raise qckt.QCktException('ERROR: KrausOperatorApplierSequense object or None expected')
         self.kraus_op_sequence_applier.extend(addition)
         self.name = self.__name__()
+        return self
 
     def new_with_filtered_qubits(self, qubit_list):
         new_noise_op_applier_seq = KrausOperatorApplierSequense()
@@ -128,16 +132,12 @@ class KrausOperatorApplierSequense:
         return f'{self.name}'
 
 
-## Noise Model fields
-#   kraus_opseq_init: KrausOperatorSequence,
-#   kraus_opseq_qubits: KrausOperatorApplierSequence,
-#   kraus_opseq_allgates: KrausOperatorSequence,
-#
 class NoiseModel:
-    def __init__(self, kraus_opseq_init=None, kraus_opseq_qubits=None, kraus_opseq_allgates=None):
+    def __init__(self, kraus_opseq_init=None, kraus_opseq_qubits=None, kraus_opseq_allgates=None, kraus_opseq_allsteps=None):
         self.kraus_opseq_init = kraus_opseq_init
         self.kraus_opseq_qubits = kraus_opseq_qubits
         self.kraus_opseq_allgates = kraus_opseq_allgates
+        self.kraus_opseq_allsteps = kraus_opseq_allsteps
     def get(self, field, defval):
         print(f'deprecated dict.get(key,default) style access, key={field}.')
         retval = defval

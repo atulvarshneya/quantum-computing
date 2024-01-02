@@ -1,0 +1,54 @@
+#!/bin/bash
+VERBOSE=0
+while [[ $# -gt 0 ]]
+do
+	key="$1"
+	case $key in
+		-v|--verbose)
+		VERBOSE=1
+		;;
+		*)
+		echo "Usage: $0 [-q|--quiet]"
+		exit 1
+		;;
+	esac
+	shift # past argument or value
+done
+
+
+list=`ls *.py`
+
+len=0
+for f in $list; do
+	if [ ${#f} -gt $len ]; then
+		len=${#f}
+	fi
+done
+fmt="%-${len}s"
+
+failed_list=""
+overall_succ=0
+
+for f in $list; do
+	printf "$fmt" $f
+	if [ $VERBOSE -eq 1 ]; then
+		python3 $f
+	else
+		python3 $f > /dev/null 2>&1
+	fi
+	succ=$?
+	if [ $succ -eq 0 ]; then
+		res="COMPLETED"
+	else
+		res="ERROR"
+	fi
+	printf " %s\n" $res
+	if [ $succ -ne 0 ]; then
+		failed_list="${failed_list} ${f}"
+		overall_succ=1
+	fi
+done
+
+if [ $overall_succ -eq 1 ]; then
+	printf ">>>>>>>> List of Failed: %s\n" "$failed_list"
+fi

@@ -7,7 +7,6 @@ class Job:
 		self.circuit = circuit
 		self.nqubits, self.nclbits = circuit.get_size()
 		self.assembledCkt = circuit.assemble()
-		self.noise_model = circuit.noise_model
 		self.qtrace = qtrace
 		self.verbose = verbose
 		self.shots = shots
