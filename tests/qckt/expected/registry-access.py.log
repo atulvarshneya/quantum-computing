@@ -8,8 +8,8 @@ Using service: QSystems
 Instances available:
 qsim-eng
 qsim-deb
-nisqsim-eng
-nisqsim-deb
+dmqsim-eng
+dmqsim-deb
 -------------------------
 
 Using instance: qsim-deb

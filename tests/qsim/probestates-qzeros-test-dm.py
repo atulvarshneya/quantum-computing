@@ -2,7 +2,7 @@
 
 import qsim
 
-q = qsim.NISQSimulator(3,qtrace=True, verbose=True)
+q = qsim.DMQSimulator(3,qtrace=True, verbose=True)
 q.qgate(qsim.H(),[2])
 q.qgate(qsim.C(),[2,1])
 q.qreport('Entangled state')

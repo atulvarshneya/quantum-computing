@@ -120,7 +120,7 @@ class QSimulator:
 
 
 	def qnoise(self, noise_op_sequence, qbit_list, qtrace=False):
-		errmsg = 'Unsupported operation. For noise simulation, use NISQ simulators.'
+		errmsg = 'Unsupported operation. For noise simulation, use DM simulators.'
 		raise QSimError(errmsg)
 
 	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)

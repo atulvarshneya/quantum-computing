@@ -12,7 +12,7 @@ ck.H(2)
 ck.CX(1,2)
 ck.draw()
 job = qckt.Job(ck)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 
 print('Total steps',job.runstats['QSteps'])
 op_names = [k for k in job.runstats['OpCounts'].keys()]

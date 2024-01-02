@@ -15,7 +15,7 @@ noise_allgates = nmdl.NoiseOperatorSequence(
 noise_model = {
     'noise_opseq_allgates': noise_allgates,
 }
-q = qsim.NISQSimulator(2, noise_model=noise_model, qtrace=True, verbose=False)
+q = qsim.DMQSimulator(2, noise_model=noise_model, qtrace=True, verbose=False)
 
 q.qgate(qsim.H(),[0])
 _,state,_ = q.qsnapshot()

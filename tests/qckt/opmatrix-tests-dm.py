@@ -14,7 +14,7 @@ ck1.draw()
 op = ck1.to_opMatrix()
 
 job1 = qckt.Job(ck1)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job1)
 svec1 = job1.get_svec()
 
@@ -27,7 +27,7 @@ ck2.Probe("Circuit to_opMatrix()")
 ck2.draw()
 
 job2 = qckt.Job(ck2)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job2)
 svec2 = job2.get_svec()
 

@@ -26,7 +26,7 @@ ckt3.M([3,4,5],[3,4,5])
 ckt3.draw()
 
 job = qk.Job(ckt3, qtrace=False)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job)
 print("READ OUT STATE VECTOR: ")
 print(job.get_svec())

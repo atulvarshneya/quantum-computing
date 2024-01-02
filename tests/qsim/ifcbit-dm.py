@@ -2,7 +2,7 @@
 
 import qsim
 
-q = qsim.NISQSimulator(5,qtrace=True)
+q = qsim.DMQSimulator(5,qtrace=True)
 
 q.qgate(qsim.X(),[0])
 q.qmeasure([0])

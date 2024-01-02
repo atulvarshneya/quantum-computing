@@ -5,12 +5,12 @@ try:
 	nqbits = 6
 
 	# initialise with the default state of all qbits = |0>
-	q = qsim.NISQSimulator(nqbits,qtrace=True)
+	q = qsim.DMQSimulator(nqbits,qtrace=True)
 	q.qgate(qsim.H(),[1])
 	q.qgate(qsim.C(),[1,0])
 
 	# initialise with initial states of qbits
-	q = qsim.NISQSimulator(nqbits,prepqubits=[[1,0],[1,0],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
+	q = qsim.DMQSimulator(nqbits,prepqubits=[[1,0],[1,0],[1,0],[0,1],[1,0],[0,1]],qtrace=True)
 	q.qgate(qsim.H(),[1])
 	q.qgate(qsim.C(),[1,0])
 
@@ -24,7 +24,7 @@ try:
 		initstate[i] = complex(c,s)
 		p += np.absolute(initstate[i])**2
 	initstate = np.transpose(np.matrix(initstate,dtype=complex))/np.sqrt(p)
-	q = qsim.NISQSimulator(nqbits,initstate=initstate, qtrace=True)
+	q = qsim.DMQSimulator(nqbits,initstate=initstate, qtrace=True)
 	q.qgate(qsim.H(),[1])
 	q.qgate(qsim.C(),[1,0])
 

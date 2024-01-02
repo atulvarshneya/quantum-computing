@@ -66,5 +66,5 @@ bv_ckt.draw()
 
 job = qckt.Job(bv_ckt,qtrace=False, verbose=False)
 # Qdeb().runjob(job)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 print(job.get_creg()[0])

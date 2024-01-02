@@ -18,7 +18,7 @@ import sys
 ##            BUT, the state vector ordering is [0000, ...., 1111]. Good that it does not impact the user.
 ## Sorry, for this confusion, but too much effort to change now.
 
-class NISQSimulator:
+class DMQSimulator:
 
 	def __init__(self,
 			nqbits,
@@ -100,7 +100,7 @@ class NISQSimulator:
 		self.__initialize_sim()
 
 	def qreset(self):
-		print(f'WARNING: qreset() is deprecated. Reinstantiate the NISQsimulator object instead.', file=sys.stderr)
+		print(f'WARNING: qreset() is deprecated. Reinstantiate the DMQsimulator object instead.', file=sys.stderr)
 		self.__initialize_sim()
 	def __initialize_sim(self):
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.

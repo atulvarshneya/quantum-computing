@@ -351,7 +351,7 @@ The classical bits array can be accessed through the `.value` field and its inte
 This class is available in `qckt.backend`.
 
 ### `class StateVector`
-An object of this class is returned by `job.get_svec()`, and holds the *statevector* value from the simulator backend engine. Note that state is available only when you run on a simulator, not on an actual QC hardware. In case of NISQ simulator, the diagonal of the density operator is returned.
+An object of this class is returned by `job.get_svec()`, and holds the *statevector* value from the simulator backend engine. Note that state is available only when you run on a simulator, not on an actual QC hardware. In case of DM simulator, the diagonal of the density operator is returned.
 
 It provides methods to convert that to pretty printable string, e.g., in `str(statevector)`, `print(statevector)`.
 The *statevector* array can be accessed through the `.value` field of the object

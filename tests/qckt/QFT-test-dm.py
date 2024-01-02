@@ -19,7 +19,7 @@ ckt.QFT(*(range(nqbits-1,1,-1)))
 ckt.draw()
 
 job = qckt.Job(ckt,qtrace=False)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job)
 
 svec = job.get_svec()

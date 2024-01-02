@@ -15,7 +15,7 @@ qc.M([4,5])
 qc.draw()
 
 job = qckt.Job(qc,qtrace=False)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job)
 
 svec = job.get_svec()
@@ -47,7 +47,7 @@ ck.list()
 ck.draw()
 
 job = qckt.Job(ck,qtrace=True)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job)
 
 svec = job.get_svec()

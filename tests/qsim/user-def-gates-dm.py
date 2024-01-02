@@ -1,7 +1,7 @@
 import numpy
 import qsim
 
-qc = qsim.NISQSimulator(8,qtrace=True)
+qc = qsim.DMQSimulator(8,qtrace=True)
 
 print()
 print("------------------------------------------------")

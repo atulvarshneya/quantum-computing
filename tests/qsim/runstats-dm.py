@@ -1,7 +1,7 @@
 
 import qsim
 
-q = qsim.NISQSimulator(4,qtrace=True)
+q = qsim.DMQSimulator(4,qtrace=True)
 
 # H gate
 q.qgate(qsim.H(),[2])

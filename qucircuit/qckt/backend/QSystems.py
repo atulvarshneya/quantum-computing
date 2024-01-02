@@ -31,14 +31,14 @@ def convert_to_qsim_noise_op_sequence(qckt_kraus_op_sequence):
 	return qsim_noise_opseq
 
 
-class NISQeng:
+class DMQeng:
 	def __init__(self):
 		pass
 
 	def runjob(self, job):
 		cregres_list = [None]*job.shots
 		for shot_count in range(job.shots):
-			qc = qsim.NISQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=False,verbose=job.verbose)
+			qc = qsim.DMQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=False,verbose=job.verbose)
 			for op in job.assembledCkt:
 				if op["op"] == "gate":
 					qckt_noise_op = op['krausOps']
@@ -67,7 +67,7 @@ class NISQeng:
 		job.runstats = runstats
 		return self
 
-class NISQdeb:
+class DMQdeb:
 	def __init__(self):
 		pass
 
@@ -75,7 +75,7 @@ class NISQdeb:
 		cregres_list = [None]*job.shots
 		if job.shots != 1:
 			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
-		qc = qsim.NISQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=job.qtrace,verbose=job.verbose)
+		qc = qsim.DMQSimulator(job.nqubits,job.nclbits,noise_model=None,qtrace=job.qtrace,verbose=job.verbose)
 		for op in job.assembledCkt:
 			if op["op"] == "gate":
 				qckt_noise_op = op['krausOps']
@@ -211,5 +211,5 @@ class qsimSvc(BackendSvc):
 		else:
 			raise QCktException("No such quantum computing instance "+str(instkey))
 	# in our case since the list of instances is fixed we have simply statically initialized it
-	instances = {"qsim-eng":Qeng,"qsim-deb":Qdeb, 'nisqsim-eng':NISQeng, "nisqsim-deb":NISQdeb}
+	instances = {"qsim-eng":Qeng,"qsim-deb":Qdeb, 'dmqsim-eng':DMQeng, "dmqsim-deb":DMQdeb}
 

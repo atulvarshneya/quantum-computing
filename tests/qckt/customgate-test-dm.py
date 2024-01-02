@@ -28,7 +28,7 @@ ckt.custom_gate("CNOT",opmat)
 ckt.CNOT(1,3)
 ckt.draw()
 job = qckt.Job(ckt,qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 
 ## by appending circuits, the custom gates definitions are inherited by the new circuit
 print("==Direct CUSTOM gate=======================")
@@ -47,4 +47,4 @@ except QCktException as e:
 	print(e)
 ckt.draw()
 job = qckt.Job(ckt,qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)

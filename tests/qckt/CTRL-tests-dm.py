@@ -12,7 +12,7 @@ ck.CX(6,5,4,3)
 ck.list()
 ck.draw()
 job = qckt.Job(ck, qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 
 # CY
 print("CY ---------------------------------------")
@@ -23,7 +23,7 @@ ck.CY(6,5,4,3)
 ck.list()
 ck.draw()
 job = qckt.Job(ck, qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 
 # CZ
 print("CZ ---------------------------------------")
@@ -34,7 +34,7 @@ ck.CZ(6,5,4,3)
 ck.list()
 ck.draw()
 job = qckt.Job(ck, qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 
 # CP
 print("CP ---------------------------------------")
@@ -45,7 +45,7 @@ ck.CP(np.pi/4,6,5,4,3)
 ck.list()
 ck.draw()
 job = qckt.Job(ck, qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)
 
 
 # CROTx
@@ -57,4 +57,4 @@ ck.CROTk(3,6,5,4,3)
 ck.list()
 ck.draw()
 job = qckt.Job(ck, qtrace=True)
-NISQdeb().runjob(job)
+DMQdeb().runjob(job)

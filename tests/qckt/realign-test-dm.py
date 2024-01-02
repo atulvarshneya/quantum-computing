@@ -12,7 +12,7 @@ print("Realigned with:",inpqubits)
 ck.draw()
 
 job = qckt.Job(ck,qtrace=True)
-bk = NISQdeb()
+bk = DMQdeb()
 bk.runjob(job)
 print("STATE VECTOR READ OUT")
 print(job.get_svec())

@@ -20,8 +20,8 @@ for i in svcinsts:
 	print(i)
 print("-------------------------")
 print()
-print('Using instance:','nisqsim-deb')
-engine = svc.getInstance('nisqsim-deb')
+print('Using instance:','dmqsim-deb')
+engine = svc.getInstance('dmqsim-deb')
 print("-------------------------")
 print()
 
