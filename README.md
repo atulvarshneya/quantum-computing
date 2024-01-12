@@ -12,14 +12,18 @@ Since `qucircuit` has `qusimulator` as a dependency, so installing qucircuit wil
 ## FEATURES
 All common gates available as pre-defined. Allows user-defined gates. Allows adding control qubits to any gates. A number of utility functions to manipulate gates - combine sequentially applied or parallelly applied gates, check for unitarity, inverse.
 
+Full featured support for quantum noise simulation. Leverages a new density-matrix based simulation engine.
+
 Easy to follow documentation with tutorial introduction - see `qusimumator/README.md` and `qucircuit/README.md`. A bunch of examples under `examples/qsim` and `examples/qckt`. Code for regression tests also serves as examples to quickly learn `qsim` and `qckt` packages (see folder `tests/`).
+
+Getting started tutorials - `examples/qckt/Getting-started-tutorial.ipynb`, `examples/qckt/Getting-started-tutorial-noise-sim.ipynb`
 
 Several quantum algorithm implementations included as examples:
 * Teleportation
 * Simple Search
 * Deutsch-Jozsa
 * Bernstien-Vazirani
-* Quantum Fourier Tramsform
+* Quantum Fourier Transform
 * Period-finding
 * Grover's algorithm
 * Sudoku using Grover's algorithm
