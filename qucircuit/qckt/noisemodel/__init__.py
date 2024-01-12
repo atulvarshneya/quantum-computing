@@ -1,18 +1,18 @@
-from .noiseUtils import KrausOperator, \
-    KrausOperatorSequence, \
-    KrausOperatorApplierSequense, \
-    NoiseModel, \
+from .noiseUtils import NoiseChannel, \
+    NoiseChannelSequence, \
+    NoiseChannelApplierSequense, \
+    NoiseProfile, \
     consolidate_gate_noise
 
-from .noiseOperators import bit_flip, \
+from .noiseChannels import bit_flip, \
     phase_flip, \
     depolarizing, \
     amplitude_damping, \
     phase_damping, \
     pauli_channel, \
     generalized_amplitude_damping, \
-    dummy_2qubit_kop, \
+    dummy_2qubit_chan, \
     two_qubit_dephasing, \
     two_qubit_depolarizing, \
-    noise_operator_list, \
-    noise_operator_lookup
+    noise_channel_list, \
+    noise_channel_lookup

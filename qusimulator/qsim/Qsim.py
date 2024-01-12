@@ -24,11 +24,15 @@ class QSimulator:
 			ncbits=None,
 			initstate=None,
 			prepqubits=None,
+			noise_profile=None,
 			qtrace=False,
 			qzeros=False,
 			verbose=False,
 			validation=False,
 			visualize=False):
+		if noise_profile is not None:
+			print('WARNING: Ignoring unsupported argument noise_profile in QSimulator(). For noise simulation, use DM simulators.')
+
 		# record input variables for reset
 		self.nqbits = nqbits
 		self.ncbits = ncbits
@@ -58,7 +62,7 @@ class QSimulator:
 		self.__initialize_sim()
 
 	def qreset(self):
-		print(f'WARNING: qreset() is deprecated. Reinstantiate the Qsimulator object instead.', file=sys.stderr)
+		print(f'WARNING: qreset() is deprecated. Reinstantiate the Qsimulator object instead.')
 		self.__initialize_sim()
 	def __initialize_sim(self):
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
@@ -119,11 +123,13 @@ class QSimulator:
 			self.qreport(header="Initial State")
 
 
-	def qnoise(self, noise_op_sequence, qbit_list, qtrace=False):
-		errmsg = 'Unsupported operation. For noise simulation, use DM simulators.'
-		raise QSimError(errmsg)
+	def qnoise(self, noise_chan, qbit_list, qtrace=False):
+		print('WARNING: Ignoring unsupported function qnoise(). For noise simulation, use DM simulators.')
 
-	def qgate(self, oper, qbit_list, ifcbit=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
+	def qgate(self, oper, qbit_list, ifcbit=None, noise_chan=None, qtrace=False):  # ifcbit is encoded as tuple (cbit, ifvalue)
+		if noise_chan is not None:
+			print('WARNING: Ignoring unsupported argument noise_chan in qgate(). For noise simulation, use DM simulators.')
+
 		# runstats - sim cpu time
 		st = time.process_time()
 

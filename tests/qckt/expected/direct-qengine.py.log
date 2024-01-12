@@ -1,14 +1,15 @@
 q000 -[H]-[.]--#------#--v-
-           |   #      #  V 
+           |   #      #  v 
 q001 -----[X]--#------#--v-
-               #      #  V 
+               #      #  v 
 q002 ----------#-[X]--#--v-
-               #      #  V 
+               #      #  v 
 q003 ----------#-[X]--#--v-
-               #      #  V 
+               #      #  v 
 creg ==========#======#==v=
-               #      #  V 
+               #      #  v 
 WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.
+
 PROBE: point 1
 1100    0.70710678+0.00000000j
 1111    0.70710678+0.00000000j

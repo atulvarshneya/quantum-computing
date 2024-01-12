@@ -1,8 +1,8 @@
 import qckt
 
 ## Noise
-# noise operator (kraus operator) is specified as a sequence of pairs of list of operators. 
-# KrausOperator has three fields
+# noise channel is specified as a sequence of pairs of list of kraus operators and probability factor. 
+# NoiseChannel has three fields
 #   [ (op1,op1_prob_multiplier), (op2,op2_prob_multiplier), ...  ],
 #	name,
 #   num_target_qubits
@@ -13,117 +13,117 @@ import qckt
 #
 # so, in math terms, rho = op1_prob_multipier * (op1 * rho * op1_dag) + op2_prob_multiplier * (op2 * rho * op2.dag) + ...
 #
-#   num_target_qubits is the number of qubits this kraus operator acts on
+#   num_target_qubits is the number of qubits this noise channel acts on
 # 
 
-class KrausOperator:
-    def __init__(self, name, kraus_op, nqubits):
+class NoiseChannel:
+    def __init__(self, name, noise_chan, nqubits):
         self.name = name
-        self.kraus_op = kraus_op
+        self.noise_chan = noise_chan
         self.nqubits = nqubits
 
     def __iter__(self):
-        self.it = iter(self.kraus_op)
+        self.it = iter(self.noise_chan)
         return self.it
     def __next__(self):
         return next(self.it)
 
     def __str__(self):
-        return f'name={self.name}\nkraus_op={self.kraus_op}\nnqubits={self.nqubits}'
+        return f'name={self.name}\nnoise_chan={self.noise_chan}\nnqubits={self.nqubits}'
 
-class KrausOperatorSequence:
+class NoiseChannelSequence:
     def __init__(self, *args):
-        self.kraus_op_sequence = []
+        self.noise_chan_sequence = []
         for a in args:
             if a is None:
                 pass
-            elif type(a) is KrausOperator:
-                self.add_kraus_op(a)
-            elif type(a) is KrausOperatorSequence:
-                self.add_kraus_op_sequence(a)
+            elif type(a) is NoiseChannel:
+                self.add_noise_chan(a)
+            elif type(a) is NoiseChannelSequence:
+                self.add_noise_chan_sequence(a)
             else:
-                raise qckt.QCktException('ERROR: Invalid argument, only KrausOperator and KrausOperatorSeuence objects or None expected')
+                raise qckt.QCktException('ERROR: Invalid argument, only NoiseChannel and NoiseChannelSequence objects or None expected')
         self.name = self.__name__()
 
-    def add_kraus_op_sequence(self, kraus_op_sequence):
-        if kraus_op_sequence is None:
+    def add_noise_chan_sequence(self, noise_chan_sequence):
+        if noise_chan_sequence is None:
             addition = []
-        elif type(kraus_op_sequence) is KrausOperatorSequence:
-            addition = kraus_op_sequence.kraus_op_sequence
+        elif type(noise_chan_sequence) is NoiseChannelSequence:
+            addition = noise_chan_sequence.noise_chan_sequence
         else:
-            raise qckt.QCktException('ERROR: KrausOperatorSequence object or None expected')
-        self.kraus_op_sequence.extend(addition)
+            raise qckt.QCktException('ERROR: NoiseChannelSequence object or None expected')
+        self.noise_chan_sequence.extend(addition)
         self.name = self.__name__()
         return self
 
-    def add_kraus_op(self, kraus_op):
-        if kraus_op is None:
+    def add_noise_chan(self, noise_chan):
+        if noise_chan is None:
             pass
-        elif type(kraus_op) is KrausOperator:
-            self.kraus_op_sequence.append(kraus_op)            
+        elif type(noise_chan) is NoiseChannel:
+            self.noise_chan_sequence.append(noise_chan)            
         else:
-            raise qckt.QCktException('ERROR: KrausOperator object expected')
+            raise qckt.QCktException('ERROR: NoiseChannel object expected')
         self.name = self.__name__()
         return self
 
     def __iter__(self):
-        self.it = iter(self.kraus_op_sequence)
+        self.it = iter(self.noise_chan_sequence)
         return self.it
     def __next__(self):
         return next(self.it)
 
     def __name__(self):
-        return ','.join([oper.name for oper in self.kraus_op_sequence])
+        return ','.join([chan.name for chan in self.noise_chan_sequence])
 
     def __str__(self):
         return self.name
 
-class KrausOperatorApplierSequense:
-    def __init__(self, noise_ops=None, qubit_list=None):
+class NoiseChannelApplierSequense:
+    def __init__(self, noise_chan=None, qubit_list=None):
         self.name = ''
-        self.kraus_op_sequence_applier = []
-        if noise_ops is not None:
+        self.noise_chan_applier_sequence = []
+        if noise_chan is not None:
             if qubit_list is None:
                 raise qckt.QCktException('ERROR: qubits list required.')
-            self.add(noise_ops, qubit_list)
+            self.add(noise_chan, qubit_list)
 
-    def add(self, kraus_ops, qbit_list):
-        if kraus_ops is None:
+    def add(self, noise_chan, qbit_list):
+        if noise_chan is None:
             addition = []
-        elif type(kraus_ops) is KrausOperatorSequence:
-            addition = [(op,qbit_list) for op in kraus_ops]
-        elif type(kraus_ops) is KrausOperator:
-            addition = [(kraus_ops, qbit_list)]
+        elif type(noise_chan) is NoiseChannelSequence:
+            addition = [(chan,qbit_list) for chan in noise_chan]
+        elif type(noise_chan) is NoiseChannel:
+            addition = [(noise_chan, qbit_list)]
         else:
-            raise qckt.QCktException('ERROR: KrausOperatorSequence, KrausOperator object or None expected.')
-        self.kraus_op_sequence_applier.extend(addition)
+            raise qckt.QCktException('ERROR: NoiseChannelSequence, NoiseChannel object or None expected.')
+        self.noise_chan_applier_sequence.extend(addition)
         self.name = self.__name__()
         return self
 
-    def extend(self, kraus_op_applier_seq):
-        if kraus_op_applier_seq is None:
+    def extend(self, noise_chan_applier_seq):
+        if noise_chan_applier_seq is None:
             addition = []
-        elif type(kraus_op_applier_seq) is KrausOperatorApplierSequense:
-            addition = kraus_op_applier_seq.kraus_op_sequence_applier
+        elif type(noise_chan_applier_seq) is NoiseChannelApplierSequense:
+            addition = noise_chan_applier_seq.noise_chan_applier_sequence
         else:
-            raise qckt.QCktException('ERROR: KrausOperatorApplierSequense object or None expected')
-        self.kraus_op_sequence_applier.extend(addition)
+            raise qckt.QCktException('ERROR: NoiseChannelApplierSequense object or None expected')
+        self.noise_chan_applier_sequence.extend(addition)
         self.name = self.__name__()
         return self
 
     def new_with_filtered_qubits(self, qubit_list):
-        new_noise_op_applier_seq = KrausOperatorApplierSequense()
-        for noise_operator,qblist in self.kraus_op_sequence_applier:
+        new_noise_chan_applier_seq = NoiseChannelApplierSequense()
+        for noise_channel,qblist in self.noise_chan_applier_sequence:
             filtered_qbits = [q for q in qblist if q in qubit_list]
             if len(filtered_qbits) > 0:
-                new_noise_op_applier_seq.add(noise_operator,filtered_qbits)
-        return new_noise_op_applier_seq
+                new_noise_chan_applier_seq.add(noise_channel,filtered_qbits)
+        return new_noise_chan_applier_seq
 
     def __name__(self):
-        return ','.join([f'({oper.name},{qbits})' for oper,qbits in self.kraus_op_sequence_applier])
+        return ','.join([f'({chan.name},{qbits})' for chan,qbits in self.noise_chan_applier_sequence])
 
     def __iter__(self):
-        self.it = iter(self.kraus_op_sequence_applier)
+        self.it = iter(self.noise_chan_applier_sequence)
         return self.it
     def __next__(self):
         return next(self.it) 
@@ -132,12 +132,12 @@ class KrausOperatorApplierSequense:
         return f'{self.name}'
 
 
-class NoiseModel:
-    def __init__(self, kraus_opseq_init=None, kraus_opseq_qubits=None, kraus_opseq_allgates=None, kraus_opseq_allsteps=None):
-        self.kraus_opseq_init = kraus_opseq_init
-        self.kraus_opseq_qubits = kraus_opseq_qubits
-        self.kraus_opseq_allgates = kraus_opseq_allgates
-        self.kraus_opseq_allsteps = kraus_opseq_allsteps
+class NoiseProfile:
+    def __init__(self, noise_chan_init=None, noise_chan_qubits=None, noise_chan_allgates=None, noise_chan_allsteps=None):
+        self.noise_chan_init = noise_chan_init
+        self.noise_chan_qubits = noise_chan_qubits
+        self.noise_chan_allgates = noise_chan_allgates
+        self.noise_chan_allsteps = noise_chan_allsteps
     def get(self, field, defval):
         print(f'deprecated dict.get(key,default) style access, key={field}.')
         retval = defval
@@ -149,36 +149,36 @@ class NoiseModel:
         return self.get(index,None)
     def keys(self):
         print('deprecated dict.keys() access')
-        return ['kraus_opseq_init', 'kraus_opseq_qubits', 'kraus_opseq_allgates']
+        return ['noise_chan_init', 'noise_chan_qubits', 'noise_chan_allgates', 'noise_chan_allsteps']
     
 
-## create a KrausOperatorApplierSequence combining all components of noise to be applied when gate is applied on certain qubit_list
+## create a NoiseChannelApplierSequence combining all components of noise to be applied when gate is applied on certain qubit_list
 #
-def consolidate_gate_noise(noise_model, gate_noise, qubit_list):
-    noise_op_applier_sequence_overall = KrausOperatorApplierSequense()
+def consolidate_gate_noise(noise_profile, gate_noise, qubit_list):
+    noise_chan_applier_sequence_overall = NoiseChannelApplierSequense()
 
-    # 1. noise on specific qubits, kraus_opseq_qubits
-    noise_op_applier_sequence_qubits = KrausOperatorApplierSequense()
-    if noise_model is not None:
-        noise_model_qubits = noise_model.kraus_opseq_qubits
-        if noise_model_qubits is not None:
-            noise_op_applier_sequence_qubits = noise_model_qubits.new_with_filtered_qubits(qubit_list)
-    noise_op_applier_sequence_overall.extend(noise_op_applier_sequence_qubits)
-    # 2. noise on all gates, kraus_opseq_allgates
-    noise_op_applier_sequence_all_gates = KrausOperatorApplierSequense()
-    if noise_model is not None:
-        noise_model_allgates = noise_model.kraus_opseq_allgates
-        noise_op_applier_sequence_all_gates = KrausOperatorApplierSequense(noise_ops=noise_model_allgates, qubit_list=qubit_list)
-    noise_op_applier_sequence_overall.extend(noise_op_applier_sequence_all_gates)
+    # 1. noise on specific qubits, noise_chan_qubits
+    noise_chan_applier_sequence_qubits = NoiseChannelApplierSequense()
+    if noise_profile is not None:
+        noise_profile_qubits = noise_profile.noise_chan_qubits
+        if noise_profile_qubits is not None:
+            noise_chan_applier_sequence_qubits = noise_profile_qubits.new_with_filtered_qubits(qubit_list)
+    noise_chan_applier_sequence_overall.extend(noise_chan_applier_sequence_qubits)
+    # 2. noise on all gates, noise_chan_allgates
+    noise_chan_applier_sequence_all_gates = NoiseChannelApplierSequense()
+    if noise_profile is not None:
+        noise_profile_allgates = noise_profile.noise_chan_allgates
+        noise_chan_applier_sequence_all_gates = NoiseChannelApplierSequense(noise_chan=noise_profile_allgates, qubit_list=qubit_list)
+    noise_chan_applier_sequence_overall.extend(noise_chan_applier_sequence_all_gates)
     # 3. current gate noise
-    noise_op_applier_sequence_this_gate = KrausOperatorApplierSequense()
+    noise_chan_applier_sequence_this_gate = NoiseChannelApplierSequense()
     if gate_noise is not None:
-        if type(gate_noise) is KrausOperator:
-            noise_op_applier_sequence_this_gate.add(kraus_ops=KrausOperatorSequence(gate_noise), qbit_list=qubit_list)            
-        elif type(gate_noise) is KrausOperatorSequence:
-            noise_op_applier_sequence_this_gate.add(kraus_ops=gate_noise, qbit_list=qubit_list)
+        if type(gate_noise) is NoiseChannel:
+            noise_chan_applier_sequence_this_gate.add(noise_chan=NoiseChannelSequence(gate_noise), qbit_list=qubit_list)            
+        elif type(gate_noise) is NoiseChannelSequence:
+            noise_chan_applier_sequence_this_gate.add(noise_chan=gate_noise, qbit_list=qubit_list)
         else:
-            raise qckt.QCktException('ERROR: KrausOperator, KrausOperatorSequence object or None expected.')
-    noise_op_applier_sequence_overall.extend(noise_op_applier_sequence_this_gate)
+            raise qckt.QCktException('ERROR: NoiseChannel, NoiseChannelSequence object or None expected.')
+    noise_chan_applier_sequence_overall.extend(noise_chan_applier_sequence_this_gate)
 
-    return noise_op_applier_sequence_overall
+    return noise_chan_applier_sequence_overall

@@ -4,13 +4,13 @@ import qckt
 import qckt.backend as bknd
 
 print("Services available")
-svclist = bknd.Registry.listSvc()
+svclist = bknd.Registry().listSvc()
 for i in svclist: print(i[0],":", i[1])
 print("-------------------------")
 print()
 usesvc = svclist[0][0]
 print("Using service:",usesvc)
-svc = bknd.Registry.getSvc('QSystems')
+svc = bknd.Registry().getSvc('QSystems')
 # print("Service object:", svc)
 print("-------------------------")
 print()

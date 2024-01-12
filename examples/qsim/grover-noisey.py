@@ -68,9 +68,9 @@ def main(n):
 
 	# bit flip probality of around 0.002 is about the max that this circuit can tolerate
 	noise_ops = nmdl.bit_flip(probability=0.0025)
-	noise_all_gates = nmdl.NoiseOperatorSequence(noise_ops)
+	noise_all_gates = nmdl.qNoiseChannelSequence(noise_ops)
 	noise_model = {
-		'noise_opseq_allgates': noise_all_gates
+		'noise_chan_allgates': noise_all_gates
 	}
 
 	q = qsim.DMQSimulator(n)
@@ -82,7 +82,7 @@ def main(n):
 
 	print("Take from the following, best of 5 results...")
 	for m in range(5):  # Look for best of 5
-		q = qsim.DMQSimulator(n, noise_model=noise_model, qtrace=False)
+		q = qsim.DMQSimulator(n, noise_profile=noise_model, qtrace=False)
 		# Hn on x-register
 		q.qgate(qsim.Hn(n-1), list(range(n-1,0,-1)))
 		# prepare b as |->

@@ -10,10 +10,10 @@ class Registry:
 
 	def __init__(self):
 		pass
-	def listSvc():
+	def listSvc(self):
 		'returns a list of tuples (name, description) of all services available (i.e. registered in the configuration)'
 		return [(k,Registry.services[k][1]) for k in Registry.services.keys()]
-	def getSvc(svcName):
+	def getSvc(self, svcName):
 		if svcName in Registry.services.keys():
 			return Registry.services[svcName][0]()
 		else:

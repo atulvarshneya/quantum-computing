@@ -1,9 +1,9 @@
-from .noiseUtils import NoiseOperator, \
-    NoiseOperatorSequence, \
-    NoiseOperatorApplierSequense, \
+from .noiseUtils import qNoiseChannel, \
+    qNoiseChannelSequence, \
+    qNoiseChannelApplierSequense, \
     consolidate_gate_noise
 
-from .noiseOperators import bit_flip, \
+from .noiseChannels import bit_flip, \
     phase_flip, \
     depolarizing, \
     amplitude_damping, \
@@ -12,5 +12,5 @@ from .noiseOperators import bit_flip, \
     generalized_amplitude_damping, \
     two_qubit_dephasing, \
     two_qubit_depolarizing, \
-    noise_operator_list, \
-    noise_operator_lookup
+    noise_channel_list, \
+    noise_channel_lookup

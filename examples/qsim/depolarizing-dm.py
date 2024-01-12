@@ -9,13 +9,13 @@ print()
 
 # with probabilty = 0.75, the bell-state gets completely depolarized (TODO source of this info?)
 # i.e., becomes 1/4*I
-noise_allgates = nmdl.NoiseOperatorSequence(
+noise_allgates = nmdl.qNoiseChannelSequence(
     nmdl.depolarizing(probability=0.75),
 )
 noise_model = {
-    'noise_opseq_allgates': noise_allgates,
+    'noise_chan_allgates': noise_allgates,
 }
-q = qsim.DMQSimulator(2, noise_model=noise_model, qtrace=True, verbose=False)
+q = qsim.DMQSimulator(2, noise_profile=noise_model, qtrace=True, verbose=False)
 
 q.qgate(qsim.H(),[0])
 _,state,_ = q.qsnapshot()

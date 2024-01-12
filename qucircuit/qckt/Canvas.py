@@ -132,11 +132,11 @@ class Canvas:
 	def draw(self,show_noise=True):
 		self._initcanvas()
 		### draw the init noise
-		noise_model = self.circuit.noise_model
-		if (noise_model is not None) and show_noise:
-			if noise_model.kraus_opseq_init is not None:
+		noise_profile = self.circuit.noise_profile
+		if (noise_profile is not None) and show_noise:
+			if noise_profile.noise_chan_init is not None:
 				init_noise_list = []
-				for op in noise_model.kraus_opseq_init:
+				for op in noise_profile.noise_chan_init:
 					init_noise_list.append(op.name)
 				circuit_qubits = [i for i in range(self.circuit.nqubits)]
 				init_noise_label = 'INIT:'+','.join(init_noise_list)
@@ -146,10 +146,10 @@ class Canvas:
 			if (type(g) is not qckt.Gates.NOISE) or show_noise:
 				g.addtocanvas(self)
 			if show_noise:
-				g.addtocanvas_gatenoise(self, noise_model=self.circuit.noise_model, noise_model_gates=self.circuit.noise_model_gates)
+				g.addtocanvas_gatenoise(self, noise_profile=self.circuit.noise_profile, noise_profile_gates=self.circuit.noise_profile_gates)
 				if type(g) is not qckt.Gates.NOISE:
-					if noise_model is not None and noise_model.kraus_opseq_allsteps is not None and g.is_noise_step():
-						for kop,qbt in noise_model.kraus_opseq_allsteps:
+					if noise_profile is not None and noise_profile.noise_chan_allsteps is not None and g.is_noise_step():
+						for kop,qbt in noise_profile.noise_chan_allsteps:
 							self._add_simple(qbt, "AS:"+kop.name)
 		self._paint()
 

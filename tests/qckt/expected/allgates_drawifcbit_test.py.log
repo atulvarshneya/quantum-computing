@@ -146,17 +146,17 @@ creg ==#=
 Probe
 Probe does not support ifcbit()
 q000 --v-
-       V 
+       v 
 q001 --v-
-       V 
+       v 
 q002 --v-
-       V 
+       v 
 q003 --v-
-       V 
+       v 
 q004 --v-
-       V 
+       v 
 creg ==v=
-       V 
+       v 
 QFT
 q000 ---------
               

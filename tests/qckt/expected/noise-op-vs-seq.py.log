@@ -1,4 +1,4 @@
-test 01 - DMQdeb, All KrausOperatorSequence
+test 01 - DMQdeb, All NoiseChannelSequence
 q000 -[X]-[.]---------
            |          
 q001 -----[X]---------
@@ -90,7 +90,7 @@ Density matrix DIAGONAL
 110  0.04388000+0.00000000j
 111  0.25419111+0.00000000j
 
-test 02 - DMQdeb, All KrausOperatorSequence
+test 02 - DMQdeb, All NoiseChannelSequence
 q000 -[X]-[.]---------
            |          
 q001 -----[X]---------
@@ -182,7 +182,7 @@ Density matrix DIAGONAL
 110  0.04388000+0.00000000j
 111  0.25419111+0.00000000j
 
-test 03 - DMQeng, All KrausOperatorSequence
+test 03 - DMQeng, All NoiseChannelSequence
 q000 -[X]-[.]---------
            |          
 q001 -----[X]---------
@@ -210,7 +210,7 @@ Density matrix DIAGONAL
 110  0.04388000+0.00000000j
 111  0.25419111+0.00000000j
 
-test 04 - DMQeng, All KrausOperatorSequence
+test 04 - DMQeng, All NoiseChannelSequence
 q000 -[X]-[.]---------
            |          
 q001 -----[X]---------

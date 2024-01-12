@@ -1,4 +1,4 @@
-['AmplitudeDamping', 'BitFlip', 'DUMMY-NOISEOP', 'Depolarizing', 'GeneralizedAmplitudeDamping', 'PauliChannel', 'PhaseDamping', 'PhaseFlip', 'TwoQubitDephasing', 'TwoQubitDepolarizing']
+['AmplitudeDamping', 'BitFlip', 'DUMMY-NOISECHAN', 'Depolarizing', 'GeneralizedAmplitudeDamping', 'PauliChannel', 'PhaseDamping', 'PhaseFlip', 'TwoQubitDephasing', 'TwoQubitDepolarizing']
 
 test 01 - without any noise model
 Initial State
@@ -668,6 +668,6 @@ AmplitudeDamping                amplitude_damping(gamma=0.05)
 GeneralizedAmplitudeDamping     generalized_amplitude_damping(probability=0.05, gamma=0.05)
 PhaseDamping                    phase_damping(gamma=0.05)
 PauliChannel                    pauli_channel(probx=0.05, proby=0.05, probz=0.05)
-DUMMY-NOISEOP                   dummy_2qubit_noiseop(probability=0.05)
+DUMMY-NOISECHAN                 dummy_2qubit_noisechan(probability=0.05)
 TwoQubitDephasing               two_qubit_dephasing(probability=0.05)
 TwoQubitDepolarizing            two_qubit_depolarizing(probability=0.05)

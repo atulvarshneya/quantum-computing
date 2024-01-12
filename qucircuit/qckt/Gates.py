@@ -8,8 +8,6 @@ import qckt.noisemodel as ns
 from qckt.qException import QCktException
 
 class QGate:
-	gatecls_kraus_ops = None
-
 	def __init__(self):
 		self.qbits = None
 		self.cbits = None
@@ -17,7 +15,7 @@ class QGate:
 		self.name = None
 		self.opMatrix = None
 		self.cbit_cond = None
-		self.kraus_ops = None
+		self.noise_chan = None
 
 	def _reorderlist(self,oseq,nseq):
 		newseq = []
@@ -46,10 +44,10 @@ class QGate:
 			# print(f'gate {self.name} shape {opMatrix.shape} qubits are a list = {qbits}', file=sys.stderr)
 		return ret_opMatrix, ret_qbits
 
-	def assemble(self, noise_model, noise_model_gates):
-		kraus_ops = self.get_gate_noise(noise_model_gates)
-		noise_opseq = ns.consolidate_gate_noise(noise_model=noise_model, gate_noise=kraus_ops, qubit_list=self.qbits)
-		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond, 'krausOps':noise_opseq}
+	def assemble(self, noise_profile, noise_profile_gates):
+		noise_chan = self.get_gate_noise(noise_profile_gates)
+		noise_opseq = ns.consolidate_gate_noise(noise_profile=noise_profile, gate_noise=noise_chan, qubit_list=self.qbits)
+		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond, 'noiseChan':noise_opseq}
 
 	def to_fullmatrix(self,nqbits):
 		oplist = []
@@ -66,40 +64,40 @@ class QGate:
 		self.cbit_cond = (cbit,val)
 		return self
 	
-	def add_noise(self, kraus_ops):  # kraus_ops can be KrausOperator or KrausOperatorSequence
-		# don't need to check KrausOperator or KrausOperatorSequence, consolidate_gate_noise() checks that and converts
-		if self.check_noise_op_multi_qubits(kraus_ops) == False:
-			raise QCktException(f"Error: add_noise() - multi-qubit noise operator, {kraus_ops.name},  can't be used on gate {self.name}")
-		self.kraus_ops = kraus_ops
+	def set_noise(self, noise_chan):  # noise_chan can be NoiseChannel or NoiseChannelSequence
+		# don't need to check NoiseChannel or NoiseChannelSequence, consolidate_gate_noise() checks that and converts
+		if self.check_noise_op_multi_qubits(noise_chan) == False:
+			raise QCktException(f"Error: set_noise() - multi-qubit noise operator, {noise_chan.name},  can't be used on gate {self.name}")
+		self.noise_chan = noise_chan
 		return self
 	
-	def check_noise_op_multi_qubits(self, kraus_ops):
-		if kraus_ops is not None:
-			if type(kraus_ops) is not ns.KrausOperator and type(kraus_ops) is not ns.KrausOperatorSequence:
-				raise QCktException(f"ERROR: KrausOperator or KrausOperatorSequence object or None expected.")
-			if type(kraus_ops) is ns.KrausOperator:
-				if kraus_ops.nqubits != 1 and len(self.qbits) != kraus_ops.nqubits:
+	def check_noise_op_multi_qubits(self, noise_chan):
+		if noise_chan is not None:
+			if type(noise_chan) is not ns.NoiseChannel and type(noise_chan) is not ns.NoiseChannelSequence:
+				raise QCktException(f"ERROR: NoiseChannel or NoiseChannelSequence object or None expected.")
+			if type(noise_chan) is ns.NoiseChannel:
+				if noise_chan.nqubits != 1 and len(self.qbits) != noise_chan.nqubits:
 					return False
-			else:  # type is ns.KrausOperatorSequence
-				for op in kraus_ops:
+			else:  # type is ns.NoiseChannelSequence
+				for op in noise_chan:
 					if op.nqubits != 1 and len(self.qbits) != op.nqubits:
 						return False
 		return True
 
-	def addtocanvas_gatenoise(self, canvas, noise_model, noise_model_gates):
-		kraus_ops = self.get_gate_noise(noise_model_gates)
-		noise_opseq = ns.consolidate_gate_noise(noise_model=noise_model, gate_noise=kraus_ops, qubit_list=self.qbits)
+	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
+		noise_chan = self.get_gate_noise(noise_profile_gates)
+		noise_opseq = ns.consolidate_gate_noise(noise_profile=noise_profile, gate_noise=noise_chan, qubit_list=self.qbits)
 		for kop,qbt in noise_opseq:
 			canvas._add_simple(qbt,f'{self.name}:{kop.name}')
 
-	def get_gate_noise(self, noise_model_gates):
+	def get_gate_noise(self, noise_profile_gates):
 		# pick from noise on gate type, and noise on gate instance
-		kraus_ops = noise_model_gates.get(self.__class__, None)
-		if self.check_noise_op_multi_qubits(kraus_ops) == False:
-			raise QCktException(f"Error: add_noise_to_all() - multi-qubit noise operator, {kraus_ops.name},  can't be used on gate {self.name}")
-		if self.kraus_ops is not None:
-			kraus_ops = self.kraus_ops
-		return kraus_ops
+		noise_chan = noise_profile_gates.get(self.__class__, None)
+		if self.check_noise_op_multi_qubits(noise_chan) == False:
+			raise QCktException(f"Error: add_noise_to_all() - multi-qubit noise operator, {noise_chan.name},  can't be used on gate {self.name}")
+		if self.noise_chan is not None:
+			noise_chan = self.noise_chan
+		return noise_chan
 	
 	def is_noise_step(self):  # is a step after which 'allsteps' noise should be applied
 		return True
@@ -209,29 +207,29 @@ def registerGate(gateclass):
 
 @registerGate
 class NOISE(QGate):
-	def __init__(self, kraus_ops, qbit):
+	def __init__(self, noise_chan, qbit):
 		super().__init__()
 		self.qbits = qbit
-		if type(kraus_ops) is ns.KrausOperator:
-			kraus_ops = ns.KrausOperatorSequence(kraus_ops)
-		self.kraus_ops = kraus_ops
-		self.name = self.kraus_ops.name
+		if type(noise_chan) is ns.NoiseChannel:
+			noise_chan = ns.NoiseChannelSequence(noise_chan)
+		self.noise_chan = noise_chan
+		self.name = self.noise_chan.name
 
 	def addtocanvas(self,canvas):
 		canvas._add_simple(self.qbits, f'NS:{self.name}')
 
-	def addtocanvas_gatenoise(self, canvas, noise_model, noise_model_gates):
+	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
 		pass
 
 	def check_qbit_args(self,nqbits):
 		return self.varqbit_args(nqbits,1)
 
-	def assemble(self, noise_model, noise_model_gates):
-		kraus_ops = self.kraus_ops
-		if type(kraus_ops) is ns.KrausOperator:
-			print('Internal warning: found NOISE kraus_op of class NoiseOperator', file=sys.stderr)
-			kraus_ops = ns.KrausOperatorSequence(self.kraus_ops)
-		return {"op":"noise","name":self.name,"krausOps":kraus_ops,"qubits":self.qbits}
+	def assemble(self, noise_profile, noise_profile_gates):
+		noise_chan = self.noise_chan
+		if type(noise_chan) is ns.NoiseChannel:
+			print('Internal warning: found NOISE noise_chan of class NoiseOperator', file=sys.stderr)
+			noise_chan = ns.NoiseChannelSequence(self.noise_chan)
+		return {"op":"noise","name":self.name,"noiseChan":noise_chan,"qubits":self.qbits}
 
 	def to_fullmatrix(self,nqbits):
 		return None
@@ -449,7 +447,7 @@ class M(QGate):
 			canvas._extend()
 		return self
 
-	def addtocanvas_gatenoise(self, canvas, noise_model, noise_model_gates):
+	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
 		pass
 
 	def check_qbit_args(self,nqbits):
@@ -473,7 +471,7 @@ class M(QGate):
 		errmsg = "Measure gate cannot be converted to opmatrix."
 		raise QCktException(errmsg)
 
-	def assemble(self, noise_model, noise_model_gates):
+	def assemble(self, noise_profile, noise_profile_gates):
 		return {"op":"measure", "qubits":self.qbits, "clbits":self.cbits}
 
 	def is_noise_step(self):
@@ -498,7 +496,7 @@ class Border(QGate):
 		canvas._extend()
 		return self
 
-	def addtocanvas_gatenoise(self, canvas, noise_model, noise_model_gates):
+	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
 		pass
 
 	def check_qbit_args(self,nqbits):
@@ -512,7 +510,7 @@ class Border(QGate):
 	def to_fullmatrix(self,nqbits):
 		return None
 
-	def assemble(self, noise_model, noise_model_gates):
+	def assemble(self, noise_profile, noise_profile_gates):
 		return {"op":"noop"}
 
 	def is_noise_step(self):
@@ -539,12 +537,12 @@ class Probe(QGate):
 		en = len(col)//2
 		for i in range(en):
 			col[2*i] = "v"
-			col[2*i+1] = "V"
+			col[2*i+1] = "v"
 		canvas._append(col)
 		canvas._extend()
 		return self
 
-	def addtocanvas_gatenoise(self, canvas, noise_model, noise_model_gates):
+	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
 		pass
 
 	def check_qbit_args(self,nqbits):
@@ -558,7 +556,7 @@ class Probe(QGate):
 	def to_fullmatrix(self,nqbits):
 		return None
 
-	def assemble(self, noise_model, noise_model_gates):
+	def assemble(self, noise_profile, noise_profile_gates):
 		return {"op":"probe","header":self.header,"probestates":self.probestates}
 
 	def is_noise_step(self):

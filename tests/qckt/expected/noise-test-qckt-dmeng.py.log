@@ -1,6 +1,6 @@
 ['AmplitudeDamping', 'BitFlip', 'Depolarizing', 'GeneralizedAmplitudeDamping', 'PauliChannel', 'PhaseDamping', 'PhaseFlip', 'TwoQubitDephasing', 'TwoQubitDepolarizing']
 
-test 01 - without any noise model
+test 01 - without any noise profile
 q000 -[X]-[.]---------
            |          
 q001 -----[X]---------
@@ -302,7 +302,7 @@ Density matrix DIAGONAL
 110  0.00500000+0.00000000j
 111  0.40500000+0.00000000j
 
-test06 - 2-qubit dummy kraus operator
+test06 - 2-qubit dummy noise channel
 q000 -[H]-[.]-----
            |      
 q001 -----[X]-----
@@ -311,14 +311,14 @@ q002 ---------[H]-
                   
 creg =============
                   
-q000 -[H]-[.]-[CX:DUMMY-KOP(0.5)]-----
-           |                          
-q001 -----[X]-[CX:DUMMY-KOP(0.5)]-----
-                                      
-q002 -----------------------------[H]-
-                                      
-creg =================================
-                                      
+q000 -[H]-[.]-[CX:DUMMY-CHAN(0.5)]-----
+           |                           
+q001 -----[X]-[CX:DUMMY-CHAN(0.5)]-----
+                                       
+q002 ------------------------------[H]-
+                                       
+creg ==================================
+                                       
 READ OUT STATE VECTOR: 
 Density matrix DIAGONAL
 000  0.25000000+0.00000000j
@@ -326,7 +326,7 @@ Density matrix DIAGONAL
 100  0.25000000+0.00000000j
 111  0.25000000+0.00000000j
 
-test07 - custom gates with add_noise_to_all()
+test07 - custom gates with set_noise_on_all()
 q000 -[myX M]-[H]-[.]---------[myX M]-
                    |                  
 q001 -------------[X]-----------------
@@ -350,8 +350,8 @@ Density matrix DIAGONAL
 101  0.40000000+0.00000000j
 110  0.40000000+0.00000000j
 
-test08 - catch error on multi-quibit KrausOperator on mismatched qubit gate
-Error: add_noise() - multi-qubit noise operator, 2DPH(0.2),  can't be used on gate H
+test08 - catch error on multi-quibit NoiseChannel on mismatched qubit gate
+Error: set_noise() - multi-qubit noise operator, 2DPH(0.2),  can't be used on gate H
 Error: add_noise_to_all() - multi-qubit noise operator, 2DPH(0.3),  can't be used on gate H
 Error: add_noise_to_all() - multi-qubit noise operator, 2DPH(0.3),  can't be used on gate H
 

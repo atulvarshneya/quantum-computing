@@ -1,7 +1,8 @@
 q000 -[X]-[H]--v-[Rx]-
-               V      
+               v      
 creg ==========v======
-               V      
+               v      
+
 PROBE: 
 0    0.70710678+0.00000000j
 1    -0.70710678+0.00000000j
@@ -13,9 +14,10 @@ STATE VECTOR READ OUT
 CREGISTER READ OUT: 
 
 q000 -[X]-[H]--v-[Ry]-
-               V      
+               v      
 creg ==========v======
-               V      
+               v      
+
 PROBE: 
 0    0.70710678+0.00000000j
 1    -0.70710678+0.00000000j
@@ -26,9 +28,10 @@ STATE VECTOR READ OUT
 CREGISTER READ OUT: 
 
 q000 -[X]-[H]--v-[Rz]-
-               V      
+               v      
 creg ==========v======
-               V      
+               v      
+
 PROBE: 
 0    0.70710678+0.00000000j
 1    -0.70710678+0.00000000j

@@ -87,27 +87,9 @@ and, here is its output --
 	MEASURED Qubit[0] = [0] with probality = 0.5
 	00000000    1.00000000+0.00000000j
 
-1.2	PROGRAMMING MODEL
---------
-qsim assumes a programming model as shown below.
-
-Users write the algorithms on a front-end classical computer using standard programming language (Python), and qsim provides an API to access and perform operations on a Quantum Computer as a back-end resource.
-
-While executing one quantum operation at a time is not how realistic quantum computers operate, the idea is to provide a quantum programming environment to easily develop and debug quantum algorithms. The companion project, qucircuit (pip install qucircuit), provides a paradigm applicable to real quantum computers.
-
-	                     +--------------------+          +----------------+
-	                     |                +---|          |                |
-	    +-------+        |                | q |          |                |
-	    |       |        |  Classical     | s |          |    Quantum     |
-	    |       |--------|  Computer      | i |----------|    Computer    |
-	    +-------+        |  (Front-end)   | m |          |   (Back-end)   |
-	   /       /         |                |   |          |                |
-	  ---------          |                +---|          |                |
-	                     +--------------------+          +----------------+
-
 # 2. CORE FUNCTIONS
 
-2.1	**qc = qsim.QSimulator(nqubits, ncbits=None, initstate=None, prepqubits=None, qtrace=False, qzeros=False, validation=False, visualize=False)**
+2.1	**qc = qsim.QSimulator(nqubits, ncbits=None, initstate=None, prepqubits=None, noise_profile=None, qtrace=False, qzeros=False, validation=False, visualize=False)**
 
 First argument specifies the number of qubits in the system. If ncbits is provided it specifies the number of classical bits, if not provide, it defaults to same as the number of qubits. If neither initstate or prepqubits is provided, prepares all qubits to |0>.
 
@@ -125,6 +107,14 @@ If validation=True, every qgate() call validates the gate to be unitary
 
 If visualize=True, the qreport() displays an additional bar graph showing the magnitude of the amplitudes of each state.
 
+`QSimulator` version of the simulator ignores the argument, `noise_profile`. For noise simultion use the density matirx based `DMQSimulator` version of the simulator.
+
+**qc = qsim.DMQSimulator(nqubits, ncbits=None, initstate=None, prepqubits=None, noise_profile=None, qtrace=False, qzeros=False, validation=False, visualize=False)**
+
+`DMQSimulator` version of the simulator takes an additional argument, `noise_profile`.
+
+If not `None` its value should be a dictionary object with keys `noise_opseq_init`, `noise_opseq_allgates` and `noise_opseq_qubits`. The values for keys `noise_opseq_init` and `noise_opseq_allgates` are objects either of classes `qsim.noisemodel.NoiseOperator` or `qsim.noisemodel.NoiseOperatorSequence`, or `None`, and value for key `noise_opseq_qubits` is object of class `qsim.noisemodel.NoiseOperatorApplierSequence`, or `None`. More details on `noise_profile` in the section on **Noise Simulation**.
+
 2.2	**qc.qreset()**
 
 Brings the simulator to the same state as after QSimulator() call - initial state, qtrace, qzeros, ... everything.
@@ -132,7 +122,7 @@ Brings the simulator to the same state as after QSimulator() call - initial stat
 qreset() has been deprecated. Just re-instantiate the simulator object instead.
 
 
-2.3	**qc.qgate(quantum_gate, list_of_qubits, ifcbit=None, qtrace=False)**
+2.3	**qc.qgate(quantum_gate, list_of_qubits, noise_chan=None, ifcbit=None, qtrace=False)**
 
 qgate() is used to perform quantum gate operations, quantum_gate, on a set of qubits, list_of_qubits.
 
@@ -142,7 +132,17 @@ ifcbit argument, if provided, causes the gate to be applied conditionally. ifcbi
 
 If qtrace is True, the resulting state is printed out.
 
-2.4	**qc.qmeasure(qbit_list, cbit_list=None, qtrace=False)**
+In `QSimulator` version of the simulator qgate() ignores the argument, `noise_chan`. For noise simultion use the density matirx based `DMQSimulator` version of the simulator.
+
+**qc.qgate(quantum_gate, list_of_qubits, noise_chan=None, ifcbit=None, qtrace=False)**
+
+`DMQSimulator` version of the simulator's `qgate()` method takes an additional argument, `noise_chan`. If not `None` its value should be an object either of classes `qsim.noisemodel.qNoiseChannel` or `qsim.noisemodel.qNoiseChannelSequence`. More details on `noise_chan` in the section on **Noise Simulation**.
+
+2.4 **qc.qnoise(noise_chan, qubits_list, qtrace=False)**
+
+`DMQSimulator` version of the simulator supports `qnoise()` method. This method applies noise as specified by `noise_chan` to `qubits_list` qunits. `noise_chan` is of type `qNoiseChannel` or `qNoiseChannelSequence`.
+
+2.5	**qc.qmeasure(qbit_list, cbit_list=None, qtrace=False)**
 
 Returns the measured values of the qubits in the qubit_list, each 0 or 1, as a list, in the same order as the qubits in the qubit_list. The measured qubits are also read into the corresponding classical bits in the cbit_list. if cbit_list is not specified it defaults to the same list as the qbit_list.
 
@@ -154,25 +154,25 @@ Cleary, the computations can continue after the measurement operations. Just tha
 
 If qtrace is True, the resulting state is printed out.
 
-2.5	**qc.qreport(state=None, header="State", probestates=False)**
+2.6	**qc.qreport(state=None, header="State", probestates=False)**
 
 Prints the current state of the system. if state argument is provided with a column numpy.matrix, it prints that state instead.
 The argument header provides the text to be printed above the state information.
 The argument probestates is used to limit the dumping of states information, it gets limited to only the states listed, e.g., probestates=[0,1,2,3]
 
-2.6	**qc.qsnapshot()**
+2.7	**qc.qsnapshot()**
 
 Returns the a python array of all the classical bits and a python array of complex amplitudes of superposition states of the qubits in the system.
 
-2.7	**qc.qsize()**
+2.8	**qc.qsize()**
 
 Returns the number of qubits in the system.
 
-2.8	**qc.qtraceON(boolean)**
+2.9	**qc.qtraceON(boolean)**
 
 Turns ON or OFF printing of state after each qgate() and qmeasure() function call.
 
-2.9	**qc.qzerosON(boolean)**
+2.10	**qc.qzerosON(boolean)**
 
 Turns ON or OFF printing of zero amplitude states in trace outputs and qreport() outputs.
 
@@ -414,3 +414,72 @@ Type a ? to get help, and that is all you will need to know about using the cli.
 	> q
 	$
 
+# 8. Noise in Quantum Computers
+
+The quantum computers of the current era are described as noisy intermediate-size quantum computers (NISQ computers). Apart from their *intermediate* size in terms of number of qubits, they are also noisy. Noise in quantum computers can introduce classical uncertainty in what the underlying state is. When this happens we need to consider not only a wavefunction but probabilistic sum of wavefunctions when we are uncertain as to which one we have.
+
+For example, if we know that a $\ket{0}$ qubit can flip accidentally with a 20% probability then we would say that there is a 80% probability we have the $\ket{0}$ state and a 20% probability that we have a $\ket{1}$ state. This is called an “impure” or “mixed” state. The mixed state isn’t just one wavefunction but instead a distribution over wavefunctions.
+
+## 8.1 Density Matrix
+
+We represent such a mixed state with something called a density matrix which is a richer representation of quantum states than state vectors. Pure states have very simple density matrices that are written as an outer product of the ket vector representing that state, $\ket{\psi}$, and its complex conjugate $\bra{\psi}$. I.e., the density matrix $\rho_\psi$ is defined as,  $\rho_\psi := \ket{\psi}\bra{\psi}$.
+
+If we want to describe a situation with classical uncertainty between states $\rho_1$ and $\rho_2$, then we can take their weighted sum $(p\rho_1 +(1-p)\rho_2)$, where $p \in [0,1]$ gives the classical probability that the state is $\rho_1$.
+
+## 8.2 Quantum Gate Noise
+
+There are two basic sources of quantum gate noise:
+
+1. **coherent errors** are those that preserve the purity of the input state, i.e., instead of the intended operation $\ket{\psi} \mapsto U \ket{\psi}$ we carry out a perturbed, but unitary operation $\ket{\psi} \mapsto \tilde{U} \ket{\psi}$, where $\tilde{U} \ne U$.
+2. **incoherent errors** are those that do not preserve the purity of the input state, in this case we must actually represent the evolution in terms of density matrices. The state $\rho :=\ket{\psi}\bra{\psi}$ is then mapped as $\rho \mapsto \sum_{j=1}^m K_j \rho K_j ^\dagger$, where the operators $K_1,K_2, ..., K_m$ are called Kraus operators and must obey $\sum_{j=1}^m K_j ^\dagger K_j = \boldsymbol{I}$ to conserve the trace of $\rho$. Maps expressed in this form are called Kraus maps. It can be shown that every physical map on a finite dimensional quantum system can be represented as a Kraus map.
+
+**Cuases of incoherent errors:** When a quantum system (e.g., the qubits on a quantum processor) is not perfectly isolated from its environment it generally co-evolves with the environment's degrees of freedom it couples to. The implication is that while the total time evolution of system and environment as a composite can be assumed to be unitary, the system state by itself might not be.
+
+# 9. Noise Simulation in `qusimulator`
+
+`qusimulator` provides a framework to simulate noise in quantum computers. This allows users to design and evaluate the effects of such noise on quantum algorithms without running them on actual quantum hardware.
+
+`DMQSimulator()` version of simulator is density matrix based simulator, and supports noise simulation. The `QSimulator` version and `DMQSimulator are 'drop-in` replacements for each other, except that `QSimulator` ignores all argumetns and method calls related to noise simulation.
+
+`DMQSimulator` supports two mechanims for simulating noise, they can be used individually or together.
+
+1. **Global noise overlay:** a noise profile attached to the simulator which can be setup to add noise automatically at initialization time, and after each quantum gate operation.
+2. **Applying noise at specific points in the circuit:** adds noise at specific steps. This is done by passing the `noise_chan` argument in any `qgate()` method calls, and by calling `qnoise()` method at specific instants in the simulation.
+
+## 9.1 Global noise overlay
+This mechanism allows the users to pass a noise profile to a `DMQSimulator()` instance. This supports noise to be added at 
+1. initialization time 
+2. to specific qubits when acted upon by any gates,
+3. at all gate operations to the qubits acted upon by the gate
+
+## 9.2 Applying noise at specific points in the circuit
+
+`qc.qnoise(noise_channel, qubits_list)`: this is just like applying a gate, except that instead of a gate operation a noise channel is applied to the specified qubits. The noise channel argument can be either `qNoiseChannel` or `qNoiseChannelSequence` type. . The noise channel should either be a 1-qubit channel, in which case it is 'broadcast' to all the qubits of the `qnoise()` instance, or the number of qubits of the noise channel must match the number of qubits in the `qubits_list` argument.
+
+`qc.qgate(gate, qubits_list, noise_channel)`: this applies the noise channel to the gate instance and the noise channel acts on the same qubits as the gate. The noise channel should either be a 1-qubit channel, in which case it is 'broadcast' to all the qubits of the gate instance, or the number of qubits of the noise channel must match the number of qubits of the gate. 
+
+## Noise channel and noise profile classes
+
+The API uses the following classes to represent the noise channels and the noise profile.
+
+### `qNoiseChannel`, `qNoiseChannelSequence`
+`qNoiseChannel` represents one noise channel (a set of operators $K_1, K_2, ..., K_m$ applied as $\sum_{j=1}^m K_j \rho K_j^\dagger$).
+
+The implementation assumes that users might need to apply multiple noise channels as a group in a sequence, the class `qNoiseChannelSequence` allows that in an easy way, it represents a sequence of multiple noise channels applied together, one after the other. All API functions that accept an argument of type `qNoiseChannel` are designed to also accept that argument to be of type `qNoiseChannelSequence`.
+
+### `qNoiseChannelApplierSequence` - noise 'applier' specification.
+Typically the noise channels are applied along with a gate operation, so they act on the same qubts as the gate, for those purposes it is sufficient to specify the noise as `qNoiseChannel` or `qNoiseChannelSequence`. However, as part of *noise profile* specification, noise channels can also be applied to specific qubits, this is represented usig the class `NoiseChannelApplierSequence`.
+
+For instance, the noise profile can specify a bit-flip noise on qubits 1 and 2, i.e., to apply this noise after each gate operation involving those qubits. However, if a gate acts on qubits 0 and 1, then after that gate the specified bit-flip noise will be applied to qubit 1  - the qubit common between the gate's target qubits and the noise applier's target qubits. Just to be clear, if the gate acts on qubits other than specified in the applier, that noise in the applier will not be applied.
+
+### `qNoiseProfile`
+This class represents the noise profile. It has the following fields -
+1. `noise_chan_init` 
+	- noise at initialization time 
+	- of type `NoiseChannel`, or `NoiseChannelSequence`
+2. `noise_chan_qubits` 
+	- noise on specific qubits when acted upon by any gates 
+	- of type `NoiseChannelApplierSequence`
+3. `noise_chan_allgates` 
+	- noise at all gate operations to the qubits acted upon by the gate 
+	- of type `NoiseChannel`, or `NoiseChannelSequence`

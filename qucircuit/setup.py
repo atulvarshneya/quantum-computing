@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('README.md', 'r') as file:
+with open('RELEASE-splash.md', 'r') as file:
 	long_description = file.read()
 
 setup(
@@ -16,6 +16,7 @@ setup(
     # package_dir={'': '.'},
     keywords='qsystems quantum computing',
 	url='https://github.com/atulvarshneya/quantum-computing',
+	python_requires='>3.9',
     install_requires=[
         'numpy',
         'qusimulator>=2.0'

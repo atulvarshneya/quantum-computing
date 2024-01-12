@@ -1,4 +1,4 @@
-added noise model, but using Qdeb
+added noise profile, but using Qdeb
 q000 -[INIT:PF(0.20)]-[X]-[X:Dep(0.10)]-[NS:BF(0.10)]-[.]---------------[CX:Dep(0.10)]----------------------------------------[M]-
                                                        |                                                                       |  
 q001 -[INIT:PF(0.20)]-------------------[NS:BF(0.10)]-[X]-[CX:BF(0.30)]-[CX:Dep(0.10)]------------------------------------[M]--|--
@@ -34,7 +34,7 @@ READ OUT CREG:
 111
 [0, 0, 0, 0, 0, 0, 0, 1]
 
-added noise model, but using Qeng
+added noise profile, but using Qeng
 q000 -[INIT:PF(0.20)]-[X]-[X:Dep(0.10)]-[NS:BF(0.10)]-[.]---------------[CX:Dep(0.10)]----------------------------------------[M]-
                                                        |                                                                       |  
 q001 -[INIT:PF(0.20)]-------------------[NS:BF(0.10)]-[X]-[CX:BF(0.30)]-[CX:Dep(0.10)]------------------------------------[M]--|--
