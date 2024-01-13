@@ -86,5 +86,4 @@ class Grover:
 		return self.groverckt
 
 if __name__ == "__main__":
-
 	pass

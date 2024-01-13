@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+# Standard teleportation protocol
+
 import qckt
 from qckt.backend import *
-import numpy as np
 
 ckt = qckt.QCkt(3,3)
 ckt.RND(2)

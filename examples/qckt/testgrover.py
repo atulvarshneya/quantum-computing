@@ -47,39 +47,8 @@ grv_ckt = grv.Grover(uf_ckt,inreg,outreg).getckt()
 grv_ckt.M(inreg,rclreg)
 grv_ckt.draw()
 
-maxattempts = 5
-solved = False
-for m in range(maxattempts):  # Look for best of all attempts
-	job = qckt.Job(grv_ckt, qtrace=False)
-	bk = Qdeb()
-	bk.runjob(job)
-	res = job.get_creg()[0]
-	value = res.intvalue
-
-	### Verify if the result is correct
-	verifyckt = qckt.QCkt(nqbits,ncbits,name="Verify")
-	x_list = []
-	for i in inreg:
-		if (res.intvalue & (0b1<<i)) != 0:
-			x_list.append(i)
-	if len(x_list) > 0:
-		verifyckt.X(x_list)
-	# verifyckt = verifyckt.realign(self.fullnqbits, self.fullncbits,self.uf_outreg+self.uf_inreg)
-	verifyckt = verifyckt.append(uf_ckt)
-	verifyckt.M(outreg,[0])
-	# print("### Verification Circuit ################################")
-	# verifyckt.draw()
-
-	job = qckt.Job(verifyckt)
-	bk = Qdeb()
-	bk.runjob(job)
-	creg = job.get_creg()[0]
-	if creg.intvalue == 1:
-		solved = True
-		break
-
-if not solved:
-	print("Did not find the solution")
-else:
-	# print(("Solution: {0:d} ({0:0"+str(ninreg)+"b})").format(value))
-	print(("Solution: {0:0"+str(ninreg)+"b}, ({0:d})").format(value))
+correct_res = 0
+job = qckt.Job(grv_ckt, shots=100)
+bk = Qeng()
+bk.runjob(job)
+job.plot_counts(verbose=False)
