@@ -38,14 +38,14 @@ class qNoiseChannelSequence:
             if a is None:
                 pass
             elif type(a) is qNoiseChannel:
-                self.add_noise_channel(a)
+                self.add(a)
             elif type(a) is qNoiseChannelSequence:
-                self.add_noise_channel_sequence(a)
+                self.extend(a)
             else:
                 raise qsim.QSimError('ERROR: Invalid argument, only qNoiseChannel and qNoiseChannelSequence objects or None expected')
         self.name = self.__name__()
 
-    def add_noise_channel_sequence(self, noise_channel_sequence):
+    def extend(self, noise_channel_sequence):
         if noise_channel_sequence is None:
             addition = []
         elif type(noise_channel_sequence) is qNoiseChannelSequence:
@@ -55,7 +55,7 @@ class qNoiseChannelSequence:
         self.noise_channel_sequence.extend(addition)
         self.name = self.__name__()
 
-    def add_noise_channel(self, noise_channel):
+    def add(self, noise_channel):
         if noise_channel is None:
             pass
         if type(noise_channel) is  qNoiseChannel:

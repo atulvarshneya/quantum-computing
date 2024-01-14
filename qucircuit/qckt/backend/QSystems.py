@@ -27,7 +27,7 @@ def convert_to_qsim_noise_op_sequence(qckt_noise_chan_sequence):
 			opprobset = chan.noise_chan
 			nqubits = chan.nqubits
 			qsim_op = nmdl.qNoiseChannel(name=opname,operator_prob_set=opprobset,nqubits=nqubits)
-			qsim_noise_opseq.add_noise_channel(qsim_op)
+			qsim_noise_opseq.add(qsim_op)
 	return qsim_noise_opseq
 
 
