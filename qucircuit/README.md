@@ -9,7 +9,7 @@ Install using pip command -
 * All gates accept qubits as a 'flat' list of qubits as arguments per the number of qubits it acts on. E.g., Tiffoli gate acting on qubits 0, 1, and 2, is invoked as `circuit.CCX(0,1,2)`; and QFT which accepts a variable number of qubits is invoked as `circuit.QFT(7,6,5,4,3,2,1,0)` to act on these 8 qubits 7 ... 0. Note, if the qubits are stored as lists, they can be provided as argument using the *list argument, such as `circuit.QFT(*list)`
 * All single qubit gates, such as, `X`, `Y`, `Z`, `H`, `P`, `UROTk`, `RND`, also accept a list of qubits as a mchanism of 'broadcasting' the gate to all those qubits. E.g., `circuit.H([3,2,1])` applies hadamard gate to each of these qubits individually.
 * Parameterized quantum gates such as phase-rotation gate, `P`, takes the frst argument the phase value, and the second argument as the target qubit; and as mentioned above the second argument can also be a list of qubits. E.g., `circuit.P(numpy.pi/4,3)`, `circuit.P(numpy.pi/4,[3,2,1,0])`, `circuit.UROTk(4,[7,6,5,4])`
-* All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the target qubit(s) are the LSB(s) and all other preceding ones are control qubits. E.g., `circuit.CX(ctrl1, ctrl2, ctrl3, target)`, `circuit.CP(numpy.pi/8,control, target)`. Specifically, a controlled single-qubit gate will have the target qubit as the lowest LSB, and, for instance, a controlled 2-qubit gate will have target qubits as the lowest 2 LSBs.
+* All control gates take one or more control qubits as arguments. Among all the qubits provided as arguments the target qubit(s) are the LSB(s) and all other preceding ones are control qubits. E.g., `circuit.CX(ctrl1, ctrl2, ctrl3, target)`, `circuit.CP(numpy.pi/8, control, target)`. Specifically, a controlled single-qubit gate will have the target qubit as the lowest LSB, and, for instance, a controlled 2-qubit gate will have target qubits as the lowest 2 LSBs.
 
 ## A note about MSB - LSB ordering
 `qckt`, as well as `qsim`, follow the convention that when providing arguments to any of the functions the list argument representing `qubits` or `clbits` is ordered as `[MSB, ...., LSB]`. Yes, :-), the 0th index element is MSB!
@@ -539,11 +539,11 @@ The objects of this class are iterable, and returns a noise channel in the seque
 
 ### Methods
 
-#### `add_noise_chan(noise_channel)`
+#### `add(noise_channel)`
 
 Appends a noise channel to the sequence.
 
-#### `add_noise_chan_sequence(noise_channel_sequence)`
+#### `extend(noise_channel_sequence)`
 
 Appends a channel sequence to the sequence.
 

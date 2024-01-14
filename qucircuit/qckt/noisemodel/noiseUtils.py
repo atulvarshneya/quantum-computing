@@ -38,14 +38,14 @@ class NoiseChannelSequence:
             if a is None:
                 pass
             elif type(a) is NoiseChannel:
-                self.add_noise_chan(a)
+                self.add(a)
             elif type(a) is NoiseChannelSequence:
-                self.add_noise_chan_sequence(a)
+                self.extend(a)
             else:
                 raise qckt.QCktException('ERROR: Invalid argument, only NoiseChannel and NoiseChannelSequence objects or None expected')
         self.name = self.__name__()
 
-    def add_noise_chan_sequence(self, noise_chan_sequence):
+    def extend(self, noise_chan_sequence):
         if noise_chan_sequence is None:
             addition = []
         elif type(noise_chan_sequence) is NoiseChannelSequence:
@@ -56,7 +56,7 @@ class NoiseChannelSequence:
         self.name = self.__name__()
         return self
 
-    def add_noise_chan(self, noise_chan):
+    def add(self, noise_chan):
         if noise_chan is None:
             pass
         elif type(noise_chan) is NoiseChannel:
