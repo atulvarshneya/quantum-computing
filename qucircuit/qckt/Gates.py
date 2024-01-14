@@ -434,18 +434,32 @@ class M(QGate):
 		self.name = "M"
 
 	def addtocanvas(self,canvas):
-		for qb in self.qbits:
-			col = canvas._get1col(3)
+		col = canvas._get1col(3)
+		en = len(col)//2 - 1
+		for qb in sorted(self.qbits):
 			st = qb
-			en = len(col)//2 - 1
 			for i in range(st,en):
 				col[2*i] = "-|-"
 				col[2*i+1] = " | "
 			col[qb*2] = "[M]"
-			col[en*2] = "=v="
-			canvas._append(col)
-			canvas._extend()
+		col[en*2] = "=v="
+		canvas._append(col)
+		canvas._extend()
 		return self
+
+	# def old_addtocanvas(self,canvas):
+	# 	for qb in self.qbits:
+	# 		col = canvas._get1col(3)
+	# 		st = qb
+	# 		en = len(col)//2 - 1
+	# 		for i in range(st,en):
+	# 			col[2*i] = "-|-"
+	# 			col[2*i+1] = " | "
+	# 		col[qb*2] = "[M]"
+	# 		col[en*2] = "=v="
+	# 		canvas._append(col)
+	# 		canvas._extend()
+	# 	return self
 
 	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
 		pass

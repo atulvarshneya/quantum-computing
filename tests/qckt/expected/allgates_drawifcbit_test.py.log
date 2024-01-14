@@ -117,18 +117,18 @@ creg =3===
           
 M
 M gate does not support ifcbit()
-q000 ---------
-              
-q001 -[M]-----
-       |      
-q002 --|--[M]-
-       |   |  
-q003 --|---|--
-       |   |  
-q004 --|---|--
-       |   |  
-creg ==v===v==
-              
+q000 -----
+          
+q001 -[M]-
+       |  
+q002 -[M]-
+       |  
+q003 --|--
+       |  
+q004 --|--
+       |  
+creg ==v==
+          
 Border
 Border does not support ifcbit()
 q000 --#-
