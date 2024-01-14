@@ -147,9 +147,8 @@ class Canvas:
 				g.addtocanvas(self)
 			if show_noise:
 				g.addtocanvas_gatenoise(self, noise_profile=self.circuit.noise_profile, noise_profile_gates=self.circuit.noise_profile_gates)
-				if type(g) is not qckt.Gates.NOISE:
-					if noise_profile is not None and noise_profile.noise_chan_allsteps is not None and g.is_noise_step():
-						for kop,qbt in noise_profile.noise_chan_allsteps:
-							self._add_simple(qbt, "AS:"+kop.name)
+				if noise_profile is not None and noise_profile.noise_chan_allsteps is not None and g.is_noise_step():
+					for kop,qbt in noise_profile.noise_chan_allsteps:
+						self._add_simple(qbt, "AS:"+kop.name)
 		self._paint()
 

@@ -121,13 +121,12 @@ class QCkt:
 			assembled.append(noise_gate.assemble(self.noise_profile, self.noise_profile_gates))
 		for gt in self.circuit:
 			assembled.append(gt.assemble(self.noise_profile, self.noise_profile_gates))
-			if type(gt) is not gts.NOISE:
-				if self.noise_profile is not None and self.noise_profile.noise_chan_allsteps is not None and gt.is_noise_step():
-					noise_wrapper = self.NOISE
-					noise_cls = noise_wrapper.GateCls
-					for kop,qbt in self.noise_profile.noise_chan_allsteps:
-						noise_gate = noise_cls(kop, qbt)
-						assembled.append(noise_gate.assemble(self.noise_profile, self.noise_profile_gates))
+			if self.noise_profile is not None and self.noise_profile.noise_chan_allsteps is not None and gt.is_noise_step():
+				noise_wrapper = self.NOISE
+				noise_cls = noise_wrapper.GateCls
+				for kop,qbt in self.noise_profile.noise_chan_allsteps:
+					noise_gate = noise_cls(kop, qbt)
+					assembled.append(noise_gate.assemble(self.noise_profile, self.noise_profile_gates))
 		return assembled
 
 	def to_opMatrix(self):
