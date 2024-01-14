@@ -36,7 +36,7 @@ class QPE:
 		qftckt_qubits = qckt.QRegister(len(self.measurement_qubits))
 		nq,_,_,_ = qckt.placement(qftckt_qubits)
 		ckt = qckt.QCkt(nq)
-		ckt.QFT(qftckt_qubits)
+		ckt.QFT(*qftckt_qubits)
 		mat = ckt.to_opMatrix()
 		QFTinvOp = gutils.opmat_dagger(mat)
 
