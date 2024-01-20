@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
+import qckt.noisemodel as ns
 
 # test 01
 print("================================================")
@@ -83,3 +84,33 @@ ck.P(3.14/2,[4,5,6,7])
 ck.UROTk(2,[2,3,4,5,6,7])
 ck.list()
 ck.draw()
+
+
+#### sniff test for drawing and listing noise elements
+print()
+print("================================================================")
+print("sniff test for drawing and listing noise elements===============")
+print("================================================================")
+
+ck = qckt.QCkt(2,2,name='Test circuit for draw, list')
+ck.H(0)
+ck.CX(0,1)
+ck.NOISE(ns.bit_flip(0.5),[0,1])
+ck.M([1,0],[1,0])
+ck.Probe()
+
+ck.set_noise_profile(noise_profile=ns.NoiseProfile(
+    noise_chan_init=ns.bit_flip(probability=0.1),
+    noise_chan_allgates=ns.depolarizing(probability=0.2),
+    noise_chan_qubits=ns.NoiseChannelApplierSequense(noise_chan=ns.amplitude_damping(gamma=0.3),qubit_list=[1]),
+    noise_chan_allsteps=ns.NoiseChannelApplierSequense(noise_chan=ns.phase_damping(gamma=0.4),qubit_list=[1]),
+    )
+)
+ck.list(show_noise=True)
+print()
+ck.draw(show_noise=True)
+print()
+ck.list(show_noise=False)
+print()
+ck.draw(show_noise=False)
+print()

@@ -214,11 +214,12 @@ class QCkt:
 				prline = f"{prline}:{cktstep['qubits']}"
 				if cktstep['gateObj'].cbits is not None:
 					prline = f"{prline}:{cktstep['gateObj'].cbits}"
+				print(prline)
 				if show_noise:
 					noise_ch_appl_seq = cktstep['gateObj'].form_gatenoise_ch_appl_seq(self.noise_profile, self.noise_profile_gates)
 					if len(noise_ch_appl_seq.name) > 0:
-						prline = f'{prline} {noise_ch_appl_seq.name}'
-				print(prline)
+						prline = f"{cktstep['name']}:{noise_ch_appl_seq.name}"
+						print(prline)
 			elif cktstep['op'] == 'measure':
 				prline = f"{cktstep['name']}"
 				prline = f"{prline}:{cktstep['qubits']}"
@@ -226,10 +227,10 @@ class QCkt:
 					prline = f"{prline}:{cktstep['gateObj'].cbits}"
 				print(prline)
 			elif cktstep['op'] == 'probe':
-				prline = 'PROBE'
+				prline = 'PROBE>>>>>>>>>>>>>>'
 				print(prline)
 			elif cktstep['op'] == 'noop':
-				prline = 'BORDER'
+				prline = 'BORDER#############'
 				print(prline)
 			elif cktstep['op'] == 'noise':
 				if show_noise:
