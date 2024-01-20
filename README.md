@@ -18,16 +18,7 @@ Easy to follow documentation with tutorial introduction - see `qusimumator/READM
 
 Getting started tutorials - `examples/qckt/Getting-started-tutorial.ipynb`, `examples/qckt/Getting-started-tutorial-noise-sim.ipynb`
 
-Several quantum algorithm implementations included as examples:
-* Teleportation
-* Simple Search
-* Deutsch-Jozsa
-* Bernstien-Vazirani
-* Quantum Fourier Transform
-* Period-finding
-* Grover's algorithm
-* Sudoku using Grover's algorithm
-* ... will add more
+Growing list of known quantum algorithm implementations included as examples.
 
 ## CLI tool
 An interactive commandline interface (`qsimcli`) to quickly check out sequence of quantum operations.

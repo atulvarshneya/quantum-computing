@@ -1,3 +1,5 @@
+Release 2.1
+
 # Installation
 Install using pip command -
 
@@ -16,7 +18,7 @@ Install using pip command -
 
 Note that in many gates the order is either explicit, e.g., in `CX` the arguments are explicitly (control, and target), and in some others it does not matter, e.g., in `M` the qubits will be measured with the same outcome irrespective of the order. But in some gates, such as `QFT` it very much *does* matter.
 
-## Using Registers (Registers are being deprecated, use python lists instead)
+## Using Registers (Registers are being deprecated, simply use python lists instead)
 The use of registers simplifies, and can help in readability of the quantum circuit.
 
 When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program. While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it easier to read.
@@ -147,7 +149,9 @@ Returns an empty quantum circuit.
 noise_profile if not None must be of type `qckt.NoiseProfile`.
 
 ### Methods - Gates:
-These gate methods instantiate a gate object of the specific type and append it to the quantum circuit. 
+These gate methods instantiate a gate object of the specific type and append it to the quantum circuit.
+
+Note: `circuit.get_gates_list()` (see below) returns list of all gates available in the circuit. Any custom gates defined for the circuit are included in the list.
 
 For instance,
 
@@ -165,11 +169,6 @@ would draw the following circuit -
 	q001 -----[X]-
 	
 	creg =========
-
-#### `CX(control, target)`
-Appends a `CNOT` gate to the quantum circuit.
-
-Returns the gate object.
 
 #### `H(qubit)`
 Appends a `HADAMARD` gate to the quantum circuit
@@ -191,7 +190,22 @@ Appends a `PAULI-Z` gate to the quantum circuit
 
 Returns the gate object.
 
-#### `T(control1, control2, target)`
+#### `CX(control, target)`
+Appends a `CNOT` gate to the quantum circuit.
+
+Returns the gate object.
+
+#### `CY(control, target)`
+Appends a controlled-Y gate to the quantum circuit.
+
+Returns the gate object.
+
+#### `CZ(control, target)`
+Appends a controlled-Z gate to the quantum circuit.
+
+Returns the gate object.
+
+#### `CCX(control1, control2, target)`
 Appends a `TOFFOLI` gate to the quantum circuit
 
 Returns the gate object.
@@ -201,10 +215,67 @@ Appends `MEASUREMENT` gates for measuring given qubits list into classical bits 
 
 Returns the gate object.
 
+#### `SWAP(qbit1, qbit2)`
+Appends a `SWAP` gate to the quantum circuit
+
+Returns the gate object.
+
+#### `P(rotphi, qbit)`
+Appends a `P` gate to the quantum circuit. `rotphi` is in radians.
+
+Returns the gate object.
+
+#### `CP(rotphi, control, target)`
+Appends a controlled-P gate to the quantum circuit.
+
+Returns the gate object.
+
+#### `UROTk(rotk, qbit)`
+Appends a `UROTk` gate to the quantum circuit. Useful for constructing a QFT circuit.
+
+$UROTk = \begin{bmatrix}1 & 0\\0 & e^{i2\pi/2^k} \end{bmatrix}$
+
+Returns the gate object.
+
+#### `CROTk(rotk, control, target)`
+Appends a controlled-UROTk gate to the quantum circuit. Useful for constructing a QFT circuit.
+
+Returns the gate object.
+
 #### `QFT(qubitslist)`
 Appends a `QFT` gate across the given qubits list
 
 The drawn circuit depicts multiple `QFT` gates, but it is 1 `QFT` gate acting on those qubits
+
+Returns the gate object.
+
+#### `Rx(theta, qbit)`
+Appends a `Rx` gate to the quantum circuit. `theta` is in radians.
+
+Returns the gate object.
+
+#### `CRx(theta, control, target)`
+Appends a controlled-Rx gate to the quantum circuit.
+
+Returns the gate object.
+
+#### `Ry(theta, qbit)`
+Appends a `Ry` gate to the quantum circuit. `theta` is in radians.
+
+Returns the gate object.
+
+#### `CRy(theta, control, target)`
+Appends a controlled-Ry gate to the quantum circuit.
+
+Returns the gate object.
+
+#### `Rz(theta, qbit)`
+Appends a `Rz` gate to the quantum circuit. `theta` is in radians.
+
+Returns the gate object.
+
+#### `CRz(theta, control, target)`
+Appends a controlled-Rz gate to the quantum circuit.
 
 Returns the gate object.
 
@@ -245,9 +316,14 @@ Places a vertical line in the drawing of the quantum circuit. Has effect only in
 Returns the gate object.
 
 #### `Probe(header,probestates)`
-This is a debuggig aid. Its execution gets skipped on backends which are actual quantum computers.
+This is a debugging aid. Its execution gets skipped on non-debugging backends.
 
 `header` is a string that gets prefixed with "PROBE:" and gets printed as a heading to the probe's printout. `probestates` is either `None` or a list of states, if `None`, probe prints amplitude of all the states, else prints the amplitudes of only the specified states.
+
+Returns the gate object.
+
+#### RND(qbit)
+Puts the target qubit in a random state. Not a real quantum gate, it is provied as a tool to test circuits where some arbitrary input is likely - e.g., to test the teleportation circuit.
 
 Returns the gate object.
 
@@ -324,7 +400,7 @@ Draws a text drawing of the circuit. The argument `show_noise` selects if the no
 prints out the sequence of gates in the circuit. The argument `show_noise` selects if the noise elements are listed or hidden.
 
 #### `get_gates_list()`
-returns list of all gates available in this circuit. Note any custom gates are included in the list.
+returns list of all gates available in the circuit. Any custom gates defined for the circuit are included in the list.
 
 ### Methods - noise API
 
@@ -344,7 +420,7 @@ Example usage:
 		noise_chan_allgates=ns.bit_flip(probability=0.1),
 		)
 	circuit.set_noise_profile(noise_profile)
-	draw()
+	circuit.draw()
 
 which has output as:
 
