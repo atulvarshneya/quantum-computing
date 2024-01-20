@@ -114,19 +114,23 @@ class QCkt:
 
 	def assemble(self):
 		assembled = []
+		noise_wrapper = self.NOISE
+		noise_cls = noise_wrapper.GateCls
 		if self.noise_profile is not None and self.noise_profile.noise_chan_init is not None:
-			noise_wrapper = self.NOISE
-			noise_cls = noise_wrapper.GateCls
 			noise_gate = noise_cls(self.noise_profile.noise_chan_init, list(range(self.nqubits)))
-			assembled.append(noise_gate.assemble(self.noise_profile, self.noise_profile_gates))
+			cktstep = noise_gate.assemble(self.noise_profile, self.noise_profile_gates)
+			cktstep['tag'] = 'INIT'
+			assembled.append(cktstep)
 		for gt in self.circuit:
-			assembled.append(gt.assemble(self.noise_profile, self.noise_profile_gates))
+			cktstep = gt.assemble(self.noise_profile, self.noise_profile_gates)
+			cktstep['tag'] = 'NS' if cktstep['op'] == 'noise' else gt.name
+			assembled.append(cktstep)
 			if self.noise_profile is not None and self.noise_profile.noise_chan_allsteps is not None and gt.is_noise_step():
-				noise_wrapper = self.NOISE
-				noise_cls = noise_wrapper.GateCls
 				for kop,qbt in self.noise_profile.noise_chan_allsteps:
 					noise_gate = noise_cls(kop, qbt)
-					assembled.append(noise_gate.assemble(self.noise_profile, self.noise_profile_gates))
+					cktstep = noise_gate.assemble(self.noise_profile, self.noise_profile_gates)
+					cktstep['tag'] = 'AS'
+					assembled.append(cktstep)
 		return assembled
 
 	def to_opMatrix(self):
@@ -189,13 +193,50 @@ class QCkt:
 		return self.nqubits, self.nclbits
 
 	def draw(self,show_noise=True):
-		self.canvas.draw(show_noise=show_noise)
+		assembled_circuit = self.assemble()
+		self.canvas.draw(assembled_circuit, show_noise=show_noise)
 
-	def list(self):
+	def list(self, show_noise=True):
+		assembled_circuit = self.assemble()
 		if self.name is not None:
 			print(self.name)
-		for g in self.circuit:
-			print(g)
+		for cktstep in assembled_circuit:
+			if cktstep['op'] == 'gate':
+				prline = f"{cktstep['name']}"
+				for p in cktstep['gateObj'].gateparams:
+					if type(p) is int:
+						pstr = f'{p:d}'
+					elif type(p) is float:
+						pstr = f'{p:.4f}'
+					else:
+						pstr = str(p)
+					prline = f'{prline}|{pstr}'
+				prline = f"{prline}:{cktstep['qubits']}"
+				if cktstep['gateObj'].cbits is not None:
+					prline = f"{prline}:{cktstep['gateObj'].cbits}"
+				if show_noise:
+					noise_ch_appl_seq = cktstep['gateObj'].form_gatenoise_ch_appl_seq(self.noise_profile, self.noise_profile_gates)
+					if len(noise_ch_appl_seq.name) > 0:
+						prline = f'{prline} {noise_ch_appl_seq.name}'
+				print(prline)
+			elif cktstep['op'] == 'measure':
+				prline = f"{cktstep['name']}"
+				prline = f"{prline}:{cktstep['qubits']}"
+				if cktstep['gateObj'].cbits is not None:
+					prline = f"{prline}:{cktstep['gateObj'].cbits}"
+				print(prline)
+			elif cktstep['op'] == 'probe':
+				prline = 'PROBE'
+				print(prline)
+			elif cktstep['op'] == 'noop':
+				prline = 'BORDER'
+				print(prline)
+			elif cktstep['op'] == 'noise':
+				if show_noise:
+					prline = f"{cktstep['tag']}:{cktstep['name']}:{cktstep['qubits']}"
+					print(prline)
+			else:
+				raise QCktException(f"INTERNAL ERROR: Unknown op {cktstep['op']}")
 
 	def custom_gate(self, cgate_name, opMatrix):
 		if not gutils.isunitary(opMatrix):

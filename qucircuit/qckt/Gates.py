@@ -17,6 +17,9 @@ class QGate:
 		self.cbit_cond = None
 		self.noise_chan = None
 
+	#
+	# Realign qubits
+	#
 	def _reorderlist(self,oseq,nseq):
 		newseq = []
 		nqbits = len(nseq)
@@ -33,6 +36,9 @@ class QGate:
 			self.cbits = self._reorderlist(self.cbits,newseq)
 		return self
 
+	#
+	# update opmatrix for multiple qubits
+	#
 	def __check_and_update_opmatrix_for_qubitlist__(self):
 		ret_opMatrix = self.opMatrix
 		ret_qbits = self.qbits
@@ -44,11 +50,17 @@ class QGate:
 			# print(f'gate {self.name} shape {opMatrix.shape} qubits are a list = {qbits}', file=sys.stderr)
 		return ret_opMatrix, ret_qbits
 
+	#
+	# assemble into normalized form 
+	#
 	def assemble(self, noise_profile, noise_profile_gates):
 		noise_chan = self.get_gate_noise(noise_profile_gates)
 		noise_opseq = ns.consolidate_gate_noise(noise_profile=noise_profile, gate_noise=noise_chan, qubit_list=self.qbits)
-		return {"op":"gate","name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond, 'noiseChan':noise_opseq}
+		return {"op":"gate","gateObj":self,"name":self.name,"opMatrix":self.opMatrix,"qubits":self.qbits, 'ifcbit': self.cbit_cond, 'noiseChan':noise_opseq}
 
+	#
+	# convert opMatrix to full circuit nqubits size
+	#
 	def to_fullmatrix(self,nqbits):
 		oplist = []
 		if issubclass(type(self.qbits[0]),list) and len(self.qbits) == 1:
@@ -60,18 +72,30 @@ class QGate:
 			opmat = gutils.stretched_opmatrix(nqbits,self.opMatrix,self.qbits)
 		return opmat
 
+	#
+	# set conditional execution
+	#
 	def ifcbit(self,cbit,val):
 		self.cbit_cond = (cbit,val)
 		return self
 	
+	#
+	# noise related functions
+	#####################################################
+	#
+	# set noise channel for this gate instance
+	#
 	def set_noise(self, noise_chan):  # noise_chan can be NoiseChannel or NoiseChannelSequence
 		# don't need to check NoiseChannel or NoiseChannelSequence, consolidate_gate_noise() checks that and converts
-		if self.check_noise_op_multi_qubits(noise_chan) == False:
+		if self.check_noise_chan_multi_qubits(noise_chan) == False:
 			raise QCktException(f"Error: set_noise() - multi-qubit noise operator, {noise_chan.name},  can't be used on gate {self.name}")
 		self.noise_chan = noise_chan
 		return self
 	
-	def check_noise_op_multi_qubits(self, noise_chan):
+	#
+	# validate noise chan and if multi-qubit noise chan applicable
+	#
+	def check_noise_chan_multi_qubits(self, noise_chan):
 		if noise_chan is not None:
 			if type(noise_chan) is not ns.NoiseChannel and type(noise_chan) is not ns.NoiseChannelSequence:
 				raise QCktException(f"ERROR: NoiseChannel or NoiseChannelSequence object or None expected.")
@@ -84,38 +108,40 @@ class QGate:
 						return False
 		return True
 
-	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
-		noise_chan = self.get_gate_noise(noise_profile_gates)
-		noise_opseq = ns.consolidate_gate_noise(noise_profile=noise_profile, gate_noise=noise_chan, qubit_list=self.qbits)
-		for kop,qbt in noise_opseq:
-			canvas._add_simple(qbt,f'{self.name}:{kop.name}')
-
+	#
+	# pick from noise on gate type, and noise on gate instance
+	#
 	def get_gate_noise(self, noise_profile_gates):
-		# pick from noise on gate type, and noise on gate instance
 		noise_chan = noise_profile_gates.get(self.__class__, None)
-		if self.check_noise_op_multi_qubits(noise_chan) == False:
+		if self.check_noise_chan_multi_qubits(noise_chan) == False:
 			raise QCktException(f"Error: add_noise_to_all() - multi-qubit noise operator, {noise_chan.name},  can't be used on gate {self.name}")
 		if self.noise_chan is not None:
 			noise_chan = self.noise_chan
 		return noise_chan
 	
+	#
+	# if this gate instance is a step in circuit to apply noise step, overridden by indivivdual gates
+	#
 	def is_noise_step(self):  # is a step after which 'allsteps' noise should be applied
 		return True
 
-	def __str__(self):
-		stringify = self.name
-		for p in self.gateparams:
-			if type(p) is int:
-				pstr = f'{p:d}'
-			elif type(p) is float:
-				pstr = f'{p:.4f}'
-			else:
-				pstr = str(p)
-			stringify = stringify+"|"+pstr
-		stringify = stringify+":"+str(self.qbits)
-		if self.cbits is not None:
-			stringify = stringify + ":"+str(self.cbits)
-		return stringify
+	#
+	# circuit draw related functions
+	#####################################################
+	#
+	# add this gate instance to canvas
+	#
+	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates,tag):
+		noise_ch_appl_seq = self.form_gatenoise_ch_appl_seq(noise_profile=noise_profile, noise_profile_gates=noise_profile_gates)
+		for kop,qbt in noise_ch_appl_seq:
+			canvas._add_simple(qbt,f'{tag}:{kop.name}')
+
+	# form a noise chan applier sequence for this gate instance
+	# NOISE, M, Probe, Border override it to return an empty NoiseChannelApplierSequence()
+	def form_gatenoise_ch_appl_seq(self, noise_profile, noise_profile_gates):
+		noise_chan = self.get_gate_noise(noise_profile_gates)
+		noise_ch_appl_seq = ns.consolidate_gate_noise(noise_profile=noise_profile, gate_noise=noise_chan, qubit_list=self.qbits)
+		return noise_ch_appl_seq
 
 	##############################################################################
 	## Args validation methods
@@ -215,11 +241,11 @@ class NOISE(QGate):
 		self.noise_chan = noise_chan
 		self.name = self.noise_chan.name
 
-	def addtocanvas(self,canvas):
-		canvas._add_simple(self.qbits, f'NS:{self.name}')
+	def addtocanvas(self,canvas,tag):
+		canvas._add_simple(self.qbits, f'{tag}:{self.name}')
 
-	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
-		pass
+	def form_gatenoise_ch_appl_seq(self, noise_profile, noise_profile_gates):
+		return ns.NoiseChannelApplierSequense()
 
 	def check_qbit_args(self,nqbits):
 		return self.varqbit_args(nqbits,1)
@@ -227,9 +253,9 @@ class NOISE(QGate):
 	def assemble(self, noise_profile, noise_profile_gates):
 		noise_chan = self.noise_chan
 		if type(noise_chan) is ns.NoiseChannel:
-			print('Internal warning: found NOISE noise_chan of class NoiseOperator', file=sys.stderr)
+			print('Internal warning: found NOISE noise_chan of class NoiseChannel', file=sys.stderr)
 			noise_chan = ns.NoiseChannelSequence(self.noise_chan)
-		return {"op":"noise","name":self.name,"noiseChan":noise_chan,"qubits":self.qbits}
+		return {"op":"noise","gateObj":self,"name":self.name,"noiseChan":noise_chan,"qubits":self.qbits}
 
 	def to_fullmatrix(self,nqbits):
 		return None
@@ -249,7 +275,7 @@ class X(QGate):
 		self.opMatrix = np.matrix([[0,1],[1,0]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"X", self.cbit_cond)
 		return self
 
@@ -268,7 +294,7 @@ class Y(QGate):
 		self.opMatrix = np.matrix([[0,complex(0,-1)],[complex(0,1),0]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"Y", self.cbit_cond)
 		return self
 
@@ -287,7 +313,7 @@ class Z(QGate):
 		self.opMatrix = np.matrix([[1,0],[0,-1]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"Z", self.cbit_cond)
 		return self
 
@@ -307,7 +333,7 @@ class H(QGate):
 		self.opMatrix = np.matrix([[1/sqr2,1/sqr2],[1/sqr2,-1/sqr2]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 	
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"H", self.cbit_cond)
 		return self
 
@@ -328,7 +354,7 @@ class CX(QGate):
 		for i in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["X"], self.cbit_cond)
 		return self
 
@@ -349,7 +375,7 @@ class CY(QGate):
 		for i in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Y"], self.cbit_cond)
 		return self
 
@@ -370,7 +396,7 @@ class CZ(QGate):
 		for i in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Z"], self.cbit_cond)
 		return self
 
@@ -390,7 +416,7 @@ class CCX(QGate):
 		self.name = "CCX"
 		self.opMatrix = gutils.CTL(gutils.CTL(np.matrix([[0,1],[1,0]],dtype=complex)))
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,[".",".","X"], self.cbit_cond)
 		return self
 
@@ -409,7 +435,7 @@ class SWAP(QGate):
 		self.name = "SWAP"
 		self.opMatrix = np.matrix([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]],dtype=complex)
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["*","*"], self.cbit_cond)
 		return self
 
@@ -433,7 +459,7 @@ class M(QGate):
 		self.cbits = clbitslist
 		self.name = "M"
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		col = canvas._get1col(3)
 		en = len(col)//2 - 1
 		for qb in sorted(self.qbits):
@@ -447,22 +473,8 @@ class M(QGate):
 		canvas._extend()
 		return self
 
-	# def old_addtocanvas(self,canvas):
-	# 	for qb in self.qbits:
-	# 		col = canvas._get1col(3)
-	# 		st = qb
-	# 		en = len(col)//2 - 1
-	# 		for i in range(st,en):
-	# 			col[2*i] = "-|-"
-	# 			col[2*i+1] = " | "
-	# 		col[qb*2] = "[M]"
-	# 		col[en*2] = "=v="
-	# 		canvas._append(col)
-	# 		canvas._extend()
-	# 	return self
-
-	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
-		pass
+	def form_gatenoise_ch_appl_seq(self, noise_profile, noise_profile_gates):
+		return ns.NoiseChannelApplierSequense()
 
 	def check_qbit_args(self,nqbits):
 		retval = True
@@ -486,7 +498,7 @@ class M(QGate):
 		raise QCktException(errmsg)
 
 	def assemble(self, noise_profile, noise_profile_gates):
-		return {"op":"measure", "qubits":self.qbits, "clbits":self.cbits}
+		return {"op":"measure", "gateObj":self, "name":self.name, "qubits":self.qbits, "clbits":self.cbits}
 
 	def is_noise_step(self):
 		return False
@@ -499,7 +511,7 @@ class Border(QGate):
 		self.qbits = []
 		self.name = "BORDER"
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._extend()
 		col = canvas._get1col(1)
 		en = len(col)//2
@@ -510,8 +522,8 @@ class Border(QGate):
 		canvas._extend()
 		return self
 
-	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
-		pass
+	def form_gatenoise_ch_appl_seq(self, noise_profile, noise_profile_gates):
+		return ns.NoiseChannelApplierSequense()
 
 	def check_qbit_args(self,nqbits):
 		pass
@@ -525,7 +537,7 @@ class Border(QGate):
 		return None
 
 	def assemble(self, noise_profile, noise_profile_gates):
-		return {"op":"noop"}
+		return {"op":"noop","gateObj":self}
 
 	def is_noise_step(self):
 		return False
@@ -545,7 +557,7 @@ class Probe(QGate):
 		self.probeobject = probeobject
 		self.name = "Probe"
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._extend()
 		col = canvas._get1col(1)
 		en = len(col)//2
@@ -556,8 +568,8 @@ class Probe(QGate):
 		canvas._extend()
 		return self
 
-	def addtocanvas_gatenoise(self, canvas, noise_profile, noise_profile_gates):
-		pass
+	def form_gatenoise_ch_appl_seq(self, noise_profile, noise_profile_gates):
+		return ns.NoiseChannelApplierSequense()
 
 	def check_qbit_args(self,nqbits):
 		pass
@@ -571,7 +583,7 @@ class Probe(QGate):
 		return None
 
 	def assemble(self, noise_profile, noise_profile_gates):
-		return {"op":"probe","header":self.header,"probestates":self.probestates}
+		return {"op":"probe","gateObj":self,"header":self.header,"probestates":self.probestates}
 
 	def is_noise_step(self):
 		return False
@@ -612,7 +624,7 @@ class QFT(QGate):
 			opMat[i] = row
 		self.opMatrix = np.matrix(opMat,dtype=complex) / np.sqrt(N)
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_boxed(self.qbits,"QFT", self.cbit_cond)
 		return self
 
@@ -640,7 +652,7 @@ class RND(QGate):
 		self.opMatrix = np.matrix([[complex(-re1,-im1),complex(re2,im2)],[complex(re2,im2),complex(re1,im1)]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"RND", self.cbit_cond)
 		return self
 
@@ -664,7 +676,7 @@ class P(QGate):
 		self.opMatrix = np.matrix([[1,0],[0,complex(cphi,sphi)]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"P", self.cbit_cond)
 		return self
 
@@ -690,7 +702,7 @@ class CP(QGate):
 		for q in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["P"], self.cbit_cond)
 		return self
 
@@ -714,7 +726,7 @@ class UROTk(QGate):
 		self.opMatrix = np.matrix([ [1,0], [0,complex(ck,sk)]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"UROTk", self.cbit_cond)
 		return self
 
@@ -739,8 +751,7 @@ class CROTk(QGate):
 		for i in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["UROTk"], self.cbit_cond)
 		return self
 
@@ -764,7 +775,7 @@ class Rx(QGate):
 		self.opMatrix = np.matrix([ [complex(ck,0),complex(0,-sk)], [complex(0,-sk),complex(ck,0)]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"Rx", self.cbit_cond)
 		return self
 
@@ -789,8 +800,7 @@ class CRx(QGate):
 		for q in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Rx"], self.cbit_cond)
 		return self
 
@@ -815,7 +825,7 @@ class Ry(QGate):
 		self.opMatrix = np.matrix([ [complex(ck,0),complex(-sk,0)], [complex(sk,0),complex(ck,0)]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"Ry", self.cbit_cond)
 		return self
 
@@ -840,8 +850,7 @@ class CRy(QGate):
 		for q in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Ry"], self.cbit_cond)
 		return self
 
@@ -866,7 +875,7 @@ class Rz(QGate):
 		self.opMatrix = np.matrix([ [complex(ck,-sk),complex(0,0)], [complex(0,0),complex(ck,sk)]],dtype=complex)
 		self.opMatrix, self.qbits = self.__check_and_update_opmatrix_for_qubitlist__()
 
-	def addtocanvas(self,canvas):
+	def addtocanvas(self,canvas,tag):
 		canvas._add_simple(self.qbits,"Rz", self.cbit_cond)
 		return self
 
@@ -891,8 +900,7 @@ class CRz(QGate):
 		for q in range(len(self.qbits)-1):
 			self.opMatrix = gutils.CTL(self.opMatrix)
 
-	def addtocanvas(self,canvas):
-		# canvas._add_simple(self.qbits,[".","UROTk"], self.cbit_cond)
+	def addtocanvas(self,canvas,tag):
 		canvas._add_connected(self.qbits,["."]*(len(self.qbits)-1)+["Rz"], self.cbit_cond)
 		return self
 
@@ -913,7 +921,7 @@ def fetch_custom_gateclass(cgate_name, opMatrix):
 				raise QCktException(errmsg)
 			self.opMatrix = opMatrix
 			self.qbits = [q for q in qbits]
-		def addtocanvas(self,canvas):
+		def addtocanvas(self,canvas,tag):
 			canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
 			return self
 		def check_qbit_args(self,nqbits):
@@ -936,7 +944,7 @@ def fetch_deprecated_custom_gateclass():
 				raise QCktException(errmsg)
 			self.opMatrix = opMatrix
 			self.qbits = qbits
-		def addtocanvas(self,canvas):
+		def addtocanvas(self,canvas,tag):
 			canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
 			return self
 		def check_qbit_args(self,nqbits):

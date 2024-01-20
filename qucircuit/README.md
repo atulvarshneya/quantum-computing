@@ -320,10 +320,8 @@ Returns the updated new circuit.
 #### `draw(show_noise=True)`
 Draws a text drawing of the circuit. The argument `show_noise` selects if the noise elements are drawn or hidden.
 
-#### `list()`
-prints out the sequence of gates in the circuit.
-
-In the current release (Rel 2.0) `list()` does not support displaying the noise elemetns of the circuit.
+#### `list(show_noise=True)`
+prints out the sequence of gates in the circuit. The argument `show_noise` selects if the noise elements are listed or hidden.
 
 #### `get_gates_list()`
 returns list of all gates available in this circuit. Note any custom gates are included in the list.
