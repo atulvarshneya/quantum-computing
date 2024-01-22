@@ -212,8 +212,8 @@ class QCkt:
 						pstr = str(p)
 					prline = f'{prline}|{pstr}'
 				prline = f"{prline}:{cktstep['qubits']}"
-				if cktstep['gateObj'].cbits is not None:
-					prline = f"{prline}:{cktstep['gateObj'].cbits}"
+				if cktstep['gateObj'].cbit_cond is not None:
+					prline = f"{prline}.ifcbit{cktstep['gateObj'].cbit_cond}"
 				print(prline)
 				if show_noise:
 					noise_ch_appl_seq = cktstep['gateObj'].form_gatenoise_ch_appl_seq(self.noise_profile, self.noise_profile_gates)
