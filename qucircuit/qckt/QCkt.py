@@ -27,6 +27,8 @@ class QCkt:
 	def __init__(self, nqubits, nclbits=0, name=None, noise_profile=None):
 		self.nqubits = nqubits
 		self.nclbits = nclbits
+		if self.nclbits is None:
+			self.nclbits = self.nqubits
 		self.circuit = []
 		self.custom_gatescls_list = []
 		self.name = name
@@ -203,6 +205,7 @@ class QCkt:
 		for cktstep in assembled_circuit:
 			if cktstep['op'] == 'gate':
 				prline = f"{cktstep['name']}"
+				gateparam_list = []
 				for p in cktstep['gateObj'].gateparams:
 					if type(p) is int:
 						pstr = f'{p:d}'
@@ -210,8 +213,11 @@ class QCkt:
 						pstr = f'{p:.4f}'
 					else:
 						pstr = str(p)
-					prline = f'{prline}|{pstr}'
-				prline = f"{prline}:{cktstep['qubits']}"
+					gateparam_list.append(f'{pstr}')
+				if len(gateparam_list) > 0:
+					gateparam_str = ','.join(gateparam_list)
+					prline = f'{prline}({gateparam_str})'
+				prline = f"{prline}{cktstep['qubits']}"
 				if cktstep['gateObj'].cbit_cond is not None:
 					prline = f"{prline}.ifcbit{cktstep['gateObj'].cbit_cond}"
 				print(prline)
@@ -219,12 +225,12 @@ class QCkt:
 					noise_ch_appl_seq = cktstep['gateObj'].form_gatenoise_ch_appl_seq(self.noise_profile, self.noise_profile_gates)
 					if len(noise_ch_appl_seq.name) > 0:
 						prline = f"{cktstep['name']}:{noise_ch_appl_seq.name}"
-						print(prline)
+						print(f'* {prline}')
 			elif cktstep['op'] == 'measure':
 				prline = f"{cktstep['name']}"
-				prline = f"{prline}:{cktstep['qubits']}"
+				prline = f"{prline}{cktstep['qubits']}"
 				if cktstep['gateObj'].cbits is not None:
-					prline = f"{prline}:{cktstep['gateObj'].cbits}"
+					prline = f"{prline}{cktstep['gateObj'].cbits}"
 				print(prline)
 			elif cktstep['op'] == 'probe':
 				prline = 'PROBE>>>>>>>>>>>>>>'
@@ -234,8 +240,8 @@ class QCkt:
 				print(prline)
 			elif cktstep['op'] == 'noise':
 				if show_noise:
-					prline = f"{cktstep['tag']}:{cktstep['name']}:{cktstep['qubits']}"
-					print(prline)
+					prline = f"{cktstep['tag']}:{cktstep['name']}{cktstep['qubits']}"
+					print(f'* {prline}')
 			else:
 				raise QCktException(f"INTERNAL ERROR: Unknown op {cktstep['op']}")
 
