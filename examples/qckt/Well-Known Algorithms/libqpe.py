@@ -5,43 +5,39 @@ import qckt
 import qckt.gatesutils as gutils
 
 class QPE:
-	def __init__(self, uop, uop_qubits, measurement_qubits):
-		self.measurement_qubits = measurement_qubits
-		self.uop_qubits = uop_qubits
-		self.uop = uop
-		self.nqubits = max(measurement_qubits + uop_qubits) + 1
+	def __init__(self, target_uop, uop_qubits, measurement_qubits):
 		self.qpe_circuit = None
 
-		compact_measqubits = qckt.QRegister(len(self.measurement_qubits))
-		compact_uopqubits = qckt.QRegister(len(self.uop_qubits))
-		compact_cregister = qckt.CRegister(len(compact_measqubits))
-		compact_nqubits,compact_nclbits,_,_ = qckt.placement(compact_uopqubits,compact_measqubits, compact_cregister)
+		# start the QPE circuit
+		nqubits = len(measurement_qubits + uop_qubits)
+		qc = qckt.QCkt(nqubits)
 
-		qc = qckt.QCkt(compact_nqubits)
+		# put all measuremnt qubits in full superposition
+		qc.H(measurement_qubits)
 
-		# Initialize the qubits, all counting qubits H
-		qc.H(compact_measqubits)
+		# create a custom gate for controlled-uop
+		ctrl_func_op = gutils.CTL(target_uop)
+		qc.custom_gate("CUOP", ctrl_func_op)
 
 		# Apply the controlled unitary operators in sequence
-		cuop = gutils.CTL(self.uop)
-		len_measq = len(compact_measqubits)
-		repetitions = 1
-		qc.custom_gate("UOP", cuop)
+		len_measq = len(measurement_qubits)
+		uop_exponent = 1
 		for ctrl_qubit in range(len_measq):
-			for r in range(repetitions):
-				qc.UOP(*([compact_measqubits[len_measq-ctrl_qubit-1]] + compact_uopqubits))
-			repetitions *= 2
+			for r in range(uop_exponent):
+				qc.CUOP(*([measurement_qubits[len_measq-ctrl_qubit-1]] + uop_qubits))
+			uop_exponent *= 2
 
-		# Apply the inverse quantum Fourier transform
-		qftckt_qubits = qckt.QRegister(len(self.measurement_qubits))
-		nq,_,_,_ = qckt.placement(qftckt_qubits)
-		ckt = qckt.QCkt(nq)
-		ckt.QFT(*qftckt_qubits)
+		# to apply the inverse quantum Fourier transform, first build the inverse-QFT gate
+		nqft = len(measurement_qubits)
+		qftckt_qubits = [i for i in reversed(range(nqft))]
+		ckt = qckt.QCkt(nqft)
+		ckt.QFT(*(qftckt_qubits))
 		mat = ckt.to_opMatrix()
 		QFTinvOp = gutils.opmat_dagger(mat)
+		qc.custom_gate("QFTinv", QFTinvOp)
 
-		qc.custom_gate("QFTinv", QFTinvOp).QFTinv(*compact_measqubits)
-		qc = qc.realign(self.nqubits, 0, self.uop_qubits+self.measurement_qubits)
+		# complete the circuit with inverse-QFT on measurement_qubits
+		qc.QFTinv(*measurement_qubits)
 
 		self.qpe_circuit = qc
 
