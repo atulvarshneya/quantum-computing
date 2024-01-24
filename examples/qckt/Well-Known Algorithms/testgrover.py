@@ -11,21 +11,21 @@ if len(sys.argv) != 2:
 	print(f"Usage: {sys.argv[0]} in_register_size")
 	quit()
 ninreg = int(sys.argv[1])
+nwkreg = 2
 noutreg = 1
 
-### place the registers spreadout within the available qubits
-inreg = qckt.QRegister(ninreg)
-outreg = qckt.QRegister(noutreg)
-rclreg = qckt.CRegister(ninreg)
-nqbits,ncbits,qplaced,cplaced = qckt.placement(outreg,inreg,rclreg)
-print("nq,nc,qplaced,cplaced =",nqbits,ncbits,qplaced,cplaced)
+### input, output, and (dummy) work registers
+inreg = [i for i in reversed(range(ninreg))]
+wkreg = [i+ninreg for i in reversed(range(nwkreg))]
+outreg = [i+ninreg+nwkreg for i in reversed(range(noutreg))]
+nqbits = ninreg + +nwkreg + noutreg
 
 ### 'needle' in the haytack = key
 marked = int(rnd.random() * (2**ninreg-1))
 print(("Marked to search = {0:0"+str(ninreg)+"b}, ({0:d})").format(marked))
 
-### Build the Uf circuit
-uf_ckt = qckt.QCkt(nqbits,ncbits,name="Uf")
+### Build the Oracle circuit
+uf_ckt = qckt.QCkt(nqbits,nqbits,name="Oracle")
 x_list = []
 for i in range(ninreg):
 	if (marked & (0b1<<i)) == 0:
@@ -37,14 +37,15 @@ if len(x_list) > 0:
 	uf_ckt.X(x_list)
 # uf_ckt.draw()
 
-### create a single gate representation of the Uf circuit, and replace the Uf circuit using that one gate
+### create a single gate representation of the Oracle circuit, and replace the Oracle circuit using that one gate
 uf_op = uf_ckt.to_opMatrix()
-uf_ckt = qckt.QCkt(nqbits,ncbits,name="Uf Circuit")
-uf_ckt.CUSTOM("Uf",uf_op,qplaced)
+uf_ckt = qckt.QCkt(nqbits,nqbits,name="Oracle Circuit")
+uf_ckt.custom_gate("Oracle", uf_op)
+uf_ckt.Oracle(*outreg, *wkreg, *inreg)
 # uf_ckt.draw()
 
 grv_ckt = grv.Grover(uf_ckt,inreg,outreg).getckt()
-grv_ckt.M(inreg,rclreg)
+grv_ckt.M(inreg)
 grv_ckt.draw()
 
 correct_res = 0
