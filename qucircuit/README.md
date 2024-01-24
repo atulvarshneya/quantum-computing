@@ -397,7 +397,57 @@ Returns the updated new circuit.
 Draws a text drawing of the circuit. The argument `show_noise` selects if the noise elements are drawn or hidden.
 
 #### `list(show_noise=True)`
-prints out the sequence of gates in the circuit. The argument `show_noise` selects if the noise elements are listed or hidden.
+prints out the sequence of gates in the circuit. The argument `show_noise` selects if the noise elements are listed or hidden. It comes in handy when the circuit is too large to display using draw().
+
+The output has following format. For gates, including M (measurement), and parametric gates, the format is as:
+
+	<gate-name>[<list of qubits>]
+	<gate-name>(gateparams)[<list of qubits>]
+
+For noise elements, the format is as:
+
+	* <event>:(noie-channels)[list of qubits]
+
+The events in the list() output are:
+* event *INIT* is the noise at initialization, specified in `NoiseProfile` using `noise_chan_init`, 
+* event *\<gate\>* is the noise applied to qubits as part of applying the *\<gate\>*, consolidated from `NoiseProfile` (`noise_chan_allgates`, `noise_chan_qubits`), `set_noise()` on a gate instance, and `set_noise_all()` on a gate type.
+* event *AS* is per `NoiseProfile` specifying the noise to be applied at each step (`noise_chan_allsteps`), and finally,
+* event *NS* is explicit noise applied in the circuit (`circuit.NOISE()`).
+
+For example a circuit and its list output is shown below:
+
+	ck = qckt.QCkt(2,2,name='Test circuit for draw, list')
+	ck.H(0).set_noise(ns.generalized_amplitude_damping())
+	ck.CX(0,1).ifcbit(1,1)
+	ck.P(3.14,[0,1])
+	ck.NOISE(ns.bit_flip(0.5),[0,1])
+	ck.M([1,0],[1,0])
+
+	ck.set_noise_profile(
+		noise_profile=ns.NoiseProfile(
+			noise_chan_init=ns.NoiseChannelSequence(ns.bit_flip(probability=0.1),ns.phase_flip(probability=0.1)),
+			noise_chan_allgates=ns.depolarizing(probability=0.2),
+			noise_chan_allsteps=ns.NoiseChannelApplierSequense(noise_chan=ns.phase_damping(gamma=0.4),qubit_list=[1]),
+			)
+		)
+
+	ck.list(show_noise=True)
+
+The list() output for the circuit above is as below. 
+
+	* INIT:BF(0.10),PF(0.10)[0, 1]
+	H[0]
+	* H:(Dep(0.20),[0]),(GAD(0.05,0.05),[0])
+	* AS:PD(0.40)[1]
+	CX[0, 1].ifcbit(1, 1)
+	* CX:(Dep(0.20),[0, 1])
+	* AS:PD(0.40)[1]
+	P(3.1400)[0, 1]
+	* P:(Dep(0.20),[0, 1])
+	* AS:PD(0.40)[1]
+	* NS:BF(0.50)[0, 1]
+	M[1, 0][1, 0]
+
 
 #### `get_gates_list()`
 returns list of all gates available in the circuit. Any custom gates defined for the circuit are included in the list.
