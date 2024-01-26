@@ -27,8 +27,6 @@ class QCkt:
 	def __init__(self, nqubits, nclbits=0, name=None, noise_profile=None):
 		self.nqubits = nqubits
 		self.nclbits = nclbits
-		if self.nclbits is None:
-			self.nclbits = self.nqubits
 		self.circuit = []
 		self.custom_gatescls_list = []
 		self.name = name
