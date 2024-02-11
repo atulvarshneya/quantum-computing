@@ -117,9 +117,7 @@ If not `None` its value should be a dictionary object with keys `noise_opseq_ini
 
 2.2	**qc.qreset()**
 
-Brings the simulator to the same state as after QSimulator() call - initial state, qtrace, qzeros, ... everything.
-
-qreset() has been deprecated. Just re-instantiate the simulator object instead.
+qreset() has been removed in release 2.2. Just re-instantiate the simulator object instead.
 
 
 2.3	**qc.qgate(quantum_gate, list_of_qubits, noise_chan=None, ifcbit=None, qtrace=False)**

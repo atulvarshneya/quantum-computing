@@ -99,9 +99,6 @@ class DMQSimulator:
 
 		self.__initialize_sim()
 
-	def qreset(self):
-		print(f'WARNING: qreset() is deprecated. Reinstantiate the DMQsimulator object instead.', file=sys.stderr)
-		self.__initialize_sim()
 	def __initialize_sim(self):
 		# Reset the runtime Variables, in case qtraceON(), qzerosON() have changed them.
 		self.trace = self.traceINP
