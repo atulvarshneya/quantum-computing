@@ -18,47 +18,6 @@ Install using pip command -
 
 Note that in many gates the order is either explicit, e.g., in `CX` the arguments are explicitly (control, and target), and in some others it does not matter, e.g., in `M` the qubits will be measured with the same outcome irrespective of the order. But in some gates, such as `QFT` it very much *does* matter.
 
-## Using Registers (Registers are being deprecated, simply use python lists instead)
-The use of registers simplifies, and can help in readability of the quantum circuit.
-
-When writing reusable subroutines the assignment of qubits for various uses, e.g., input, output, needs to be managed carefully across the subroutine and the other program. While this can be explictly done by passing lists of qubits for each use, and that can definitely serve the purpose very well, the use of registers makes it easier to read.
-
-There are two classes of registers - `QRegister` and `CRegister`. the former for quantum bits, and the latter for classical bits. The distiction is for assigning the actual `qubits` and `clbits` to these registers.
-
-At the end of the day, both the registers are subclasses of `list` data type. So, operations as indexing (`qreg[2]`), concatenating `(qreg1 + qreg2)`, etc., can be freely performed on the registers. Just note that the result turns out to be of `list` data type (not the original `QRegister` or `CRegister` type, *this will be fixed in subsequent releases*). The assignment of qubits and clbits to the registers follows the MSB...LSB convention as mentioned in the section above.
-
-Example uses of registers:
-
-	import qckt
-	inpreg = qckt.QRegister(4)
-	outreg = qckt.QRegister(2)
-	wrkreg = qckt.QRegister(4)
-	clmeas = qckt.CRegister(6)
-	# at this stage the registers have been declared, but no specific qubits or clbits have been assigned to them.
- 	# For that we use placement()
-	nq,nc,placedqu,placedcl = qckt.placement(inpreg,outreg,wrkreg,clmeas)
-
-
-The above code declares registers and then assigned actual `qubits` and `clbits` to them (does the placement of the registers). The way the placement has been done above, the `inpreg` qubits occupy the MSB locations in the overall number of qubits in the circuit. Followed by `outreg` and then `wrkreg`. Since there is only 1 classical register, it occupies the only number of classical bits in the circuit. Each register has bits assigned in the MSB to LSB order per the convention. So, the order in which the `QRegiter` objects appear in the `placement()` arguments, the qubits are assigned in accordance to that. Same for `CRegister` objects.
-
-	inpreg      outreg   wrkreg
-	|9 8 7 6|   |5 4|    |3 2 1 0|
-
-	clmeas
-	|5 4 3 2 1 0|
-
-`placement()` returns 4 values: the first one (`nq` in the example above) is the total number of qubits required in the circuit; second (`nc` in the example) is the total number of classical bits required in the circuit. Next two, `placedqu` and `placedcl` in the example, are registers containing all `qubits` and all `clbits` respectively.
-
-	placedqu
-	|9 8 7 6 5 4 3 2 1 0|
-
-	placedcl
-	|5 4 3 2 1 0|
-
-the `nq` and `nc` should be used while creating the circuit --
-
-	circuit = qckt.QCkt(nq,nc)
-
 # Noise in Quantum Computers
 
 The quantum computers of the current era are described as noisy intermediate-size quantum computers (NISQ computers). Apart from their *intermediate* size in terms of number of qubits, they are also noisy. Noise in quantum computers can introduce classical uncertainty in what the underlying state is. When this happens we need to consider not only a wavefunction but probabilistic sum of wavefunctions when we are uncertain as to which one we have.
@@ -143,10 +102,48 @@ This class represents the noise profile. It has the following fields -
 
 ## Package qckt
 
-### `class QCkt(nqubits, nclbits=None, noise_profile=None, name="QCkt")`
+#### `class QCkt(nqubits, nclbits=None, noise_profile=None, name=None)`
 Returns an empty quantum circuit.
 
 noise_profile if not None must be of type `qckt.NoiseProfile`.
+
+#### `get_gates_list()`
+returns list of all gates available in the package. Any user defined gates defined are included in the list.
+
+#### `define_gate(gate_name, opMatrix)`
+To add user defined gates. 
+
+`gate_name` is a string and must follow rules for a legal Python identifier, else will be unuseable; `opMatrix` is the operator matrix in form of `numpy.matrix([...],dtype=complex)`.
+
+The user defined gate can then be used as `circuit.<gate_name>(qubits)`. Note that user defined gates always accept the target qubits as appropriate number of arguments in the function call, such as `circuit.myCX(0,1)`.
+
+**Note**: the gates defined at the time of instatiation of QCkt are available for use in that circuit.
+
+As an example the following circuit -
+
+	import qckt
+	import qckt.backend as bknd
+	import numpy as np
+
+	qckt.define_gate('myX', np.matrix([[0.0,1.0],[1.0,0.0]],dtype=complex))
+	qckt.define_gate('myCX', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,0.0,1.0],[0.0,0.0,1.0,0.0]],dtype=complex))
+	
+	ck = qckt.QCkt(3,3)
+	ck.H(0)
+	ck.myCX(0,1)
+	ck.myX(2)
+	ck.draw()
+
+creates the following circuit -
+
+	q000 -[H]-[myCX M]---------
+			  |      |         
+	q001 -----[myCX L]---------
+							
+	q002 --------------[myX M]-
+							
+	creg ======================
+
 
 ### Methods - Gates:
 These gate methods instantiate a gate object of the specific type and append it to the quantum circuit.
@@ -278,37 +275,6 @@ Returns the gate object.
 Appends a controlled-Rz gate to the quantum circuit.
 
 Returns the gate object.
-
-#### `custom_gate(gatename, op_matrix)`
-To add user defined custom gates. 
-
-`gatename` is a string and must follow rules for a legal Python identifier, else will be unuseable; `op_matrix` is the operator matrix in form of `numpy.matrix([...],dtype=complex)`.
-
-The custom gate can then be used as `circuit.gatename(qubits)`. Note that custom gates always accept the target qubits as appropriate number of arguments in the function call, such as `circuit.myCX(0,1)`.
-
-As an example the following circuit -
-
-	import qckt
-	import qckt.backend as bknd
-	import numpy as np
-	ck = qckt.QCkt(3,3)
-	ck.custom_gate('myX', np.matrix([[0.0,1.0],[1.0,0.0]],dtype=complex))
-	ck.custom_gate('myCX', np.matrix([[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,0.0,1.0],[0.0,0.0,1.0,0.0]],dtype=complex))
-	ck.H(0)
-	ck.myCX(0,1)
-	ck.myX(2)
-	ck.draw()
-
-creates the following circuit -
-
-	q000 -[H]-[myCX M]---------
-			  |      |         
-	q001 -----[myCX L]---------
-							
-	q002 --------------[myX M]-
-							
-	creg ======================
-
 
 #### `Border()`
 Places a vertical line in the drawing of the quantum circuit. Has effect only in the drawing of the circuit.
@@ -448,9 +414,6 @@ The list() output for the circuit above is as below.
 	* NS:BF(0.50)[0, 1]
 	M[1, 0][1, 0]
 
-
-#### `get_gates_list()`
-returns list of all gates available in the circuit. Any custom gates defined for the circuit are included in the list.
 
 ### Methods - noise API
 

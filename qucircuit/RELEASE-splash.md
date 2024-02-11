@@ -1,5 +1,5 @@
 # Qucircuit – A quantum computing circuits simulator
-## Release 2.1
+## Release 2.2
 
 `$ pip install qucircuit`
 

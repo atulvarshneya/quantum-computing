@@ -179,18 +179,19 @@ opmat = np.matrix([
 	[0,1,0,0],
 	[0,0,0,1],
 	[0,0,1,0]],dtype=complex)
+q.define_gate("CNOT",opmat)
+ck = q.QCkt(4,4)
 try:
-	ck.custom_gate("CNOT",opmat)
 	ck.CNOT(0,1)
 	ck.CNOT(0,1,2)
 except QCktException as e:
 	print(e)
 
-opmat = np.matrix([
-	[1,0,0,0],
-	[0,0,0,1],
-	[0,0,1,0]],dtype=complex)
 try:
-	ck.custom_gate("CTRLX",opmat)
+	opmat = np.matrix([
+		[1,0,0,0],
+		[0,0,0,1],
+		[0,0,1,0]],dtype=complex)
+	q.define_gate('CTRLX',opmat)
 except QCktException as e:
 	print(e)

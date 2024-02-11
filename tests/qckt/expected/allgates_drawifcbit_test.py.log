@@ -314,6 +314,7 @@ q004 -[Rz]-
 creg =2====
            
 CUSTOM
+['NOISE', 'X', 'Y', 'Z', 'H', 'CX', 'CY', 'CZ', 'CCX', 'SWAP', 'M', 'Border', 'Probe', 'QFT', 'RND', 'P', 'CP', 'UROTk', 'CROTk', 'Rx', 'CRx', 'Ry', 'CRy', 'Rz', 'CRz', 'CUST']
 q000 -[CUST M]-
       |      | 
 q001 -|------|-

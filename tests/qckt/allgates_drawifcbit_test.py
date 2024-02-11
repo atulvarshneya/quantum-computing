@@ -137,12 +137,14 @@ ck.CRz(1.5, 2,3,4).ifcbit(2,0)
 ck.draw()
 
 print('CUSTOM')
-ck = qckt.QCkt(5,5)
 opmat = np.matrix([
 	[1,0,0,0],
 	[0,1,0,0],
 	[0,0,0,1],
 	[0,0,1,0]],dtype=complex)
-ck.custom_gate("CUST",opmat)
+qckt.define_gate("CUST",opmat)
+print(qckt.get_gates_list())
+
+ck = qckt.QCkt(5,5)
 ck.CUST(0,2).ifcbit(3,1)
 ck.draw()

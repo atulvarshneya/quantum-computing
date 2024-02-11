@@ -39,8 +39,8 @@ if len(x_list) > 0:
 
 ### create a single gate representation of the Oracle circuit, and replace the Oracle circuit using that one gate
 uf_op = uf_ckt.to_opMatrix()
+qckt.define_gate("Oracle", uf_op)
 uf_ckt = qckt.QCkt(nqbits,nqbits,name="Oracle Circuit")
-uf_ckt.custom_gate("Oracle", uf_op)
 uf_ckt.Oracle(*outreg, *wkreg, *inreg)
 # uf_ckt.draw()
 
