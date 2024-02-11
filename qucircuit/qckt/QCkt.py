@@ -28,7 +28,6 @@ class QCkt:
 		self.nqubits = nqubits
 		self.nclbits = nclbits
 		self.circuit = []
-		self.custom_gatescls_list = []
 		self.name = name
 		self.canvas = cnv.Canvas(self)
 		self.noise_profile_gates = {}  # this stores a map with gateCls as key, and noise spec as value
@@ -37,8 +36,6 @@ class QCkt:
 
 		for gclass in gts.GatesList:
 			setattr(self, gclass.__name__, GateWrapper(self,gclass))
-		## now create and register the classic CUSTOM gate. Need to deprecate that
-		self.deprecated_custom_gate()
 
 		self.idx = 0 # for iterations
 
@@ -49,12 +46,7 @@ class QCkt:
 		return next(self.it)
 
 	def get_gates_list(self):
-		gates_list = []
-		for gclass in gts.GatesList:
-			gates_list.append(gclass.__name__)
-		for cust_class in self.custom_gatescls_list:
-			gates_list.append(cust_class.__name__)
-		return gates_list
+		raise QCktException('ERROR: get_gates_list() is available under qckt package. See README.md. Usage: qckt.get_gates_list()')
 
 	def append(self, otherckt, name=None):
 		# otherckt - the ckt to be appended
@@ -64,10 +56,7 @@ class QCkt:
 			name = self.name
 		newckt = QCkt(nq,nc,name=name)
 
-		# copy over custom gate defs to new circuit
-		newckt.__copyover_custom_gatedefs__(srcckt=self)
-		newckt.__copyover_custom_gatedefs__(srcckt=otherckt)
-
+		# copy over noise_profile_gates list into new circuit
 		newckt.__copyover_noise_profile_gates__(srcckt=self)
 		newckt.__copyover_noise_profile_gates__(srcckt=otherckt)
 
@@ -91,19 +80,13 @@ class QCkt:
 			name = self.name
 		newckt = QCkt(newnq, newnc, name=name)
 
-		newckt.__copyover_custom_gatedefs__(srcckt=self)
+		# copy over noise_profile_gates list into new circuit
 		newckt.__copyover_noise_profile_gates__(srcckt=self)
 
 		for g in self.circuit:
 			galigned = g.realign(inpqubits)
 			newckt.circuit.append(galigned)
 		return newckt
-
-	def __copyover_custom_gatedefs__(self, srcckt):
-		# copy over custom gate defs from source circuit
-		for gcls in srcckt.custom_gatescls_list:
-			self.custom_gatescls_list.append(gcls)
-			setattr(self, gcls.__name__, GateWrapper(self,gcls))
 
 	def __copyover_noise_profile_gates__(self, srcckt):
 		# copy over noise_profile_gates from source circuit
@@ -244,20 +227,7 @@ class QCkt:
 				raise QCktException(f"INTERNAL ERROR: Unknown op {cktstep['op']}")
 
 	def custom_gate(self, cgate_name, opMatrix):
-		if not gutils.isunitary(opMatrix):
-			errmsg = "Custom gate, "+cgate_name+", operator matrix is not unitary."
-			raise QCktException(errmsg)
-		new_custom = gts.fetch_custom_gateclass(cgate_name=cgate_name, opMatrix=opMatrix)
-		new_custom.__name__ = cgate_name
-		self.custom_gatescls_list.append(new_custom)
-		setattr(self, cgate_name, GateWrapper(self,new_custom))
-		return self
-
-	def deprecated_custom_gate(self):
-		new_custom = gts.fetch_deprecated_custom_gateclass()
-		depr_cust_gamtename = 'CUSTOM'
-		new_custom.__name__ = depr_cust_gamtename
-		setattr(self, depr_cust_gamtename, GateWrapper(self,new_custom))
+		raise QCktException('ERROR: custom_gate() is discontinued, use qckt.define_gate() instead. See README.md.')
 
 
 if __name__ == "__main__":

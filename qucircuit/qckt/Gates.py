@@ -231,6 +231,17 @@ def registerGate(gateclass):
 	GatesList.append(gateclass)
 	return gateclass
 
+def deregisterGate(gate_name):
+	for gclass in GatesList:
+		if gclass.__name__ == gate_name:
+			GatesList.remove(gclass)
+
+def get_gates_list():
+	gates_list = []
+	for gclass in GatesList:
+		gates_list.append(gclass.__name__)
+	return gates_list
+
 @registerGate
 class NOISE(QGate):
 	def __init__(self, noise_chan, qbit):
@@ -910,49 +921,30 @@ class CRz(QGate):
 	# INHERIT def realign(self,newseq):
 	# INHERIT def __str__(self):
 
-
-def fetch_custom_gateclass(cgate_name, opMatrix):
-	class CUSTOM(QGate):
+def define_gate(gate_name, opMatrix):
+	if not gutils.isunitary(opMatrix):
+		errmsg = f"Custom gate, {gate_name}, operator matrix is not unitary."
+		raise QCktException(errmsg)
+	if gate_name in get_gates_list():
+		print(f'WARNING: Gate {gate_name} already exists, oevrriding definition.', file=sys.stderr)
+		deregisterGate(gate_name=gate_name)
+	
+	@registerGate
+	class USER_DEFINED_GATE(QGate):
 		def __init__(self, *qbits):
 			super().__init__()
-			self.name = cgate_name
-			if not gutils.isunitary(opMatrix):
-				errmsg = f"Custom gate, {self.name}, operator matrix is not unitary."
-				raise QCktException(errmsg)
+			self.name = gate_name
 			self.opMatrix = opMatrix
 			self.qbits = [q for q in qbits]
 		def addtocanvas(self,canvas,tag):
 			canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
 			return self
 		def check_qbit_args(self,nqbits):
+			# print('check_qbit_args called')
 			r,c = self.opMatrix.shape
 			if 2**len(self.qbits) != r:
 				return False
 			return self.varqbit_args(nqbits,1)
 		# INHERIT def realign(self,newseq):
 		# INHERIT def __str__(self):
-	return CUSTOM
-
-def fetch_deprecated_custom_gateclass():
-	class CUSTOM(QGate):
-		def __init__(self, name, opMatrix, qbits):
-			print('CUSTOM gate deprecated, does not support noise_to_each(). Uee QCkt.custom_gate() to register a custom gate.', file=sys.stderr)
-			super().__init__()
-			self.name = name
-			if not gutils.isunitary(opMatrix):
-				errmsg = "Custom gate, "+self.name+", operator matrix is not unitary."
-				raise QCktException(errmsg)
-			self.opMatrix = opMatrix
-			self.qbits = qbits
-		def addtocanvas(self,canvas,tag):
-			canvas._add_boxed(self.qbits,self.name, self.cbit_cond)
-			return self
-		def check_qbit_args(self,nqbits):
-			r,c = self.opMatrix.shape
-			if 2**len(self.qbits) != r:
-				return False
-			return self.varqbit_args(nqbits,1)
-		# INHERIT def realign(self,newseq):
-		# INHERIT def __str__(self):
-
-	return CUSTOM
+	USER_DEFINED_GATE.__name__ = gate_name

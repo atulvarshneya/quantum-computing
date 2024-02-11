@@ -68,8 +68,9 @@ class Job:
 		for k,v in op_times.items():
 			tot_time = tot_time + v
 		print(f'Total Ops  :  {qsteps:4d}      operations')
-		print(f'Total Time :  {tot_time:9.4f} sec')
+		# print(f'Total Time :  {tot_time:9.4f} sec')
 		print(f'Per Operation:')
 		for op in op_counts.keys():
-			print(f'    {op:8s} {op_times[op]:9.4f} sec  {op_counts[op]:4d} times {op_times[op]/op_counts[op]:4.4f} avg')
+			# print(f'    {op:8s} {op_times[op]:9.4f} sec  {op_counts[op]:4d} times {op_times[op]/op_counts[op]:4.4f} avg')
+			print(f'    {op:8s} {op_counts[op]:4d} times')
 
