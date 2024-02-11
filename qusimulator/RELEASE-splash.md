@@ -1,5 +1,5 @@
 # Qusimulator – A quantum computing simulator
-## Release 2.0
+## Release 2.2
 
 `$ pip install qusimulator`
 
