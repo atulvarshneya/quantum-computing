@@ -19,6 +19,6 @@ setup(
 	python_requires='>3.9',
     install_requires=[
         'numpy',
-        'qusimulator>=2.0'
+        'qusimulator>=2.2'
         ]
     )
