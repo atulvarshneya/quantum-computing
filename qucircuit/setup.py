@@ -19,6 +19,7 @@ setup(
 	python_requires='>3.9',
     install_requires=[
         'numpy',
+		'matplotlib',
         'qusimulator>=2.2'
         ]
     )
