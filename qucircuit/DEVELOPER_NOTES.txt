@@ -14,7 +14,7 @@
 ###		zero-qubits gates
 ###			Probe(non_qubit_args)	self.qbits = []
 ###			Border()				self.qbits = []
-###		custom gates
+###		user defined gates
 ###			gate([1,2,3,4])			self.qbits = [1,2,3,4]
 ##############################
 
@@ -38,7 +38,8 @@
 ## Lets see how we apply this 2-qubit gate to some specifc bits of a 4 qubit system,
 ## say, control qubit 1, and target qubit 3.
 ## We first 'stretch' this to the full 4 qubits U = np.kron(C, np.eye(4)). See below 
-## the description of stretched_opmatrix().
+## the description of stretched_opmatrix(). Note that this is the same as applying 
+## operator C on two MSB qubits, and Identity operator on all the remaning (two) qubits.
 ##         +---+
 ## |b3> ---|-+-|------
 ##         | | |
@@ -59,7 +60,7 @@
 ## to reorder (realign) it such that the state vector is ordered counting with qubit 1
 ## at qbit 3 position (MSB), and qubit 3 at qubit 2 position. 
 ## Next, apply U. Finally, apply an operator, rr, to undo the reordering done by 
-## the operator r.
+## the operator r. I.e., basically, perform rr*U*r*|x>.
 ## So logically, the operators circuit diagram looks like -
 ##         +---+  +---+  +---+
 ## |b3> ---|3 1|--|-+-|--|1 3|----
@@ -78,10 +79,7 @@
 ##
 ## Qubits |x> and |y>, each is acted upon by 2x2 operators U1 and U2, respectively.
 ## This is equivalent to the combined state of x and y, i.e., |xy> acted upon
-## by a single 4x4 operator U = np.kron(U1, U2) (see Umesh Vazirani course
-## on edx.org - Week 3: Quantum Circuits and Teleportation  
-## Lecture 5: Quantum Gates  Video: Two Qubit Gates and Tensor Products
-## https://www.youtube.com/watch?v=ISJYwzN-W20 )
+## by a single 4x4 operator U = np.kron(U1, U2)
 ##
 ##            +-------+
 ##            |       |
