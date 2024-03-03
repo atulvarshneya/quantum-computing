@@ -28,7 +28,7 @@ fi
 overall_ret=0
 for f in $list; do
 	logfile=runlogs/${f}.log
-	python3 $f > ${logfile}
+	python3 $f > ${logfile} 2>&1
 	explist=""
 	explist=$(ls expected/${f}.log*)
 	succ=1
