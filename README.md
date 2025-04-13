@@ -1,24 +1,64 @@
-# A quantun computing development environment in Python
-Comprises of two parts - `qusimulator` (package `qsim`) the quantum simulator, and `qucircuit` (packages `qckt`, `qckt.gatesutils`, and `qckt.backend`) the library to implement quantum computing programs using quantum circuits paradigm. `qucircuit` uses `qusimulator` as a backed engine to run quantum circuits.
+# Quantum Computing Development Environment in Python
 
-## INSTALLATION
-`qusimulator` and `qucircuit` are on PyPi now. So, you can simply install them using `pip`.
+This project provides a comprehensive environment for quantum computing development in Python. It consists of two main components:
 
-    pip install qusimulator
-    pip install qucircuit
+1. **`qusimulator`**: A quantum simulator. It is comprised of the following package:
+    - `qsim`
+2. **`qucircuit`**: A library for implementing quantum computing programs using the quantum circuit paradigm. It includes the following packages:
+   - `qckt`
+   - `qckt.gatesutils`
+   - `qckt.backend`
 
-Since `qucircuit` has `qusimulator` as a dependency, so installing qucircuit will also install `qusimulator`.
+The `qucircuit` library uses `qusimulator` as its backend engine to execute quantum circuits.
 
-## FEATURES
-All common gates available as pre-defined. Allows user-defined gates. Allows adding control qubits to any gates. A number of utility functions to manipulate gates - combine sequentially applied or parallelly applied gates, check for unitarity, inverse.
+---
 
-Full featured support for quantum noise simulation. Leverages a new density-matrix based simulation engine.
+## Installation
 
-Easy to follow documentation with tutorial introduction - see `qusimumator/README.md` and `qucircuit/README.md`. A bunch of examples under `examples/qsim` and `examples/qckt`. Code for regression tests also serves as examples to quickly learn `qsim` and `qckt` packages (see folder `tests/`).
+Both `qusimulator` and `qucircuit` are available on PyPI. You can install them using `pip`:
 
-Getting started tutorials - `examples/qckt/Getting-started-tutorial.ipynb`, `examples/qckt/Getting-started-tutorial-noise-sim.ipynb`
+```bash
+pip install qusimulator
+pip install qucircuit
+```
 
-Growing list of known quantum algorithm implementations included as examples.
+> **Note**: Installing `qucircuit` will automatically install `qusimulator` as it is a dependency.
 
-## CLI tool
-An interactive commandline interface (`qsimcli`) to quickly check out sequence of quantum operations.
+---
+
+## Features
+
+### General
+
+- **Predefined Quantum Gates**: Includes all common quantum gates.
+- **Custom Gates**: Supports user-defined gates.
+- **Controlled Gates**: Allows adding control qubits to any gate.
+- **Gate Utilities**: Provides functions to:
+  - Combine gates applied sequentially or in parallel.
+  - Check for unitarity.
+  - Compute the inverse of gates.
+
+### Quantum Noise Simulation
+
+Features a density-matrix-based simulation engine for realistic noise modeling.
+
+### Extensive Documentation
+
+Includes tutorials and examples to help you get started:
+  - Documentation: `qusimulator/README.md` and `qucircuit/README.md`
+  - Examples: `examples/qsim` and `examples/qckt`
+  - Regression tests: Located in the `tests/` folder, which also serve as learning resources.
+- **Tutorials**:
+  - `examples/qckt/Getting-started-tutorial.ipynb`
+  - `examples/qckt/Getting-started-tutorial-noise-sim.ipynb`
+- **Quantum Algorithm Implementations**: A growing collection of known quantum algorithms is included as examples.
+
+---
+
+## Command-Line Interface (CLI)
+
+The project includes an interactive CLI tool, `qsimcli`, to quickly experiment with sequences of quantum operations.
+
+---
+
+Explore the examples, tutorials, and documentation to dive into quantum computing with this powerful Python-based environment!
