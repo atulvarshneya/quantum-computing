@@ -1,0 +1,69 @@
+
+qusimulator
+* [DONE] Change NISQ to DM ?
+* [DONE] qusimulator -- check NoiseOperator is also accepted where NoiseOperatorSequence is accpeted
+    * [DONE] NISQsimulator init
+    * [DONE] qnoise
+    * [DONE] qgate
+* [DONE] report header for initialization to include noise segment (init part of noise_model)
+* [DONE] Add 2-qubit/multi-qubit noise channels in qsim. In individual qgate() invokations, individual qnoise() invokations
+    * [DONE] add actual 2-qubit operators in qsim/noiseoperator.py
+* [DONE] NISQeng.runjob() -- aligned with NISQdeb.runjob()
+* [DONE] Check alignment of Qsim.py and NISQsim.py
+* [DONE] Not to do. Is multi-qubit kraus operators relevant for init<?>, allgates<?>, on qubits<?>
+* [DONE] changge qNoiseChannelSequence.add_noise_chan_sequence() --> extend() qNoiseChannelSequence.add_noise_chan() --> add().
+* ?? controlled NOISE() 'gate'
+* qsimulator -- change noise_model from dict to NoiseModel class
+
+qucircuit
+* [DONE] MAJOR BUG: gate class is a global python object, so any class variables added persist across multiple QCkt() instantiations. I.e., if circuit.H.add_noise_to_all() is invoked once, all QCKT() instances will get that.
+    * [DONE] can we have a map in the QCkt object which maps gate class to noise spec. Check how it works for CUSTOM, and append, realign.
+* [DONE] Add 2-qubit/multi-qubit noise channels in qckt.
+    * [DONE] add actual 2-qubit operators in qckt/noiseOperator.py
+* [DONE] the functionality of interpreting the noise model's kraus_opseq_init, should go in circuit.assemble(). With that, remove the job.noise_model as that will be redundant.
+* [DONE] add_noise_to_all() does not have a check for 1-qubit vs multi-qubit
+* [DONE] do not depend how simulator combines on-qubits noise spec, allgates noise spec, gate instance noise spec - combine in qckt itself and provide as gate instance noise spec to simulator.
+* [DONE] change noise_model to a class (instead of a dictionary)
+* [DONE] Add noise to gate type
+    * [DONE] basically add an attribute to the gate class (not gate object) to store KrausOperator, KrausOperatorSequence noise object
+    * [DONE] in assemble() function pick this gate *class* noise object, AND if a gate *object* noise object is there, pick that instead (override the class attr) - OR SHOULD WE COMBINE THE TWO?
+    * [DONE] This does the job!
+    * [DONE] BUT it breaks the CUSTOM gate as the gate class attribute will become common for *all* different CUSTOM gates
+* [DONE] Change the protocol for Custom Gates -
+    * [DONE] Instead of a gate called CUSTOM, have a method in QCkt as custom_gate().
+    * [DONE] This custom_gate() should use the CUSTOM gate class, create a copy of it with the specified name and opMatrix, and register it on the QCkt instance through Gatewrapper mechanism
+* [DONE] append and realign to carry over the custom gate definitions
+* [DONE] Add test cases for custom gates with add noise to all
+* [DONE] Add test cases for custom gates with add noise
+* [DONE] validate noise functionality numbers against a proven standard (e.g., Braket)
+* [DONE] draw() to include noise applied to that gate
+* [DONE] draw() to include noise components from noise_model (init, qubits, allgates as applied)
+* [DONE] draw() to allow drawing with or without noise elements (only ideal functionality, and with noise simulation)
+* [DONE] draw() init in noise_model
+* [DONE] support nose_model.kraus_opseq_allsteps to apply noise after each gate (of course, skip NOISE() gate) - add field in NoiseModel class, add in QCkt.assemble() as marked therein
+* [DONE] list() function as well, with or without noise elements, to list the noise components with the gates (as qreport() does)
+* [DONE] QFT taking a list of qubits as QFT([0,1,2,3]) is unnecessary/redundant. Because can simply do QFT(*list)
+* [DONE] NoiseChannelSequence -  add_noise_chan(noise_channel) --> add()and add_noise_chan_sequence(noise_channel_sequence) --> extend()
+* [DONE] BUG: circuit.list() --  ifcbit is checked using cbit field, should be cbit_cond field. While fixing it, do <gate>:[qbits].ifcbit(1,1)
+* [DONE] UX improvement circuit.list() - qubits for gates as <gate>[qbits], parameterized gates to show as <gate>(params)[qbits]
+* [DONE] UX improvement circuit.list() - A * before noise lines
+* ?? [use list where draw is too large] draw() to support wrap-around - since noise simulator adds a lot of additional elements making it unwieldy
+* Relook at CX and other control-gates, as well as QFT, accepting a list of qubits. This can be confusing, not really adding much value
+* [DONE] Relook at concept of registers. Either remove or make more useful.
+* Relook at circuit arguments (nqubits,nclbits) as well as M arguments ([qureg],[clreg]), should nclbits always = qubits? and qureg always = clreg?
+* remove dependency on qsim for gate+noise. While qtrace is compact, but is not generic -- this change will change tests/qckt outputs
+* Nice to have: Support for a final readout of state (a measurement at the end of execution) - readout specified qubits, or all if not specified.
+    Does not affect the regular measurement which can be performed during the run (e.g., in teleportaion), this one is in addition to it.
+    Make sure there are no cases in examples and tests where qmeasure reads qubits into clbits not naturally aligned, e.g., qmeasure([0,1,2],[2,1,0]).
+
+[DONE] defensive checks
+[DONE] comprehensive tests
+find ways to evaluate code coverage, especially of packages code
+
+[DONE] Full documentaion update, along with 'What's new'
+[DONE] Create a ipynb tutorial for qucircuit
+[DONE] Create a ipynb tutorial for noise modeling
+
+Backends:
+	* submit job
+	* async/sync wait for job to complete

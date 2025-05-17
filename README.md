@@ -40,7 +40,7 @@ pip install qucircuit
 
 ### Quantum Noise Simulation
 
-Features a density-matrix-based simulation engine for realistic noise modeling.
+Full featured realistic noise modeling leveraging a new density-matrix-based simulation engine.
 
 ### Extensive Documentation
 

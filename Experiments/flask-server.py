@@ -10,6 +10,21 @@ from flask import Flask, request, jsonify
 from multiprocessing import Process
 import os
 
+##################################################
+# flow to-be-done:
+# 1. receive request
+# 2. store the job request in jobs db
+# 3. have a thread continually poll the jobs db, and run the job, store the result in jobs db
+# 4. ? let the client poll for the status and then fetch the result
+#
+# So, backend api:
+# submit_job
+# check_status
+# fetch_result
+#
+# all this needs to be done
+##################################################
+
 app = Flask(__name__)
 
 def runjob_worker(job):
@@ -38,6 +53,7 @@ def runjob_worker(job):
     # return the result
     return retval_pkl, 200
 
+# this is just for a sync request. Need to implement the async version, that would be the proper service
 @app.route('/runjob', methods=['POST'])
 def runjob():
     # extract job object from request
