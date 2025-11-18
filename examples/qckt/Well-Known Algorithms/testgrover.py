@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import qckt
-from qckt.backend import *
+from qckt.backend import Qeng
 import libgrover as grv
 import random as rnd
 import sys
@@ -45,11 +45,11 @@ uf_ckt.Oracle(*outreg, *wkreg, *inreg)
 # uf_ckt.draw()
 
 grv_ckt = grv.Grover(uf_ckt,inreg,outreg).getckt()
-grv_ckt.M(inreg)
+# grv_ckt.M(inreg)  # not doing this measurement as using multishot job
 grv_ckt.draw()
 
 correct_res = 0
 job = qckt.Job(grv_ckt, shots=100)
 bk = Qeng()
 bk.runjob(job)
-job.plot_counts(verbose=False)
+job.plot_counts(register=inreg, verbose=False)

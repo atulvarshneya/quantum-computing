@@ -3,7 +3,7 @@
 # Standard teleportation protocol
 
 import qckt
-from qckt.backend import *
+from qckt.backend import Qdeb
 
 ckt = qckt.QCkt(3,3)
 ckt.RND(2)

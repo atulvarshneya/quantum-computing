@@ -2,7 +2,7 @@
 
 import numpy as np
 import qckt
-from qckt.backend import *
+from qckt.backend import Qeng
 import libqpe as qpe
 
 ####
@@ -44,21 +44,23 @@ mycircuit.X(target_qubit)
 qpeckt = qpe.QPE(uop, target_qubit, measurement_qubits).getckt()
 # append to the initial circuit
 mycircuit = mycircuit.append(qpeckt)
-# and add the measuremnt
-mycircuit.M(measurement_qubits)
+# and add the measurement
+# mycircuit.M(measurement_qubits)  # not doing this measurement though, as doing multiple shots job
 mycircuit.draw()
 
 ####
 ## run multiple shots display the bargraph of results
 ## pick the one with max freq as the result
 ####
-job = qckt.Job(mycircuit, shots=100)
+nshots = 100
+job = qckt.Job(mycircuit, shots=nshots)
 bk = Qeng()
 bk.runjob(job)
 creg = job.get_creg()
-counts = job.get_counts()
+counts = job.get_counts(register=measurement_qubits)
+_ = job.plot_counts(register=measurement_qubits)
 
 # use the measured values to compute estimated phase
 resvalue = max(range(len(counts)), key=lambda x : counts[x])
-print(f"Most frequent readout = {resvalue},  frequency = {counts[resvalue]}/{len(creg)}")
+print(f"Most frequent readout = {resvalue},  frequency = {counts[resvalue]}/{nshots}")
 print(str(resvalue)+"/2**"+str(n_counting_qubits)," = ",float(resvalue)/(2**n_counting_qubits))
