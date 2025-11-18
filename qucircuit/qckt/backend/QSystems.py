@@ -36,34 +36,35 @@ class DMQeng:
 		pass
 
 	def runjob(self, job):
-		cregres_list = [None]*job.shots
-		for shot_count in range(job.shots):
-			qc = qsim.DMQSimulator(job.nqubits,job.nclbits,noise_profile=None,qtrace=False,verbose=job.verbose)
-			for op in job.assembledCkt:
-				if op["op"] == "gate":
-					qckt_noise_op = op['noiseChan']
-					qsim_noise_opseq = convert_to_qsim_noise_op_applier_seq(qckt_noise_op)
-					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"],noise_chan=qsim_noise_opseq)
-				elif op["op"] == "measure":
-					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
-				elif op["op"] == "noise":
-					qckt_noise_op = op['noiseChan']
-					qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["noiseChan"])
-					qc.qnoise(qsim_noise_opseq, op['qubits'])
-				elif op["op"] == "probe":
-					pass
-				elif op["op"] == "noop":
-					pass
-				else:
-					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-			cregvec,statevecarr,runstats = qc.qsnapshot()
-			cregres = Cregister()
-			cregres.setvalue_vec(cregvec)
-			cregres_list[shot_count] = cregres
+		qc = qsim.DMQSimulator(job.nqubits,job.nclbits,noise_profile=None,qtrace=False,verbose=job.verbose)
+		for op in job.assembledCkt:
+			if op["op"] == "gate":
+				qckt_noise_op = op['noiseChan']
+				qsim_noise_opseq = convert_to_qsim_noise_op_applier_seq(qckt_noise_op)
+				qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"],noise_chan=qsim_noise_opseq)
+			elif op["op"] == "measure":
+				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+			elif op["op"] == "noise":
+				qckt_noise_op = op['noiseChan']
+				qsim_noise_opseq = convert_to_qsim_noise_op_sequence(op["noiseChan"])
+				qc.qnoise(qsim_noise_opseq, op['qubits'])
+			elif op["op"] == "probe":
+				pass
+			elif op["op"] == "noop":
+				pass
+			else:
+				raise QCktException("Encountered unknown instruction: "+str(op["op"]))
+		# at the end of execution perform READOUT sampling the state as many times as job.shots
+		qc.qreadout(nshots=job.shots)  # this will populate the creg_counts values internally, which are returned by qsnapshot()
+
+		# Now create the Result object from the final snapshot and store it in job.result
+		cregvec,statevecarr,cregcounts,runstats = qc.qsnapshot()
+		cregres = Cregister()
+		cregres.setvalue_vec(cregvec)
 		# store the last statevec as well, helps with debugging
 		statevec = StateVector()
 		statevec.value = statevecarr
-		job.result = Result(cregvals=cregres_list,svecvals=statevec)
+		job.result = Result(cregvals=cregres, cregcounts=cregcounts)
 		job.runstats = runstats
 		return self
 
@@ -73,9 +74,6 @@ class DMQdeb:
 		pass
 
 	def runjob(self, job):
-		cregres_list = [None]*job.shots
-		if job.shots != 1:
-			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
 		qc = qsim.DMQSimulator(job.nqubits,job.nclbits,noise_profile=None,qtrace=job.qtrace,verbose=job.verbose)
 		for op in job.assembledCkt:
 			if op["op"] == "gate":
@@ -91,7 +89,7 @@ class DMQdeb:
 			elif op["op"] == "probe":
 				nqbits = job.nqubits
 				ncbits = job.nclbits
-				(creglist, sveclist, runstats) = qc.qsnapshot()
+				(creglist, sveclist, cregcounts, runstats) = qc.qsnapshot()
 				print('\n'+op["header"])
 				for i in range(len(sveclist)):
 					if (op["probestates"] is None and abs(sveclist[i][i]) > self.maxerr) \
@@ -106,13 +104,16 @@ class DMQdeb:
 				pass
 			else:
 				raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-		cregvec,statevecarr,runstats = qc.qsnapshot()
+		# at the end of execution perform READOUT sampling the state as many times as job.shots
+		qc.qreadout(nshots=job.shots)  # this will populate the creg_counts values internally, which are returned by qsnapshot()
+
+		# Now create the Result object from the final snapshot and store it in job.result
+		cregvec,statevecarr,cregcounts,runstats = qc.qsnapshot()
 		cregres = Cregister()
 		cregres.setvalue_vec(cregvec)
-		cregres_list = [cregres]
 		statevec = StateVector()
 		statevec.value = statevecarr
-		job.result = Result(cregvals=cregres_list,svecvals=statevec)
+		job.result = Result(cregvals=cregres,svecvals=statevec, cregcounts=cregcounts)
 		job.runstats = runstats
 		return self
 
@@ -121,31 +122,37 @@ class Qeng:
 		pass
 
 	def runjob(self, job):
-		cregres_list = [None]*job.shots
-		for shot_count in range(job.shots):
-			qc = qsim.QSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
-			for op in job.assembledCkt:
-				if op["op"] == "gate":
-					if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
-						for q in op["qubits"][0]:
-							qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
-					else:
-						qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
-				elif op["op"] == "measure":
-					qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
-				elif op["op"] == "noise":
-					pass
-				elif op["op"] == "probe":
-					pass
-				elif op["op"] == "noop":
-					pass
+		# cregres_list = [None]*job.shots
+		# for shot_count in range(job.shots):
+		qc = qsim.QSimulator(job.nqubits,job.nclbits,qtrace=False,verbose=job.verbose)
+		for op in job.assembledCkt:
+			if op["op"] == "gate":
+				if issubclass(type(op["qubits"][0]),list) and len(op["qubits"]) == 1:
+					for q in op["qubits"][0]:
+						qc.qgate([op["name"],op["opMatrix"]], [q], ifcbit=op["ifcbit"])
 				else:
-					raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-			cregvec,statevec,runstats = qc.qsnapshot()
-			cregres = Cregister()
-			cregres.setvalue_vec(cregvec)
-			cregres_list[shot_count] = cregres
-		job.result = Result(cregvals=cregres_list)
+					qc.qgate([op["name"],op["opMatrix"]], op["qubits"], ifcbit=op["ifcbit"])
+			elif op["op"] == "measure":
+				qc.qmeasure(op["qubits"],cbit_list=op["clbits"])
+			elif op["op"] == "noise":
+				pass
+			elif op["op"] == "probe":
+				pass
+			elif op["op"] == "noop":
+				pass
+			else:
+				raise QCktException("Encountered unknown instruction: "+str(op["op"]))
+		# at the end of execution perform READOUT sampling the state as many times as job.shots
+		qc.qreadout(nshots=job.shots)  # this will populate the creg_counts values internally, which are returned by qsnapshot()
+
+		# Now create the Result object from the final snapshot and store it in job.result
+		cregvec,statevecarr,cregcounts,runstats = qc.qsnapshot()
+		cregres = Cregister()
+		cregres.setvalue_vec(cregvec)
+		# store the last statevec as well, helps with debugging
+		statevec = StateVector()
+		statevec.value = statevecarr
+		job.result = Result(cregvals=cregres, cregcounts=cregcounts)
 		job.runstats = runstats
 		return self
 
@@ -155,9 +162,6 @@ class Qdeb:
 		pass
 
 	def runjob(self, job):
-		cregres_list = [None]*job.shots
-		if job.shots != 1:
-			print("WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.")
 		qc = qsim.QSimulator(job.nqubits,job.nclbits,qtrace=job.qtrace,verbose=job.verbose)
 		for op in job.assembledCkt:
 			if op["op"] == "gate":
@@ -173,7 +177,7 @@ class Qdeb:
 			elif op["op"] == "probe":
 				nqbits = job.nqubits
 				ncbits = job.nclbits
-				(creglist, sveclist, runstats) = qc.qsnapshot()
+				(creglist, sveclist, cregcounts, runstats) = qc.qsnapshot()
 				print('\n'+op["header"])
 				for i in range(len(sveclist)):
 					if (op["probestates"] is None and abs(sveclist[i]) > self.maxerr) \
@@ -188,13 +192,16 @@ class Qdeb:
 				pass
 			else:
 				raise QCktException("Encountered unknown instruction: "+str(op["op"]))
-		cregvec,statevecarr,runstats = qc.qsnapshot()
+		# at the end of execution perform READOUT sampling the state as many times as job.shots
+		qc.qreadout(nshots=job.shots)  # this will populate the creg_counts values internally, which are returned by qsnapshot()
+
+		# Now create the Result object from the final snapshot and store it in job.result
+		cregvec,statevecarr,cregcounts,runstats = qc.qsnapshot()
 		cregres = Cregister()
 		cregres.setvalue_vec(cregvec)
-		cregres_list = [cregres]
 		statevec = StateVector()
 		statevec.value = statevecarr
-		job.result = Result(cregvals=cregres_list,svecvals=statevec)
+		job.result = Result(cregvals=cregres, svecvals=statevec, cregcounts=cregcounts)
 		job.runstats = runstats
 		return self
 

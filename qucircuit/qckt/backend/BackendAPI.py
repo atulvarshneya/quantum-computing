@@ -74,7 +74,8 @@ class StateVector:
 		return self
 
 class Result:
-	def __init__(self,cregvals,svecvals=None):
+	def __init__(self,cregvals,svecvals=None, cregcounts=None):
 		self.cregister = cregvals
 		self.state_vector = svecvals
+		self.creg_counts = cregcounts
 

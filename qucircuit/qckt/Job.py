@@ -20,14 +20,27 @@ class Job:
 	def get_creg(self):
 		return self.result.cregister
 
-	def get_counts(self):
-		counts = [0]*(2**self.nclbits)
-		for r in self.result.cregister:
-			counts[r.intvalue] += 1
-		return counts
+	def get_counts(self, register=None):
+		if register is not None:
+			# register specifies which classical register to get counts for
+			# for now, only single classical register is supported
+			for bit in register:
+				if bit < 0 or bit >= self.nclbits:
+					raise ValueError("Invalid classical register specified")
+				if sum([1 if bit == b else 0 for b in register]) > 1:
+					raise ValueError("Duplicate bits in classical register specified")
+			counts = [0]*(2**self.nclbits)
+			mask = 0
+			for bit in register:
+				mask |= (1 << bit)
+			for i,c in enumerate(self.result.creg_counts):
+				counts[i & mask] += c
+			return counts
+		else:
+			return self.result.creg_counts
 
-	def plot_counts(self,verbose=False):
-		counts = self.get_counts()
+	def plot_counts(self,register=None, verbose=False):
+		counts = self.get_counts(register=register)
 		lc = len(counts)
 		nbits = 0
 		while 2**nbits < lc: nbits += 1
