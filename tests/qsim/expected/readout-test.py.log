@@ -1,0 +1,33 @@
+
+Apply H on 0 then C on 0,3 then Measure 0
+Test 01:
+
+Initial State
+00000000    1.00000000+0.00000000j
+CREGISTER: 00000000
+
+HADAMARD Qubit[0]
+00000000    0.70710678+0.00000000j
+00000001    0.70710678+0.00000000j
+CREGISTER: 00000000
+
+CNOT Qubit[0, 3]
+00000000    0.70710678+0.00000000j
+00001001    0.70710678+0.00000000j
+CREGISTER: 00000000
+
+READOUT
+00000000    0.70710678+0.00000000j
+00001001    0.70710678+0.00000000j
+CREGISTER: 00000000
+creg_counts[0] + creg_counts[9] = 1000
+creg_counts[0] is within range.
+creg_counts[9] is within range.
+
+Test 02:
+creg_counts[0] + creg_counts[9] = 1000
+only one of creg_counts[0] and creg_counts[9] is 1000.
+
+Test 03:
+creg_counts[0] + creg_counts[9] = 1
+only one of creg_counts[0] and creg_counts[9] is 1.
