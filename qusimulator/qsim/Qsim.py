@@ -73,6 +73,7 @@ class QSimulator:
 
 		# Clear the classical bits register
 		self.cregister = [0]*self.ncbits
+		self.creg_counts = [0]*(2**self.ncbits)
 
 		# Initial State
 		if not self.initstate is None:
@@ -169,7 +170,7 @@ class QSimulator:
 		self.qsteps += 1
 
 	def qsnapshot(self):
-		return self.cregister, np.squeeze(np.asarray(self.sys_state)), {'QSteps':self.qsteps, 'OpCounts':self.op_counts, 'OpTimes':self.op_times}
+		return self.cregister, np.squeeze(np.asarray(self.sys_state)), self.creg_counts, {'QSteps':self.qsteps, 'OpCounts':self.op_counts, 'OpTimes':self.op_times}
 
 	def qmeasure(self, qbit_list, cbit_list=None, qtrace=False):
 		# runstats - sim cpu time
@@ -260,6 +261,45 @@ class QSimulator:
 
 		return meas_val
 
+
+	def qreadout(self, nshots=1, qtrace=False):
+		# runstats - sim cpu time
+		st = time.process_time()
+		oper = ["READOUT"] # use this to lookup name as in a qgate call
+
+		statevec = np.squeeze(np.asarray(self.sys_state))  # in SV simulator
+		# statevec = np.diagonal(np.absolute(self.sys_state))  # in DM simulator
+		## Note - here it assumes that the density matrix diagonal elements are the probabilities of the states.
+
+		## First compute the probabilities from the statevector
+		prob = [0.0]*len(statevec)
+		for i in range(len(statevec)):
+			prob[i] = float(np.absolute(statevec[i]**2))  # in SV simulator
+			# prob[i] = float(statevec[i])   # in DM simulator
+
+		## Now do measurements based on the probabilities
+		self.creg_counts = [0]*len(statevec)
+		for i in range(nshots):
+			# OK, now see which one should be selected
+			toss = rnd.random()
+			sel = len(prob) - 1 # to default if all the probs add up just short of 1, and toss == 1
+			cumprob = 0
+			for i in range(len(prob)):
+				if toss > cumprob and toss <= (cumprob + prob[i]):
+					sel = i
+				cumprob += prob[i]
+			# increment the count for the selected state
+			self.creg_counts[sel] += 1
+
+		if qtrace or self.trace:
+			hdr = "READOUT"
+			self.qreport(header=hdr)
+
+		#update runstats
+		et = time.process_time()
+		self.op_times[oper[0]] = self.op_times.get(oper[0], 0.0) + (et-st)
+		self.op_counts[oper[0]] = self.op_counts.get(oper[0], 0) + 1
+		self.qsteps += 1
 
 	def qreport(self, header="State", state=None, probestates=None, visualize=False):
 		# This is only a simulator function for debugging. it CANNOT be done on a real Quantum Computer.
