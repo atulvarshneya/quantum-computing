@@ -9,7 +9,8 @@ def ghz_ck(n_qubits: int):
     ck.H(0)
     for ii in range(0, n_qubits-1):
         ck.CX(ii,ii+1)
-    ck.M(list(range(n_qubits)))
+	# For multiple shots leverage the inherent READOUT instead of M
+    # ck.M(list(range(n_qubits)))
     return ck
 
 print('bit_flip')

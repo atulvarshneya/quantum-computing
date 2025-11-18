@@ -8,7 +8,8 @@ q003 -------------[X]-------------
                                   
 creg =============================
                                   
-Total steps 7
+Total steps 8
 op CX count 1
 op H count 2
+op READOUT count 1
 op X count 4

@@ -27,5 +27,5 @@ print("READ OUT STATE VECTOR: ")
 print(svec)
 
 print("READ OUT CREGISTER: ",end="")
-creg = job.get_creg()[0]
+creg = job.get_creg()
 print(creg)

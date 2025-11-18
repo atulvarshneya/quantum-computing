@@ -24,6 +24,9 @@ ck.draw()
 job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.DMQdeb()
 bk.runjob(job)
+svec = job.get_svec()
+print("READ OUT STATE VECTOR: ")
+print(svec)
 
 # test 02 - direct call to qnoise
 print('test 02 - direct call to qnoise')
@@ -38,6 +41,13 @@ ck.draw()
 job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.DMQdeb()
 bk.runjob(job)
+svec = job.get_svec()
+print("READ OUT STATE VECTOR: ")
+print(svec)
+# print("READ OUT STATE VECTOR (verbose): ")
+# svec.verbose(True)
+# print(svec)
+
 
 # test 03 - adding noise applied to a gate invokation
 print('test 03 - adding noise applied to a gate invokation')
@@ -53,6 +63,9 @@ ck.draw()
 job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.DMQdeb()
 bk.runjob(job)
+svec = job.get_svec()
+print("READ OUT STATE VECTOR: ")
+print(svec)
 
 # test 04 - adding noise at init, applied to specifc qubits, all gates
 print('test 04 - adding noise at init, applied to specifc qubits, all gates')
@@ -73,6 +86,9 @@ ck.draw()
 job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.DMQdeb()
 bk.runjob(job)
+svec = job.get_svec()
+print("READ OUT STATE VECTOR: ")
+print(svec)
 
 # test 05 - a blanket test for all noise operators applied to all gates, using their default arguments
 for nchanid in noise_channels:
@@ -90,13 +106,16 @@ for nchanid in noise_channels:
     noise_profile = ns.NoiseProfile(
         noise_chan_allgates=ns.NoiseChannelSequence(krfn()),
         noise_chan_init=None
-        )
+	)
     ck.set_noise_profile(noise_profile=noise_profile)
     ck.draw(show_noise=False)
     ck.draw()
     job = qckt.Job(ck,qtrace=True, verbose=True)
     bk = bknd.DMQdeb()
     bk.runjob(job)
+    svec = job.get_svec()
+    print("READ OUT STATE VECTOR: ")
+    print(svec)
 
 # test06 - 2-qubit dummy noise channel
 print(f'test06 - 2-qubit dummy noise channel')
@@ -109,6 +128,9 @@ ck.draw()
 job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.DMQdeb()
 bk.runjob(job)
+svec = job.get_svec()
+print("READ OUT STATE VECTOR: ")
+print(svec)
 
 # test07 - user defined gates with set_noise_on_all(), set_noise()
 print('test07 - custom gates with set_noise_on_all()')
@@ -126,6 +148,9 @@ ck.draw()
 job = qckt.Job(ck,qtrace=True, verbose=True)
 bk = bknd.DMQdeb()
 bk.runjob(job)
+svec = job.get_svec()
+print("READ OUT STATE VECTOR: ")
+print(svec)
 
 # test08 - catch error on multi-quibit NoiseChannel on mismatched qubit gate
 print('test08 - catch error on multi-quibit NoiseChannel on mismatched qubit gate')
@@ -146,6 +171,7 @@ try:
 except Exception as e:
     print(e)
 print()
+
 
 # test0x - list noise channel/operator signatures
 noise_chans_list = ns.noise_channel_list()

@@ -8,7 +8,6 @@ q003 ----------#-[X]--#--v-
                #      #  v 
 creg ==========#======#==v=
                #      #  v 
-WARNING: debugger simulator, multi-shot not supported. Falling back to shots=1.
 
 PROBE: point 1
 1100    0.70710678+0.00000000j

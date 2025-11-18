@@ -30,6 +30,6 @@ bk = DMQdeb()
 bk.runjob(job)
 print("READ OUT STATE VECTOR: ")
 print(job.get_svec())
-res = job.get_creg()[0]
+res = job.get_creg()
 print("READ OUT CREGISTER: ", end="")
 print(res)

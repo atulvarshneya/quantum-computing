@@ -27,7 +27,7 @@ print(svec)
 
 # print cregister in proper MSB to LSB order
 print("READ OUT CREGISTER: ",end="")
-creg = job.get_creg()[0]
+creg = job.get_creg()
 print(creg)
 
 #### multiple qbits inputs for single qubit gates draw and list

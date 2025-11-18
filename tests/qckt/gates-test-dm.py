@@ -14,7 +14,7 @@ print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT: ",end="")
 print()
-print(job.get_creg()[0])
+print(job.get_creg())
 
 # Test 02
 ck = qckt.QCkt(4)
@@ -29,7 +29,7 @@ print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT: ",end="")
 print()
-print(job.get_creg()[0])
+print(job.get_creg())
 
 # Test 03
 ck = qckt.QCkt(4,4)
@@ -47,7 +47,7 @@ print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT: ",end="")
 print()
-print(job.get_creg()[0])
+print(job.get_creg())
 
 # Test 04
 ck = qckt.QCkt(6)
@@ -64,7 +64,7 @@ print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT: ",end="")
 print()
-print(job.get_creg()[0])
+print(job.get_creg())
 
 # Test 05
 ck = qckt.QCkt(6)
@@ -78,7 +78,7 @@ print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT: ",end="")
 print()
-print(job.get_creg()[0])
+print(job.get_creg())
 
 # Test 06
 ck = qckt.QCkt(6)
@@ -95,4 +95,4 @@ print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT: ",end="")
 print()
-print(job.get_creg()[0])
+print(job.get_creg())

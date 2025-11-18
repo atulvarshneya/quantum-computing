@@ -17,5 +17,5 @@ bk.runjob(job)
 print("STATE VECTOR READ OUT")
 print(job.get_svec())
 print("CREGISTER READ OUT")
-print(job.get_creg()[0])
+print(job.get_creg())
 
