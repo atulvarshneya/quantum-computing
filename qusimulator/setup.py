@@ -5,7 +5,7 @@ with open('RELEASE-splash.md', 'r') as file:
 
 setup(
     name='qusimulator',
-    version='2.2',
+    version='2.3',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',
@@ -16,7 +16,7 @@ setup(
     # package_dir={'': '.'},
     keywords='qsystems quantum computing',
 	url='https://github.com/atulvarshneya/quantum-computing',
-	python_requires='>3.9',
+	python_requires='>=3.11',
     install_requires=[
         'numpy'
         ],

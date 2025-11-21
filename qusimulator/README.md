@@ -115,12 +115,7 @@ If visualize=True, the qreport() displays an additional bar graph showing the ma
 
 If not `None` its value should be a dictionary object with keys `noise_opseq_init`, `noise_opseq_allgates` and `noise_opseq_qubits`. The values for keys `noise_opseq_init` and `noise_opseq_allgates` are objects either of classes `qsim.noisemodel.NoiseOperator` or `qsim.noisemodel.NoiseOperatorSequence`, or `None`, and value for key `noise_opseq_qubits` is object of class `qsim.noisemodel.NoiseOperatorApplierSequence`, or `None`. More details on `noise_profile` in the section on **Noise Simulation**.
 
-2.2	**qc.qreset()**
-
-qreset() has been removed in release 2.2. Just re-instantiate the simulator object instead.
-
-
-2.3	**qc.qgate(quantum_gate, list_of_qubits, noise_chan=None, ifcbit=None, qtrace=False)**
+2.2	**qc.qgate(quantum_gate, list_of_qubits, noise_chan=None, ifcbit=None, qtrace=False)**
 
 qgate() is used to perform quantum gate operations, quantum_gate, on a set of qubits, list_of_qubits.
 
@@ -136,11 +131,11 @@ In `QSimulator` version of the simulator qgate() ignores the argument, `noise_ch
 
 `DMQSimulator` version of the simulator's `qgate()` method takes an additional argument, `noise_chan`. If not `None` its value should be an object either of classes `qsim.noisemodel.qNoiseChannel` or `qsim.noisemodel.qNoiseChannelSequence`. More details on `noise_chan` in the section on **Noise Simulation**.
 
-2.4 **qc.qnoise(noise_chan, qubits_list, qtrace=False)**
+2.3 **qc.qnoise(noise_chan, qubits_list, qtrace=False)**
 
 `DMQSimulator` version of the simulator supports `qnoise()` method. This method applies noise as specified by `noise_chan` to `qubits_list` qunits. `noise_chan` is of type `qNoiseChannel` or `qNoiseChannelSequence`.
 
-2.5	**qc.qmeasure(qbit_list, cbit_list=None, qtrace=False)**
+2.4	**qc.qmeasure(qbit_list, cbit_list=None, qtrace=False)**
 
 Returns the measured values of the qubits in the qubit_list, each 0 or 1, as a list, in the same order as the qubits in the qubit_list. The measured qubits are also read into the corresponding classical bits in the cbit_list. if cbit_list is not specified it defaults to the same list as the qbit_list.
 
@@ -151,6 +146,18 @@ To measure in some basis, you can apply corresponding operation (gate) to the qb
 Cleary, the computations can continue after the measurement operations. Just that the overall state will have the appropriately collapsed state of the measured qubits.
 
 If qtrace is True, the resulting state is printed out.
+
+2.5 **qc.qreadout(nshots=1, qtrace=False)**
+
+If you want to make multiple measurements from the same quantum computations, one way to do that is to run multiple times the sequence of gates and perform measurement every time. This way you can collect the frequency of various measurements outputs. However, instead of that you can run through the sequence of gates once, and then from that prepared state readout the frequency of the the results, including the measurement counts  -- the number of times each possible classical outcome would be measured across many repetitions, or "shots". This is an efficient way to get multi-shot readout without having to run the simulator multiple times.
+
+The simulator implementation leverages the fact that the state at the end of each computation will be identical, and the measurement will be based on the amplitudes. Thus, since the simulator directly has access to the computed state, it can use it to sample as many ("shots") measurement outcomes as required.
+
+Note that if a measurement is performed before readout operation, the state would have collapsed. Hence the readout for those qubits that have been measured will be identical for all the shots. Thus for most cases it is better to NOT perform the measurement and perform readout instead at the end of the computations.
+
+This oeration does not modify the state of the quantum computer.
+
+If qtrace is True, the current state is printed out.
 
 2.6	**qc.qreport(state=None, header="State", probestates=False)**
 
@@ -353,7 +360,7 @@ Following is the list of error messages with the name of the function, thrown in
 
 # 7. COMMAND LINE TOOL qsimcli
 
-Release 1.5.1 adds a simple commandline tool, qsimcli, which provides an interactive way to execute quantum operations. It is more a learning tool than for any serious use. Below is a sample session -
+Release 1.5.1 added a simple commandline tool, qsimcli, which provides an interactive way to execute quantum operations. It is more a learning tool than for any serious use. Below is a sample session -
 
 	$ qsimcli
 	Type '?' for help.
