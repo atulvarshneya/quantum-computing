@@ -525,34 +525,42 @@ The constructor takes the following arguments -
 * initstate - default value `None`. The initial state the quantum computer to be initialized with
 * prepqubits - default value `None`. Another way to specify the initial state, by providing the state vector
 * qtrace - default value `False`. If using a debugging version of the backend engine, specifies if at each step the state of the computation be printed out.
-* shots - default value 1. The number of times the circuit should be run. The measured values are stored for each run. For debugging version backend engine the number of shots is set to 1.
+* shots - default value 1. The number of times the circuit should be run. The measured values are stored for each run.
 
 #### Methods
 
 #### `job.get_creg()`
-returns an array of `Cregister` objects from all runs/shots.
+returns a `Cregister` objects which holds the classical register values based on the measurement operation's outcome.
 
-#### `job.get_counts()`
-returns the frequencies of different `Cregister` values in the results.
+#### `job.get_counts(register=None)`
+returns the frequencies of different `Cregister` values per the number of shots the circuit is run at the backend. Note that if any explicit measurement is performed in the circuit, the result will depend on the backend's functionality -- most simulators run the circuit *only once* and then sample the resulting state "shots" number of times, hence in case of explicit measurement will end-up reading out identical values "shots" number of times. Therefore, if relying on readout, it is recommended to not include measurement in the circuit. Most backends support this style of readout of results.
 
-#### `job.plot_counts()`
+`register` argument is a list of qubits. If provided, the counts are collapsed for measurements of those qubits only, and other qubit are read as 0.
+
+If the backend is a simulator (which runs the circuit only once, and then samples it shots number of times), this capability makes the running of algorithms extremely fast -- e.g., for shots = 2000, a fairly common case, consider the time for running the circuit 2000 times vs running it just once.
+
+#### `job.plot_counts(register=None, verbose=False)`
 plots the counts in a visual form using text characters.
+
+It uses `job.get_counts(register)` to get the counts, and then plots them. Note the `register` argument is used by `job.get_counts(register)` to generate the appropriate counts, which are then plotted.
+
+`verbose` if set to `True`, shows all state values, even when the counts for them are 0, else only those states with non-zero values are shown.
 
 If running in Jupyter notebook, plots using `matplotlib`.
 
 #### `job.get_svec()`
-only useful for state-vector based simulator backends, returns the state-vector at the end of the execution. `shots` must be only 1. In density matrix based simulator backends, the trace of the density matrix is returned (effectively square of the amplitudes of the state vector).
+only useful for state-vector based simulator backends, returns the state-vector at the end of the execution. In density matrix based simulator backends, the trace of the density matrix is returned (effectively square of the amplitudes of the state vector).
 
 
 Example Usage:
 
 	import qckt
 	import qckt.backend as bknd
-	job = qckt.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=100)
+	job = qckt.Job(somecircuit, initstate=somestate, prepqubits= None, qtrace=True, shots=1000)
 	bk_engine = bknd.Qeng() # same as svc.getInstance("qsim") where svc = bknd.Registry().getSvc("QSystems")
 	bk_engine.runjob(job)
-	print(job.get_creg()[0]) # print the cregister value from the first execution of the circuit
-	counts = job.get_counts()
+	print(job.get_creg()) # print the cregister value from the execution of the circuit, useful if measurement was performed in the circuit
+	counts = job.get_counts() # since using Qeng backend, get_counts() is useful if measurement was NOT performed in the circuit
 	for i,c in enumerate(counts):
 		if c > 0: # lets print only the important ones
 			print("{0:04b} ({0:2d})    {1:d}".format(i,c))
@@ -595,6 +603,7 @@ which gives output as
 	Per Operation:
 		H           0.0030 sec     1 times 0.0030 avg
 		CX          0.0006 sec     1 times 0.0006 avg
+		READOUT		0.0001 sec     1 times 0.0001 avg
 
 
 # Package `qckt.noisemodel`
