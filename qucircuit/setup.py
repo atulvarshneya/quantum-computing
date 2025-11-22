@@ -5,7 +5,7 @@ with open('RELEASE-splash.md', 'r') as file:
 
 setup(
     name='qucircuit',
-    version='2.3',
+    version='2.5',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',
@@ -20,6 +20,6 @@ setup(
     install_requires=[
         'numpy',
         'matplotlib',
-        'qusimulator>=2.3'
+        'qusimulator>=2.5'
         ]
     )

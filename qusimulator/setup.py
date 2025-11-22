@@ -5,7 +5,7 @@ with open('RELEASE-splash.md', 'r') as file:
 
 setup(
     name='qusimulator',
-    version='2.3',
+    version='2.5',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',
