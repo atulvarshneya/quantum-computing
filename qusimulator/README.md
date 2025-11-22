@@ -155,7 +155,7 @@ The simulator implementation leverages the fact that the state at the end of eac
 
 Note that if a measurement is performed before readout operation, the state would have collapsed. Hence the readout for those qubits that have been measured will be identical for all the shots. Thus for most cases it is better to NOT perform the measurement and perform readout instead at the end of the computations.
 
-This oeration does not modify the state of the quantum computer.
+This operation does not modify the state of the quantum computer.
 
 If qtrace is True, the current state is printed out.
 
