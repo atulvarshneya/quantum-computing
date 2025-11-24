@@ -11,8 +11,8 @@ qc.qgate(qsim.C(),[0,3])
 qc.qreadout(nshots=1000)
 
 _,_,cregcounts,_ = qc.qsnapshot()
-c0 = cregcounts[0]
-c9 = cregcounts[9]
+c0 = cregcounts.get(0,0)
+c9 = cregcounts.get(9,0)
 print("creg_counts[0] + creg_counts[9] =",c0 + c9)  # Must add to nshots = 1000
 # check creg_counts[0] is 500 +/- 50
 if c0 > (500 - 50) and c0 < (500+50):
@@ -37,8 +37,8 @@ qc.qmeasure([0])
 qc.qreadout(nshots=1000)
 
 _,_,cregcounts,_ = qc.qsnapshot()
-c0 = cregcounts[0]
-c9 = cregcounts[9]
+c0 = cregcounts.get(0,0)
+c9 = cregcounts.get(9,0)
 print("creg_counts[0] + creg_counts[9] =",c0 + c9)  # Must add to nshots = 1000
 # check creg_counts[0] or creg_counts[9] is 1000
 if (c0 == 1000 and c9 == 0) or (c0 == 0 and c9 == 1000):
@@ -59,8 +59,8 @@ qc.qmeasure([0])
 qc.qreadout()
 
 _,_,cregcounts,_ = qc.qsnapshot()
-c0 = cregcounts[0]
-c9 = cregcounts[9]
+c0 = cregcounts.get(0,0)
+c9 = cregcounts.get(9,0)
 print("creg_counts[0] + creg_counts[9] =",c0 + c9)  # Must add to nshots = 1
 # check creg_counts[0] or creg_counts[9] is 1
 if (c0 == 1 and c9 == 0) or (c0 == 0 and c9 == 1):
@@ -89,10 +89,10 @@ qc.qgate(qsim.C(),[0,1])
 qc.qreadout(nshots=1000)
 
 _,_,cregcounts,_ = qc.qsnapshot()
-c0 = cregcounts[0]
-c1 = cregcounts[1]
-c2 = cregcounts[2]
-c3 = cregcounts[3]
+c0 = cregcounts.get(0,0)
+c1 = cregcounts.get(1,0)
+c2 = cregcounts.get(2,0)
+c3 = cregcounts.get(3,0)
 # print("creg_counts:",cregcounts)
 print("creg_counts[0] + creg_counts[1] + creg_counts[2] + creg_counts[3] =",c0 + c1 + c2 + c3)  # Must add to nshots = 1000
 
@@ -137,10 +137,10 @@ qc.qgate(qsim.C(),[0,1])
 qc.qreadout(nshots=1000)
 
 _,_,cregcounts,_ = qc.qsnapshot()
-c0 = cregcounts[0]
-c1 = cregcounts[1]
-c2 = cregcounts[2]
-c3 = cregcounts[3]
+c0 = cregcounts.get(0,0)
+c1 = cregcounts.get(1,0)
+c2 = cregcounts.get(2,0)
+c3 = cregcounts.get(3,0)
 # print("creg_counts:",cregcounts)
 print("creg_counts[0] + creg_counts[1] + creg_counts[2] + creg_counts[3] =",c0 + c1 + c2 + c3)  # Must add to nshots = 1000
 

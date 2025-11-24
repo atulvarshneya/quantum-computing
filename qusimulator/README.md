@@ -149,7 +149,9 @@ If qtrace is True, the resulting state is printed out.
 
 2.5 **qc.qreadout(nshots=1, qtrace=False)**
 
-If you want to make multiple measurements from the same quantum computations, one way to do that is to run multiple times the sequence of gates and perform measurement every time. This way you can collect the frequency of various measurements outputs. However, instead of that you can run through the sequence of gates once, and then from that prepared state readout the frequency of the the results, including the measurement counts  -- the number of times each possible classical outcome would be measured across many repetitions, or "shots". This is an efficient way to get multi-shot readout without having to run the simulator multiple times.
+If you want to make multiple measurements from the same quantum computations, one way to do that is to run multiple times the sequence of gates and perform measurement every time. This way you can collect the frequency of various measurements outputs. However, instead of that you can run through the sequence of gates once, and then from that prepared state readout the frequency of the results, including the measurement counts  -- the number of times each possible classical outcome would be measured across many repetitions, or "shots". This is an efficient way to get multi-shot readout without having to run the simulator multiple times.
+
+The result generated is a python dictionary object with measerured values as keys and counts as the values. E.g., a bell-circuit run with shots=100 could potentially result in {0: 54, 3: 46}. Note, only the values which are actually measured, i.e., have count > 0, are present in this dictionary object.
 
 The simulator implementation leverages the fact that the state at the end of each computation will be identical, and the measurement will be based on the amplitudes. Thus, since the simulator directly has access to the computed state, it can use it to sample as many ("shots") measurement outcomes as required.
 

@@ -73,7 +73,7 @@ class QSimulator:
 
 		# Clear the classical bits register
 		self.cregister = [0]*self.ncbits
-		self.creg_counts = [0]*(2**self.ncbits)
+		self.creg_counts = {}
 
 		# Initial State
 		if not self.initstate is None:
@@ -278,7 +278,7 @@ class QSimulator:
 			# prob[i] = float(statevec[i])   # in DM simulator
 
 		## Now do measurements based on the probabilities
-		self.creg_counts = [0]*len(statevec)
+		self.creg_counts = {}
 		for i in range(nshots):
 			# OK, now see which one should be selected
 			toss = rnd.random()
@@ -289,7 +289,7 @@ class QSimulator:
 					sel = i
 				cumprob += prob[i]
 			# increment the count for the selected state
-			self.creg_counts[sel] += 1
+			self.creg_counts[sel] = self.creg_counts.get(sel,0) + 1
 
 		if qtrace or self.trace:
 			hdr = "READOUT"
