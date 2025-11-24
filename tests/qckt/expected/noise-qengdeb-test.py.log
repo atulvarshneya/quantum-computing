@@ -36,7 +36,7 @@ READ OUT STATE VECTOR:
 
 READ OUT CREG: 
 111
-[0, 0, 0, 0, 0, 0, 0, 1]
+{7: 1}
 
 added noise profile, but using Qeng
 q000 -[INIT:PF(0.20)]-[X]-[X:Dep(0.10)]-[NS:BF(0.10)]-[.]---------------[CX:Dep(0.10)]--------------------------------[M]-
@@ -51,4 +51,4 @@ READ OUT STATE VECTOR:
 None
 READ OUT CREG: 
 111
-[0, 0, 0, 0, 0, 0, 0, 100]
+{7: 100}

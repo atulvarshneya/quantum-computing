@@ -29,27 +29,31 @@ class Job:
 					raise ValueError("Invalid classical register specified")
 				if sum([1 if bit == b else 0 for b in register]) > 1:
 					raise ValueError("Duplicate bits in classical register specified")
-			counts = [0]*(2**self.nclbits)
 			mask = 0
 			for bit in register:
 				mask |= (1 << bit)
-			for i,c in enumerate(self.result.creg_counts):
-				counts[i & mask] += c
+			counts = {}
+			for i in sorted(self.result.creg_counts.keys()):
+				c = self.result.creg_counts[i]
+				state = i & mask
+				counts[state] = counts.get(state,0) + c
 			return counts
 		else:
-			return self.result.creg_counts
+			# just to have the keys in a sorted order
+			counts = {}
+			for i in sorted(self.result.creg_counts.keys()):
+				counts[i] = self.result.creg_counts[i]
+			return counts
 
 	def plot_counts(self,register=None, verbose=False):
 		counts = self.get_counts(register=register)
-		lc = len(counts)
-		nbits = 0
-		while 2**nbits < lc: nbits += 1
 		if 'ipykernel' in sys.modules:
 			lbl = []
 			vals = []
-			for i,c in enumerate(counts):
+			for i in range(2**self.nqubits):
+				c = counts.get(i,0)
 				if verbose or c > 0:
-					binlbl = ('[{0:0'+str(nbits)+'b}]').format(i)
+					binlbl = ('[{0:0'+str(self.nqubits)+'b}]').format(i)
 					lbl.append(str(i)+" "+binlbl)
 					vals.append(c)
 			import matplotlib.pyplot as plt
@@ -59,12 +63,13 @@ class Job:
 				plt.annotate(str(vals[i]), xy=(lbl[i],vals[i]), ha='center', va='bottom')
 			plt.show()
 		else:
-			maxc = max(counts)
+			maxc = max([val for k,val in counts.items()])
 			cwid = len(str(maxc))
 			scale = 1 if maxc < 50 else 50.0/maxc
-			for i,c in enumerate(counts):
+			for i in range(2**self.nqubits):
+				c = counts.get(i,0)
 				if verbose or c > 0:
-					print(('{0:4d} [{0:0'+str(nbits)+'b}]  {1:'+str(cwid)+'d} |').format(i,c),end="")
+					print(('{0:4d} [{0:0'+str(self.nqubits)+'b}]  {1:>'+str(cwid)+'d} |').format(i,c),end="")
 					for j in range(int(c * scale)):
 						print("*",end="")
 					print()

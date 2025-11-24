@@ -1,0 +1,15 @@
+q000 -[X]---------
+                  
+q001 -----[H]-[.]-
+               |  
+q002 ---------[X]-
+                  
+creg =============
+                  
+The only states produced are 001 (1) and 111 (7)
+1
+7
+So, counts for state 011 (counts.get(3,0)) - expected as 0
+0
+and, counts for get_count(register=[0]) - expected {1: 100} because shots=100
+{1: 100}

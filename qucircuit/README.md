@@ -533,9 +533,11 @@ The constructor takes the following arguments -
 returns a `Cregister` objects which holds the classical register values based on the measurement operation's outcome.
 
 #### `job.get_counts(register=None)`
-returns the frequencies of different `Cregister` values per the number of shots the circuit is run at the backend. Note that if any explicit measurement is performed in the circuit, the result will depend on the backend's functionality -- most simulators run the circuit *only once* and then sample the resulting state "shots" number of times, hence in case of explicit measurement will end-up reading out identical values "shots" number of times. Therefore, if relying on readout, it is recommended to not include measurement in the circuit. Most backends support this style of readout of results.
+returns the frequencies of different measured values per the number of shots the circuit is run at the backend. Note that if any explicit measurement is performed in the circuit, the result will depend on the backend's functionality -- most simulators run the circuit *only once* and then sample the resulting state "shots" number of times, hence in case of explicit measurement they will end-up reading out identical values of those qubits "shots" number of times. Therefore, if relying on readout, it is recommended to not include measurement in the circuit. Most backends support this style of readout of results.
 
-`register` argument is a list of qubits. If provided, the counts are collapsed for measurements of those qubits only, and other qubit are read as 0.
+`register` argument is a list of qubits. If provided, the counts are collapsed for measurements of those qubits only, and other qubits are read as 0.
+
+The result returned is a python dictionary object with measerured values as keys and counts as the values. E.g., a bell-circuit run with shots=100 could potentially result in {0: 54, 3: 46}. Note, only the values which are actually measured, i.e., have count > 0, are present in this dictionary object.
 
 If the backend is a simulator (which runs the circuit only once, and then samples it shots number of times), this capability makes the running of algorithms extremely fast -- e.g., for shots = 2000, a fairly common case, consider the time for running the circuit 2000 times vs running it just once.
 

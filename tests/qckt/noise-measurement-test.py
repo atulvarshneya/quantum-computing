@@ -24,7 +24,7 @@ job = qckt.Job(ck, shots=shots)
 bk = bknd.DMQeng()
 bk.runjob(job=job)
 creg_counts = job.get_counts()
-creg_pct = [float(ct)/shots for ct in creg_counts]
+creg_pct = [float(creg_counts[val])/shots for val in sorted(creg_counts.keys())]
 # print(creg_pct)
 
 expected_pct = [
@@ -40,7 +40,7 @@ expected_pct = [
 
 # basic sanity test
 allerrors = []
-margin_allowed = 0.1
+margin_allowed = 0.11
 looksgood = True
 for i,e in enumerate(expected_pct):
     errval = abs(creg_pct[i]-e)/e

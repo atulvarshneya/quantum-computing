@@ -4,7 +4,7 @@ from qckt.Gates import define_gate, get_gates_list
 from qckt.Job import Job
 from qckt.qException import QCktException
 
-__version__ = '2.5'
+__version__ = '3.0'
 __author__ = 'Atul Varshneya'
 __author_email__ = 'atul.varshneya@gmail.com'
 __email__ = __author_email__
