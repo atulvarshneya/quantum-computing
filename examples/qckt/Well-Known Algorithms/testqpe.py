@@ -61,6 +61,6 @@ counts = job.get_counts(register=measurement_qubits)
 _ = job.plot_counts(register=measurement_qubits)
 
 # use the measured values to compute estimated phase
-resvalue = max(range(len(counts)), key=lambda x : counts[x])
+resvalue = max(counts, key=counts.get)
 print(f"Most frequent readout = {resvalue},  frequency = {counts[resvalue]}/{nshots}")
 print(str(resvalue)+"/2**"+str(n_counting_qubits)," = ",float(resvalue)/(2**n_counting_qubits))
