@@ -1,1 +1,0 @@
-# QAOA Step-by-Step:
