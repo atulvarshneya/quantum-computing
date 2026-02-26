@@ -1,5 +1,8 @@
-Variational Quantum Algorithms
-==============================
+<h1 style="text-align: center;">
+QAOA Step by Step: Concepts, Circuits, and Code for Quantum Enthusiasts
+</h1>
+
+## Variational Quantum Algorithms
 
 Quantum computers promise extraordinary capabilities, from simulating
 complex molecules to solving optimization problems that overwhelm
@@ -18,8 +21,7 @@ computer evaluates how good those states are and adjusts the quantum
 circuit accordingly. This synergy makes VQAs robust against noise and
 ideal for hardware available today.
 
-Why Variational Quantum Algorithms?
------------------------------------
+### Why Variational Quantum Algorithms?
 
 As mentioned earlier, current quantum hardware are intermediate-scale in
 number of qubits, and are noisy, thus they are unable to run long
@@ -41,8 +43,7 @@ This interaction between quantum exploration and classical optimization
 allows VQAs to deliver useful, approximate results even with noisy
 intermediate-scale hardware.
 
-How a Variational Quantum Algorithm Works
------------------------------------------
+### How a Variational Quantum Algorithm Works
 
 At a high level, the flow of a VQA looks very much like training a small
 neural network, except that the model is a quantum circuit.
@@ -80,8 +81,7 @@ quantum evaluations with classical optimizers that steer the search;
 hence they represent one of the most practical families of quantum
 algorithms today.
 
-Where VQAs Are Useful
----------------------
+### Where VQAs Are Useful
 
 Variational quantum algorithms are already being applied to several
 important domains. In quantum chemistry, they can estimate ground-state
@@ -96,12 +96,11 @@ Because QAOA is conceptually simple, mathematically elegant, and
 practical to implement, it has become a favorite example for learning
 quantum optimization. That is why this blog series focuses on it.
 
-QAOA for MAXCUT Problem
-=======================
+## QAOA for MAXCUT Problem
 
-Let $G = \left( V,E \right)$ be an undirected graph, where $V$ is the
+Let $G = (V,E)$ be an undirected graph, where $V$ is the
 set of vertices in the graph, and $E$ is the set of edges
-therein, $E \subseteq \left\{ \left( i,j \right)|i,j \in V,\ i \neq j \right\}$.
+therein, $E \subseteq \{ ( i,j)|i,j \in V,\ i \neq j \}$.
 
 A cut is a partition of the vertex set into two disjoint
 subsets $S$ and $S^{'}$, such
@@ -133,8 +132,7 @@ There are good classical approximation algorithms, and in practice many
 heuristics work well. But MAXCUT remains an excellent model problem for
 exploring new optimization techniques, especially quantum ones.
 
-Representing Cuts as Bitstrings
--------------------------------
+### Representing Cuts as Bitstrings
 
 Cuts of graphs naturally map onto *bitstrings*. Each vertex can belong
 to one of two subsets, so we assign 0 for one subset, and 1 for the
@@ -150,8 +148,7 @@ Since quantum computers natively work with superpositions of bitstrings,
 hence by representing each vertex as a qubit, $N$-qubits can represent
 *all* $2^{N}$ possible cuts at the same time.
 
-The Concept of Cost Hamiltonian
--------------------------------
+### The Concept of Cost Hamiltonian
 
 In this sub-section we just briefly introduce the concept of cost
 Hamiltonian as applicable to QAOA for MAXCUT problem, we will cover this
@@ -216,8 +213,7 @@ implements the required $2^{N} \times 2^{N}$ unitary operator[^1].
 In a later post we will get into mathematical details of deriving the
 cost Hamiltonian for MAXCUT and its corresponding unitary operator.
 
-The Core Structure of QAOA
-==========================
+## The Core Structure of QAOA
 
 A QAOA circuit has a very elegant structure:
 
@@ -229,8 +225,7 @@ A QAOA circuit has a very elegant structure:
 
 Let's unpack each of these steps.
 
-Step 1: Preparing the Initial Superposition
--------------------------------------------
+### Step 1: Preparing the Initial Superposition
 
 Note that with $N$ qubits, a quantum system can represent all $2^{N}$
 possible cuts simultaneously in superposition. This is the starting
@@ -248,7 +243,7 @@ toward any particular solution at the start. Instead, the algorithm
 *learns* which cuts are better through quantum interference and
 classical optimization.
 
-### Quantum Circuit for Preparing Initial Superposition
+#### Quantum Circuit for Preparing Initial Superposition
 
 This step is realized as the following quantum circuit:
 
@@ -260,8 +255,7 @@ q2  --[H]--
 qN  --[H]--
 ```
 
-Step 2: Alternating Cost and Mixer Operators
---------------------------------------------
+### Step 2: Alternating Cost and Mixer Operators
 
 Once the superposition is created, QAOA applies a repeating sequence of
 two alternating quantum operators:
@@ -274,7 +268,7 @@ two alternating quantum operators:
 Each pair of cost and mixer operations is called a QAOA layer. If the
 algorithm uses $p$ such layers, we say the circuit has *depth* $p$.
 
-### The Cost Operator: Imprinting the Problem onto the Quantum State
+#### The Cost Operator: Imprinting the Problem onto the Quantum State
 
 Since the quantum circuits use unitary operators, so we define a unitary
 operator, as was discussed in an earlier section (*The Concept of Cost
@@ -301,7 +295,7 @@ directly change probabilities *yet*, but it sets the stage for quantum
 interference to amplify good solutions and suppress bad ones in later
 steps.
 
-### The Mixer Operator: Exploring the Search Space
+#### The Mixer Operator: Exploring the Search Space
 
 If we applied only the cost operator repeatedly, the quantum state would
 only accumulate phases, and the probability of measuring any state would
@@ -338,7 +332,7 @@ does not get "stuck", the probability mass moves through the space of
 all cuts, and useful interference patterns can form between good and bad
 solutions.
 
-### What Does a Full QAOA Layer Do?
+#### What Does a Full QAOA Layer Do?
 
 Each QAOA layer first applies the cost operator (problem-specific), then
 the mixer operator (problem-independent). One layer nudges the quantum
@@ -381,7 +375,7 @@ surprisingly good results.
 > through the solution space, potentially reducing the required depth of
 > the circuit.
 
-### Quantum Circuit for Cost and Mixer Unitaries
+#### Quantum Circuit for Cost and Mixer Unitaries
 
 The cost Hamiltonian turns out to be as following. For now you can check
 it to be correct by constructing it by hand for a small number of
@@ -407,7 +401,8 @@ of quantum gates are added to the quantum circuit -
 
 ```
 qi  ---*------------------*---
-       |                  |
+.      |                  |
+.      |                  |
 qj  --[X]--[Rz(-gamma)]--[X]--
 ```
 
@@ -439,8 +434,7 @@ q2  --[Rx(2*beta)]--
 qN  --[Rx(2*beta)]--
 ```
 
-Step 3: Classical Optimizer
----------------------------
+### Step 3: Classical Optimizer
 
 All of QAOA's intelligence resides not in the circuit itself, but in how
 the parameters $\gamma_{k}$ and $\beta_{k}$ are chosen.
@@ -454,8 +448,7 @@ This is where QAOA truly becomes a hybrid algorithm: quantum mechanics
 shapes the probability distribution, and classical optimization steers
 it.
 
-Getting Hands-on with QAOA Implementation in Python
-===================================================
+## Getting Hands-on with QAOA Implementation in Python
 
 It's a good time now to see the code in action, you can explore a
 complete Python implementation of QAOA for MAXCUT
@@ -477,8 +470,7 @@ pip install qucircuit
 Once installed, you can run the entire QAOA implementation locally on
 your own computer and experiment with it at your own pace.
 
-What Comes Next
-===============
+## What Comes Next
 
 This post presented the key ideas behind QAOA at the architectural
 level: superposition, alternating operators, layers, and parameter
