@@ -242,7 +242,7 @@ classical optimization.
 
 This step is realized as the following quantum circuit:
 
-```
+```text
 q1  --[H]--
 q2  --[H]--
 .
@@ -271,10 +271,10 @@ Hamiltonian*)
 
 $$U_{C}\left( \gamma \right) = e^{- i\gamma H_{C}}$$
 
-*where* $H_{C}$ *is the* cost Hamiltonian*, and* $\gamma$ *is a
-real-valued parameter. The parameter* $\gamma$ *is tuned as part of the
+where $H_{C}$ is the cost Hamiltonian, and $\gamma$ is a
+real-valued parameter. The parameter $\gamma$ is tuned as part of the
 QAOA algorithm such that the circuit outputs as close to optimal
-solution as possible.*
+solution as possible.
 
 So, what does the cost unitary do? Recall from earlier that each
 computational basis vector $|x\rangle$ is an eigenvector of $H_{C}$ with
@@ -394,7 +394,7 @@ $$e^{i\frac{\gamma}{2}\ Z_{i}\ Z_{j}} = CNOT_{i \rightarrow j}\text{\ \ }R_{Z}\l
 In quantum circuit form, for each edge $(i,j)$, the following sequence
 of quantum gates are added to the quantum circuit -
 
-```
+```text
 qi  ---*------------------*---
 .      |                  |
 .      |                  |
@@ -421,7 +421,7 @@ applied to every qubit.
 
 In quantum circuit form
 
-```
+```text
 q1  --[Rx(2*beta)]--
 q2  --[Rx(2*beta)]--
 .
