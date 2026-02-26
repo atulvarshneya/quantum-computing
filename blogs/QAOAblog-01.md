@@ -203,7 +203,7 @@ Note that we do not build $U_{c}(\gamma)$ by explicitly calculating the
 entries of the Hamiltonian $H_{c}$, that would be infeasible as it would
 require us to calculate $2^{N} \times 2^{N}$ entries of that matrix. We
 instead build a quantum circuit of $N$ qubits, which implicitly
-implements the required $2^{N} \times 2^{N}$ unitary operator[^1].
+implements the required $2^{N} \times 2^{N}$ unitary operator. Note that every $N$-qubit unitary operator if written-out explicitly is a $2^N \times 2^N$ matrix.
 
 In a later post we will get into mathematical details of deriving the
 cost Hamiltonian for MAXCUT and its corresponding unitary operator.
@@ -472,6 +472,3 @@ level: superposition, alternating operators, layers, and parameter
 tuning. In the next post, we'll go deeper into the cost and Mixer
 Hamiltonians, $H_{C}$ and $H_{B}$, and corresponding unitaries, $U_{C}$
 and $U_{B}$, for MAXCUT and develop better understanding about them.
-
-[^1]: Every N-qubit unitary operator if written-out explicitly is a
-    $`2^{N} \times 2^{N}`$ matrix.
