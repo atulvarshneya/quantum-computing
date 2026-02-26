@@ -431,7 +431,7 @@ qN  --[Rx(2*beta)]--
 
 ### Step 3: Classical Optimizer
 
-All of QAOA's intelligence resides not in the circuit itself, but in how
+All of QAOA's intelligence resides not only in the circuit itself, but in how
 the parameters $\gamma_{k}$ and $\beta_{k}$ are chosen.
 
 After the quantum circuit is executed and measured many times, the
