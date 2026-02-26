@@ -100,8 +100,8 @@ set of vertices in the graph, and $`E`$ is the set of edges
 therein, $`E \subseteq \{ ( i,j)|i,j \in V,\ i \neq j \}`$.
 
 A cut is a partition of the vertex set into two disjoint
-subsets $S$ and $S^{'}$, such
-that $S \cup S^{'} = V$ and $S \cap S^{'} = \varnothing$. The cost of a
+subsets $`S`$ and $`S^{'}`$, such
+that $`S \cup S^{'} = V`$ and $`S \cap S^{'} = \varnothing`$. The cost of a
 cut is the number of edges that span this partition - or are cut by this
 partition. The MAXCUT problem is to find a partition that maximizes the
 cost of the cut. 
