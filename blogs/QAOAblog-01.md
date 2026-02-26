@@ -56,12 +56,9 @@ returns a set of measurement outcomes, usually bitstrings like 0101 or
 1110. These bitstrings represent candidate solutions to the problem at
 hand.
 
-<div style="text-align: center;">
-<figure>
 <img src="./images/media/QAOAblog-01-image1.png" width="600">
-<figcaption>Figure : Variational Quantum Algorithms</figcaption>
-</figure>
-</div>
+
+*Figure : Variational Quantum Algorithms*
 
 Next, these solutions are evaluated by a classical computer using a
 *cost function*. This cost function depends on the problem; in an
@@ -98,9 +95,9 @@ quantum optimization. That is why this blog series focuses on it.
 
 ## QAOA for MAXCUT Problem
 
-Let $G = (V,E)$ be an undirected graph, where $V$ is the
-set of vertices in the graph, and $E$ is the set of edges
-therein, $E \subseteq \{ ( i,j)|i,j \in V,\ i \neq j \}$.
+Let $`G = (V,E)`$ be an undirected graph, where $`V`$ is the
+set of vertices in the graph, and $`E`$ is the set of edges
+therein, $`E \subseteq \{ ( i,j)|i,j \in V,\ i \neq j \}`$.
 
 A cut is a partition of the vertex set into two disjoint
 subsets $S$ and $S^{'}$, such
@@ -111,12 +108,10 @@ cost of the cut. 
 
 Figure below shows an example MAXCUT for a graph drawn in two different
 ways.
-<div style="text-align: center;">
-<figure>
+
 <img src="./images/media/QAOAblog-01-image2.png" width="500">
-<figcaption>Figure : Cut in a graph: group A orange, group B blue</figcaption>
-</figure>
-</div>
+
+*Figure : Cut in a graph: group A orange, group B blue*
 
 
 MAXCUT is an *NP-hard* problem and serves as a canonical benchmark for
