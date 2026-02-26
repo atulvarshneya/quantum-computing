@@ -474,4 +474,4 @@ Hamiltonians, $H_{C}$ and $H_{B}$, and corresponding unitaries, $U_{C}$
 and $U_{B}$, for MAXCUT and develop better understanding about them.
 
 [^1]: Every N-qubit unitary operator if written-out explicitly is a
-    $2^{N} \times 2^{N}$ matrix.
+    $`2^{N} \times 2^{N}`$ matrix.
