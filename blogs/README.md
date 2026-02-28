@@ -1,12 +1,12 @@
 <h1 style="text-align: center;">
-Quantum Computing Blogs
+Quantum Computing Blog
 </h1>
 
 Welcome to a practitioner’s guide to quantum computing.
 
 This blog is designed for curious computer scientists, software engineers, and technology enthusiasts who want to understand quantum computing from the inside out — not as abstract physics, but as something you can actually build, simulate, and experiment with. The focus here is hands-on and algorithm-centric: we will explore the most important quantum computing algorithms, unpack how and why they work, and implement them step by step using Qucircuit, a full-featured quantum computing simulator that runs locally on your own machine. Along the way, a dedicated series of “Short Notes” will distill key concepts from quantum mechanics and quantum information into clear, practical explanations that strengthen your intuition without requiring a deep background in physics. If you enjoy learning by building, reasoning from first principles, and understanding systems at a conceptual level, this site is for you.
 
-## Blogs
+## Blog Posts
 
 * [QAOA Step by Step: Concepts, Circuits, and Code for Quantum Enthusiasts](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/QAOAblog-01.md), February 27, 2026<br>
 
