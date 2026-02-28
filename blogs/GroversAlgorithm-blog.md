@@ -1,4 +1,6 @@
-# Unstructured Search - Grover's Algorithm
+<h1 style="text-align: center;">
+Grover's Algorithm: Quantum Speedup of Unstructured Search
+</h1>
 
 In this post, we take an educational approach for a well-known quantum
 algorithm, *Grover's algorithm*. We'll first explain how Grover's
