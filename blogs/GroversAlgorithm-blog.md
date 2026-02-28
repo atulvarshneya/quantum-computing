@@ -43,7 +43,7 @@ complexity of $O(\sqrt{N})$ using Grover's algorithm.
 An 'oracle' is a function that entirely contains the validation logic
 that defines the search problem. An example is the function we just
 mentioned in the previous paragraph. Such operations can be defined as a
-classical Boolean function $f:\left\{ 0,1 \right\}^{n} \rightarrow \left\{ 0,1 \right\}$, which takes an n-bit binary input and -- for this discussion -- produces a 1-bit binary output.
+classical Boolean function $f:\left\\{ 0,1 \right\\}^{n} \rightarrow \{ 0,1 \}$, which takes an n-bit binary input and -- for this discussion -- produces a 1-bit binary output.
 
 So, considering our example problem again, we want a function, $f$, that
 takes an index between 0-9, and returns $\text{True}$ if the item at the
