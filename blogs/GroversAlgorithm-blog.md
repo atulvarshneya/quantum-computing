@@ -43,7 +43,7 @@ complexity of $O(\sqrt{N})$ using Grover's algorithm.
 An 'oracle' is a function that entirely contains the validation logic
 that defines the search problem. An example is the function we just
 mentioned in the previous paragraph. Such operations can be defined as a
-classical Boolean function $f:\left\{ 0,1 \right\}^{n} \rightarrow \left\{ 0,1 \right\}$, which takes an n-bit binary input and -- for this discussion -- produces a 1-bit binary output.
+classical Boolean function $f:\left\\{ 0,1 \right\\}^{n} \rightarrow \{ 0,1 \}$, which takes an n-bit binary input and -- for this discussion -- produces a 1-bit binary output.
 
 So, considering our example problem again, we want a function, $f$, that
 takes an index between 0-9, and returns $\text{True}$ if the item at the
@@ -134,16 +134,16 @@ kickback*.
 Say an oracle, only for a particular input state $\ket{m}$, toggles the
 output qubit. That is,
 
-$\ket{0}\ket{m} \xrightarrow{Oracle} \ket{1}\ket{m}, and$
+$\ket{0}\ket{m} \rightarrow \ket{1}\ket{m}, and$
 
-$\ket{1}\ket{m} \xrightarrow{Oracle} \ket{0}\ket{m}$
+$\ket{1}\ket{m} \rightarrow \ket{0}\ket{m}$
 
 Now consider the situation where the output qubit is not in state $\ket{0}$
 but is instead prepared to be in superposition state $\frac{1}{\sqrt{2}} ( \ket{0} -\ket{1} )$
 (also known as $\ket{-}$ state). Applying the oracle operation to this
 results in an interesting outcome as follows,
 
-$\frac{1}{\sqrt{2}} (\ket{0}-\ket{1})\ket{m} \xrightarrow{Oracle} \frac{1}{\sqrt{2}} (\ket{1}-\ket{0})\ket{m} = \frac{1}{\sqrt{2}} (\ket{0}-\ket{1})(-\ket{m})$
+$\frac{1}{\sqrt{2}} (\ket{0}-\ket{1})\ket{m} \rightarrow \frac{1}{\sqrt{2}} (\ket{1}-\ket{0})\ket{m} = \frac{1}{\sqrt{2}} (\ket{0}-\ket{1})(-\ket{m})$
 
 As you see, the operation changes the *sign* of the overall state, which
 is the same as leaving the output qubit *as-is*, and inverting the sign
@@ -303,7 +303,7 @@ While each of these constraints has only $2$ people, in general for a
 larger problem the constraints can involve many more people. For instancec, perhaps
 your friends Alice and Bob gang up and pick on your other friends
 Charlie and David if they see them together, and you don't want that to
-happen in your party; this involves a constrint involving 4 people.
+happen in your party; this involves a constraint involving 4 people.
 
 Lastly, it'll be a good idea to have at least *someone* turn up to the
 party, so we should include that when coding the constraints.
