@@ -56,7 +56,7 @@ returns a set of measurement outcomes, usually bitstrings like 0101 or
 1110. These bitstrings represent candidate solutions to the problem at
 hand.
 
-<img src="./images/media/QAOAblog-01-image1.png" width="600">
+<img src="./images/QAOAblog/QAOAblog-01-image1.png" width="600">
 
 *Figure : Variational Quantum Algorithms*
 
@@ -109,7 +109,7 @@ cost of the cut. 
 Figure below shows an example MAXCUT for a graph drawn in two different
 ways.
 
-<img src="./images/media/QAOAblog-01-image2.png" width="500">
+<img src="./images/QAOAblog/QAOAblog-01-image2.png" width="500">
 
 *Figure : Cut in a graph: group A orange, group B blue*
 
