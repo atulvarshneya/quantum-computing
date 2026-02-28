@@ -303,7 +303,7 @@ While each of these constraints has only $2$ people, in general for a
 larger problem the constraints can involve many more people. For instancec, perhaps
 your friends Alice and Bob gang up and pick on your other friends
 Charlie and David if they see them together, and you don't want that to
-happen in your party; this involves a constrint involving 4 people.
+happen in your party; this involves a constraint involving 4 people.
 
 Lastly, it'll be a good idea to have at least *someone* turn up to the
 party, so we should include that when coding the constraints.
