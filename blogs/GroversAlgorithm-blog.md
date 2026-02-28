@@ -134,16 +134,16 @@ kickback*.
 Say an oracle, only for a particular input state $\ket{m}$, toggles the
 output qubit. That is,
 
-$\ket{0}\ket{m} \xrightarrow{Oracle} \ket{1}\ket{m}, and$
+$\ket{0}\ket{m} \rightarrow \ket{1}\ket{m}, and$
 
-$\ket{1}\ket{m} \xrightarrow{Oracle} \ket{0}\ket{m}$
+$\ket{1}\ket{m} \rightarrow \ket{0}\ket{m}$
 
 Now consider the situation where the output qubit is not in state $\ket{0}$
 but is instead prepared to be in superposition state $\frac{1}{\sqrt{2}} ( \ket{0} -\ket{1} )$
 (also known as $\ket{-}$ state). Applying the oracle operation to this
 results in an interesting outcome as follows,
 
-$\frac{1}{\sqrt{2}} (\ket{0}-\ket{1})\ket{m} \xrightarrow{Oracle} \frac{1}{\sqrt{2}} (\ket{1}-\ket{0})\ket{m} = \frac{1}{\sqrt{2}} (\ket{0}-\ket{1})(-\ket{m})$
+$\frac{1}{\sqrt{2}} (\ket{0}-\ket{1})\ket{m} \rightarrow \frac{1}{\sqrt{2}} (\ket{1}-\ket{0})\ket{m} = \frac{1}{\sqrt{2}} (\ket{0}-\ket{1})(-\ket{m})$
 
 As you see, the operation changes the *sign* of the overall state, which
 is the same as leaving the output qubit *as-is*, and inverting the sign
