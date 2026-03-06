@@ -430,7 +430,7 @@ Repeat this entire block $p$ times, then measure.
 To make things even more specific, below is an example of a QAOA 
 circuit for 5-node graph with edges (0,1), (1,2), (2,3), (3,0), (1,4), and (4,2).
 
-<img src="./images/QAOAblog/QAOAblog-02-image01.png" width="300">
+<img src="./images/QAOAblog/QAOAblog-02-image01.PNG" width="300">
 
 For simplicity of illustration the circuit has just 1 QAOA layer.
 
