@@ -17,7 +17,7 @@ classical parameter optimization. We kept the discussion intentionally
 at a high-level so we could clearly see the architecture without getting
 buried in equations.
 
-Now it's time to zoom a bit into some mathematical details of the Cost and
+Now it's time to zoom-in a bit into some mathematical details of the Cost and
 Mixer Hamiltonians and their corresponding unitaries used in the QAOA's
 quantum circuit.
 
@@ -30,7 +30,7 @@ We continue to use MAXCUT as the running example to explore QAOA.
 Let's restate the classical MAXCUT objective.
 We are given a graph $G = (V,E)$ with a set of vertices $V$, and a set
 of edges $E$. We will use $N$ to represent the number of vertices, and $M$ 
-the number of edges. The problem involves dividing the vertices into $2$ sets, 
+the number of edges. The problem involves dividing the vertices into $2$ disjoint sets, 
 $A$ and $B$. To represent that, each vertex $i$ is assigned a binary value, 
 $x_{i} = 0$ if vertex $i$ is in set $A$, and $x_{i} = 1$ if vertex $i$ is in 
 set $B$. All edges that connect vertices in different groups are said to be cut. 
@@ -45,16 +45,19 @@ C\left( x \right) = \sum_{\left( i,j \right) \in E}^{}1_{x_{i} \neq x_{j}}
 $$
 
 Our goal now is to convert this purely classical function into a
-quantum Hamiltonian operator whose eigenvalues match this cost.
+quantum Hamiltonian operator, $H_{C}$, whose eigenvalues match this cost, i.e., $H_C \ket{x} = C(x) \ket{x}$.
 To do this, the key trick is to move from binary values $\{ 0,1\}$ to quantum
 eigenvalues $\{ + 1,\  - 1\}$.
-Basically, instead of representing a bit $x_{i} \in \left\{0,1 \right\}$, we
+Basically, instead of representing a bit $x_{i} \in \left\\{0,1 \right\\}$, we
 work with different variables 
-$z_{i} \in \left\{ + 1,\  - 1 \right\}$, such that the mapping between $x_i$ and $z_i$ is:
+$z_{i} \in \left\\{ + 1,\  - 1 \right\\}$, such that the mapping between $x_i$ and $z_i$ is:
+
 $$x_{i} = 0 \Rightarrow z_{i} = + 1$$
+
 $$x_{i} = 1 \Rightarrow z_{i} = - 1$$
 
 Or, in a compact form,
+
 $$z_{i} = \left(-1 \right)^{x_i}$$
 
 Consider an edge between vertices $i$ and $j$. Using the $z_{i}$ representation we see that,
@@ -64,7 +67,7 @@ $$\text{If\ }x_{i} = x_{j},then\ z_{i}z_{j} = + 1$$
 $$\text{If\ }x_{i} \neq x_{j},then\ z_{i}z_{j} = - 1$$
 
 So, the simple expression $\frac{1}{2} \left( 1 - z_{i}\ z_{j} \right)$ evaluates to $1$ 
-if the edge is cut, and $0$ if the edge is not cut. Thus, $(1)$, the total cut value, can be written as
+if the edge is cut, and $0$ if the edge is not cut. Thus, the total cut value, can be written as
 
 $$
 \begin{equation}
@@ -76,13 +79,17 @@ $$
 ### The MAXCUT Cost Hamiltonian
 
 Lets look at the $Z$ quantum operator acting on a single qubit. 
+
 $$Z\ket{0} \rightarrow \ket{0}$$
+
 $$Z\ket{1} \rightarrow -\ket{1}$$
 
 It can be written in a compact form as
+
 $$Z\ket{x_i} \rightarrow \left(-1 \right)^{x_i} \ket{x_i}$$
 
 Now, lets look at two $Z$ operators acting on qubits $i$ and $j$.
+
 $$
 Z_i Z_j \ket{x_0 x_1 ... x_{N-1}} \rightarrow \left(-1 \right)^{x_i} \left(-1 \right)^{x_j} \ket{x_0 x_1 ... x_{N-1}}
 $$
@@ -95,14 +102,18 @@ Z_i Z_j \ket{x} \rightarrow z_i z_j \ket{x}
 \end{equation}
 $$
 
-With this, and using $(2)$, a moments reflection shows that
-$$\sum_{\left( i,j \right) \in E}^{} \frac{1}{2} (I - Z_i Z_j) \ket{x} = \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} (\ket{x} - Z_i Z_j \ket{x})
-= \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} (1 - z_i z_j) \ket{x} = C(x) \ket{x}$$
+Using this, and using $C(x)$ expressed in $z$ variables, a moments reflection shows that
+
+$$\sum_{\left( i,j \right) \in E}^{} \frac{1}{2} \left(I - Z_i Z_j \right) \ket{x} = \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} \left(\ket{x} - Z_i Z_j \ket{x} \right)
+= \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} \left(\ket{x} - z_i z_j \ket{x} \right)$$
+
+$$= \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} \left(1 - z_i z_j \right) \ket{x} = C(x) \ket{x}$$
 
 Therefore, we have the Hamiltonian operator, $H_C \ket{x} = C(x) \ket{x}$, we are looking for -
+
 $$
 \begin{equation}
-H_C = \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} (I - Z_i Z_j)
+H_C = \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} \left(I - Z_i Z_j \right)
 \end{equation}
 $$
 
@@ -128,11 +139,14 @@ Quantum circuits use Unitary operators, so QAOA applies the following unitary op
 
 $$U_{C}(\gamma) = e^{- \text{iγ}H_{C}}$$
 
-Expanding that using $(4)$,
+Expanding $H_{C}$,
 
-$$U_{C}\left( \gamma \right) = \prod_{\left( i,j \right) \in E}^{}e^{- i\gamma\frac{1}{2}\left( I - Z_{i}Z_{j} \right)} = \prod_{\left( i,j \right) \in E}^{}{e^{- i\frac{\gamma}{2}I\ } e^{+ i\frac{\gamma}{2}Z_{i}Z_{j}}}
+$$U_{C}\left( \gamma \right) = e^{- i\gamma \sum_{\left( i,j \right) \in E} \frac{1}{2} \left(I - Z_i Z_j \right)} =
+\prod_{\left( i,j \right) \in E}^{}e^{- i\gamma\frac{1}{2}\left( I - Z_{i}Z_{j} \right)} = \prod_{\left( i,j \right) \in E}^{}{e^{- i\frac{\gamma}{2}I\ } e^{+ i\frac{\gamma}{2}Z_{i}Z_{j}}}
 $$
+
 Ignoring the global phase, as it does not affect measurement,
+
 $$
 \begin{equation}
 U_{C}\left( \gamma \right) = \prod_{\left( i,j \right) \in \ E}^{}e^{i\frac{\gamma}{2}\left( Z_{i}\ Z_{j} \right)}
@@ -154,7 +168,7 @@ It's worth pausing to interpret what this operator is doing physically.
 
 $$U_{C}\left( \gamma \right)\left| x \right\rangle = e^{- i\gamma H_{C}}\left| x \right\rangle = e^{- i\gamma C\left( x \right)}|x\rangle$$
 
-So, good cuts receive one kind of phase, bad cuts receive another.
+It adds a phase to each state per their cost. So, good cuts receive one kind of phase, bad cuts receive another.
 Importantly:
 -   This does not directly change probabilities.
 -   It changes how amplitudes will interfere after the mixer is
@@ -164,11 +178,12 @@ This is the first core quantum magic of QAOA: *We do not reward good
 solutions immediately---we make them interfere constructively later.*
 
 ### The Target Gate: A Two-Qubit ZZ Rotation
-From $(5)$ it is evident that the operator $U_C(\gamma)$ is simply a sequence of application of gates $U_{ij}(\gamma)$, one for each edge $(i,j) \in E$
+From $U_{C}\left( \gamma \right) = \prod_{\left( i,j \right) \in \ E}^{}e^{i\frac{\gamma}{2}\left( Z_{i}\ Z_{j} \right)}$, it is evident that the operator $U_C(\gamma)$ is simply a sequence of application of gates $U_{ij}(\gamma)$, one for each edge $(i,j) \in E$
 
 $$U_{\text{ij}}\left( \gamma \right) = e^{+ i\frac{\gamma}{2}Z_{i}Z_{j}}$$
 
-And, from $(3)$, we see
+And, from $Z_i Z_j \ket{x} \rightarrow z_i z_j \ket{x}$, we see
+
 $$
 U_{ij}(\gamma)\ket{x} = e^{+\frac{\gamma}{2}z_i z_j}\ket{x}
 $$
@@ -176,25 +191,25 @@ $$
 So, this gate applies different phases depending on whether the two qubits
 are equal or different:
 
-| **State** | **qubits Parity**  | **Phase Applied** |
-|:---|:---:|:---:|
-| \|00⟩ | 0 | $$e^{+ i\frac{\gamma}{2}}$$ |
-| \|01⟩ | 1 | $$e^{- i\frac{\gamma}{2}}$$ |
-| \|10⟩ | 1 | $$e^{- i\frac{\gamma}{2}}$$ |
-| \|11⟩ | 0 | $$e^{+ i\frac{\gamma}{2}}$$ |
+| **State** | **$z_i z_j$** | **Qubits Parity**  | **Phase Applied** |
+|:---|:---:|:---:|:---:|
+| \|00⟩ | 1 | 0 | $$e^{+ i\frac{\gamma}{2}}$$ |
+| \|01⟩ | -1 | 1 | $$e^{- i\frac{\gamma}{2}}$$ |
+| \|10⟩ | -1 | 1 | $$e^{- i\frac{\gamma}{2}}$$ |
+| \|11⟩ | 1 | 0 | $$e^{+ i\frac{\gamma}{2}}$$ |
 
 The standard identity for implementing this operator is:
 
 $$
 \begin{equation}
-e^{+ i\frac{\gamma}{2}\ Z_{i}\ Z_{j}} \equiv \text{CNO}T_{i \rightarrow j}\text{\ \ }R_{Z}\left( - \gamma \right)_{j}\ \text{CNO}T_{i \rightarrow j}
+e^{+ i\frac{\gamma}{2}\ Z_{i}\ Z_{j}} \equiv \text{CNO}T_{i \rightarrow j}\text{\ \ }R_{Z}\left( - \gamma \right)_{j}\ \text{CNOT}_{i \rightarrow j}
 \end{equation}
 $$
 
 Intuition on what this circuit does conceptually:
-- Compute parity of qubits $i$ and $j$; apply $CNOT_{i \rightarrow j}$, qubit $j$ gets the parity value
-- Apply a phase depending on parity; apply $R_z$ on qubit $j$
-- Uncompute parity; apply $CNOT_{i \rightarrow j}$ again
+- Compute parity of qubits $i$ and $j$: apply $CNOT_{i \rightarrow j}$, qubit $j$ gets the parity value
+- Apply a phase depending on parity: apply $R_z$ on qubit $j$
+- Uncompute parity: apply $CNOT_{i \rightarrow j}$ again
 
 > **Important detail about sign:**
 > By definition, $R_{Z}\left( \theta \right) = e^{- i\frac{\theta}{2}\text{\ Z}}$.
@@ -206,8 +221,11 @@ negative in the circuit.
 
 To construct the full cost operator:
 
-1.  Loop over all edges $(i,j)$ in the graph.
-2.  For each edge, apply the gates as given in $(6)$.
+- Loop over all edges $(i,j)$ in the graph.
+- For each edge, apply the gates
+  - $CNOT_{i \rightarrow j}$ $R_{Z} (- \gamma)_{j}$
+  - $R_{Z} \left( - \gamma \right)_{j}$
+  - $CNOT_{i \rightarrow j}$.
 
 ```python
 for (i,j) in edges:
