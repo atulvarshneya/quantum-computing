@@ -6,7 +6,7 @@ QAOA Step by Step: Concepts, Circuits, and Code for Quantum Enthusiasts
 
 Quantum computers promise extraordinary capabilities, from simulating
 complex molecules to solving optimization problems that overwhelm
-classical machines. But today's hardware is still at an early stage.
+classical machines. But today's hardware are still at an early stage.
 Qubits are fragile, gates are noisy, and circuits must remain shallow
 before errors dominate. This era, often called the *NISQ era* (Noisy
 Intermediate-Scale Quantum), poses a clear challenge \-- how can we make
@@ -469,6 +469,6 @@ your own computer and experiment with it at your own pace.
 
 This post presented the key ideas behind QAOA at the architectural
 level: superposition, alternating operators, layers, and parameter
-tuning. In the next post, we'll go deeper into the cost and Mixer
+tuning. In the [next post](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/QAOAblog-02.md), we'll go deeper into the cost and Mixer
 Hamiltonians, $H_{C}$ and $H_{B}$, and corresponding unitaries, $U_{C}$
 and $U_{B}$, for MAXCUT and develop better understanding about them.

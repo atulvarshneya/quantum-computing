@@ -2,13 +2,6 @@
 QAOA Step by Step: A Closer Look into Cost and Mixer Operators
 </h1>
 
-## Blog outline
-* Introduction
-* Cost Unitary Operator
-* Mixer Unitary Operator
-* One Full QAOA Layer Quantum Circuit
-* Getting Hands-on with QAOA Implementation in Python
-
 ## Introduction
 
 In the [previous post](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/QAOAblog-01.md), we explored the overall structure of QAOA:
@@ -17,9 +10,11 @@ classical parameter optimization. We kept the discussion intentionally
 at a high-level so we could clearly see the architecture without getting
 buried in equations.
 
-Now it's time to zoom-in a bit into some mathematical details of the Cost and
+Now it's time to zoom in a bit on some mathematical details of the Cost and
 Mixer Hamiltonians and their corresponding unitaries used in the QAOA's
-quantum circuit.
+quantum circuit. In keeping with our target audience of computer scientists,
+software engineers, and technology enthusiasts, we will avoid getting too far into the 
+weeds.
 
 We continue to use MAXCUT as the running example to explore QAOA.
 
@@ -30,19 +25,22 @@ We continue to use MAXCUT as the running example to explore QAOA.
 Let's restate the classical MAXCUT objective.
 We are given a graph $G = (V,E)$ with a set of vertices $V$, and a set
 of edges $E$. We will use $N$ to represent the number of vertices, and $M$ 
-the number of edges. The problem involves dividing the vertices into $2$ disjoint sets, 
-$A$ and $B$. To represent that, each vertex $i$ is assigned a binary value, 
+the number of edges. The problem involves dividing the vertices into $2$ disjoint sets 
+$A$ and $B$. All edges that connect vertices from different sets are said to be cut. The problem is to maximize the total number of edges that are so cut.
+
+To represent the membership to a group, each vertex $i$ is assigned a binary value, 
 $x_{i} = 0$ if vertex $i$ is in set $A$, and $x_{i} = 1$ if vertex $i$ is in 
-set $B$. All edges that connect vertices in different groups are said to be cut. 
-That is, an edge $(i,j)$ is said to be cut if $x_{i} \neq x_{j}$. The
-total cut value is the number of edges that are cut, as given in the equation 
-below, which is the quantity we want QAOA to maximize. Note that $1_{x_{i} \neq x_{j}} = 1 \ if \left( x_{i} \neq x_{j} \right),\ 0\ otherwise$. And, $x$ represents $(x_0, x_1, ..., x_{N-1})$.
+set $B$. 
+Hence, an edge $(i,j)$ is said to be cut if $x_{i} \neq x_{j}$. The
+total cut value is as given in the equation below, which needs to be maximized.
 
 $$
 \begin{equation}
 C\left( x \right) = \sum_{\left( i,j \right) \in E}^{}1_{x_{i} \neq x_{j}}
 \end{equation}
 $$
+
+Note that $1_{x_{i} \neq x_{j}} = 1 \ if \left( x_{i} \neq x_{j} \right),\ 0\ otherwise$. And, $x$ represents $(x_0, x_1, ..., x_{N-1})$.
 
 Our goal now is to convert this purely classical function into a
 quantum Hamiltonian operator, $H_{C}$, whose eigenvalues match this cost, i.e., $H_C \ket{x} = C(x) \ket{x}$.
@@ -117,25 +115,19 @@ H_C = \sum_{\left( i,j \right) \in E}^{} \frac{1}{2} \left(I - Z_i Z_j \right)
 \end{equation}
 $$
 
-Where each edge $(i,j)$ contributes the following to the Hamiltonian -
-
-$$
-\frac{1}{2}\left( I - Z_{i}Z_{j} \right)
-$$
-
 This Hamiltonian has several desirable properties:
 
--   It is **diagonal** in the computational basis.
--   Every basis state $|x\rangle$ is an **eigenstate**.
--   The eigenvalue equals the **cut value** of that bitstring, $C(x)$.
--   Each edge contributes **locally** using only two qubits.
+-   It is diagonal in the computational basis.
+-   Every basis state $|x\rangle$ is an eigenstate.
+-   The eigenvalue equals the cut value of that bitstring, $C(x)$.
+-   Each edge contributes locally using only two qubits.
 
 This means the Hamiltonian evaluates the cut value *in parallel for all
-possible cuts*---exactly what we want for QAOA.
+possible cuts*.
 
 ### From Hamiltonian to Cost Unitary
 
-Quantum circuits use Unitary operators, so QAOA applies the following unitary operator derived from the Hamiltonian $H_C$:
+The time evolution of a quantum state is mathematically represented by a unitary operator. Quantum gates are therefore unitary operators. QAOA uses the following unitary operator derived from the Hamiltonian $H_C$:
 
 $$U_{C}(\gamma) = e^{- \text{iγ}H_{C}}$$
 
@@ -145,7 +137,7 @@ $$U_{C}\left( \gamma \right) = e^{- i\gamma \sum_{\left( i,j \right) \in E} \fra
 \prod_{\left( i,j \right) \in E}^{}e^{- i\gamma\frac{1}{2}\left( I - Z_{i}Z_{j} \right)} = \prod_{\left( i,j \right) \in E}^{}{e^{- i\frac{\gamma}{2}I\ } e^{+ i\frac{\gamma}{2}Z_{i}Z_{j}}}
 $$
 
-Ignoring the global phase, as it does not affect measurement,
+Ignoring the global phase, as it does not affect measurement, we can express $U_C(\gamma)$ as
 
 $$
 \begin{equation}
@@ -153,39 +145,18 @@ U_{C}\left( \gamma \right) = \prod_{\left( i,j \right) \in \ E}^{}e^{i\frac{\gam
 \end{equation}
 $$
 
-So, every edge contributes a **two-qubit ZZ rotation** gate.
-
-**A Really Important Takeaway**: 
-The above is incredibly important from an implementation standpoint:
--   The massive $2^{N} \times 2^{N}$ matrix is never constructed.
--   The cost operator is implemented using only local two-qubit
-    gates.
--   This makes QAOA physically realizable on real hardware.
-
-### What the Cost Operator Actually Does
-
-It's worth pausing to interpret what this operator is doing physically.
-
-$$U_{C}\left( \gamma \right)\left| x \right\rangle = e^{- i\gamma H_{C}}\left| x \right\rangle = e^{- i\gamma C\left( x \right)}|x\rangle$$
-
-It adds a phase to each state per their cost. So, good cuts receive one kind of phase, bad cuts receive another.
-Importantly:
--   This does not directly change probabilities.
--   It changes how amplitudes will interfere after the mixer is
-    applied.
-
-This is the first core quantum magic of QAOA: *We do not reward good
-solutions immediately---we make them interfere constructively later.*
+Note that every edge contributes a two-qubit ZZ rotation gate.
 
 ### The Target Gate: A Two-Qubit ZZ Rotation
-From $U_{C}\left( \gamma \right) = \prod_{\left( i,j \right) \in \ E}^{}e^{i\frac{\gamma}{2}\left( Z_{i}\ Z_{j} \right)}$, it is evident that the operator $U_C(\gamma)$ is simply a sequence of application of gates $U_{ij}(\gamma)$, one for each edge $(i,j) \in E$
+From the equation written above, it is evident that the operator $U_C(\gamma)$ is simply a 
+sequence of application of gates $U_{i,j}(\gamma)$ given below, one for each edge $(i,j) \in E$
 
-$$U_{\text{ij}}\left( \gamma \right) = e^{+ i\frac{\gamma}{2}Z_{i}Z_{j}}$$
+$$U_{i,j}\left( \gamma \right) = e^{+ i\frac{\gamma}{2}Z_{i}Z_{j}}$$
 
-And, from $Z_i Z_j \ket{x} \rightarrow z_i z_j \ket{x}$, we see
+Now, since $Z_i Z_j \ket{x} \rightarrow z_i z_j \ket{x}$, therefore
 
 $$
-U_{ij}(\gamma)\ket{x} = e^{+\frac{\gamma}{2}z_i z_j}\ket{x}
+U_{i,j}(\gamma)\ket{x} = e^{+\frac{\gamma}{2}z_i z_j}\ket{x}
 $$
 
 So, this gate applies different phases depending on whether the two qubits
@@ -198,7 +169,7 @@ are equal or different:
 | \|10⟩ | -1 | 1 | $$e^{- i\frac{\gamma}{2}}$$ |
 | \|11⟩ | 1 | 0 | $$e^{+ i\frac{\gamma}{2}}$$ |
 
-The standard identity for implementing this operator is:
+The standard identity for implementing this $U_{ij}(\gamma)$ operator is:
 
 $$
 \begin{equation}
@@ -213,7 +184,7 @@ Intuition on what this circuit does conceptually:
 
 > **Important detail about sign:**
 > By definition, $R_{Z}\left( \theta \right) = e^{- i\frac{\theta}{2}\text{\ Z}}$.
-So, to obtain $e^{+ i\frac{\gamma}{2}Z}$, we must apply
+So, to obtain a phase $e^{+ i\frac{\gamma}{2}}$ when qubit is $0$ and $e^{- i\frac{\gamma}{2}}$ when qubit is $1$, we must apply
 $R_{Z}\left( - \gamma \right)$. That is why the $R_Z$ angle is
 negative in the circuit.
 
@@ -223,7 +194,7 @@ To construct the full cost operator:
 
 - Loop over all edges $(i,j)$ in the graph.
 - For each edge, apply the gates
-  - $CNOT_{i \rightarrow j}$ $R_{Z} (- \gamma)_{j}$
+  - $CNOT_{i \rightarrow j}$
   - $R_{Z} \left( - \gamma \right)_{j}$
   - $CNOT_{i \rightarrow j}$.
 
@@ -244,48 +215,23 @@ number of edges, not $2^{N}$. This makes QAOA scalable on near-term hardware.
 
 ### What the Cost Operator Physically Does
 
-After applying the cost operator
-$\left| x \right\rangle \longrightarrow e^{- i\gamma H_{C}\left( x \right)}\left| x \right\rangle$,
+After applying the cost operator, 
+$U_{C}(\gamma)\ket{x} \rightarrow e^{- i \gamma H_C(x)}\ket{x} = e^{- i \gamma C\left( x \right)}\ket{x}$,
 all $2^{N}$ basis states still exist in superposition, only their phases
-change. Good cuts and bad cuts now carry different quantum phases.
+change per their cost. Good cuts and bad cuts now carry different quantum phases.
 
-At this stage no probabilities have changed yet, no measurements have
-been made, and the "reward signal" is encoded entirely in phase.
-
-The mixer operator (coming next) is what converts these phase
-differences into measurable probability differences through
-interference.
+At this stage no probabilities have changed yet, and the "reward signal" 
+is encoded entirely in phase. The mixer operator (coming next) 
+converts this signal into measurable probability differences.
 
 ## Mixer Unitary Operator
 
-At this point, QAOA can evaluate how good each candidate cut
-is, at least at the level of quantum phase. But there is one major
-element lacking still -- If we only apply the cost operator, the
-quantum states only accumulate phase, amplitudes of all states remains the same, hence *good states* as well as *bad states* remain equally probable.
-
-This is where the mixer operator comes in. The mixer is what allows
-QAOA to explore the space of solutions, convert phase information into
-probability, and ultimately bias the measurements toward good cuts.
-
-We now delve into what the mixer does, why it is
-needed, and how it is implemented as a quantum circuit.
-
-### Why a Mixer Is Absolutely Necessary
-
-After applying the cost operator, the quantum state looks like this:
--   All $2^{N}$ bitstrings are still present in superposition.
--   Each basis state has picked up a phase proportional to its cut
-    value.
--   But the probability values of all bitstrings are still exactly the same.
-
-If we measured right after the cost operator, we would simply get a
-random cut. No optimization would occur.
-
-To turn phase differences into measurable probability differences,
-we need a mechanism, the mixer operator, that:
+The mixer operator allows
+QAOA to explore the space of solutions,  and  bias the measurements toward good cuts.
+To do this the mixer operator does the following:
 -   mixes amplitudes between different bitstrings,
 -   allows interference between good and bad solutions,
--   and lets probability flow toward better cuts.
+-   and lets probability flow toward better solutions.
 
 ### The Standard QAOA Mixer Hamiltonian
 
@@ -293,11 +239,7 @@ The most common and simplest mixer Hamiltonian is:
 
 $$H_{B} = \sum_{i = 1}^{N}X_{i}$$
 
-Here:
-
--   $X_{i}$ is the Pauli-X operator acting on qubit $i$.
-
--   Pauli-X is just the quantum version of a bit flip.
+$X_{i}$ is the Pauli-X operator acting on qubit $i$. Pauli-X is just the quantum version of a bit flip.
 
 The corresponding unitary applied by QAOA is:
 
@@ -362,7 +304,7 @@ single-qubit rotations.
 
 ### What the Mixer Physically Does
 
-While Pauli-X flips qubits -- $X \ket{0} \rightarrow \ket{1}$, and $X \ket{1}  \rightarrow \ket{0}$ -- an X-rotation doesn't just flip, it creates superpositions of flipped
+While Pauli-X flips qubits, $X \ket{0} \rightarrow \ket{1}$, and $X \ket{1}  \rightarrow \ket{0}$, an X-rotation doesn't just flip, it creates superpositions of flipped
 and unflipped states. That means:
 -   Amplitude flows between states that differ by one bit flip.
 -   Over multiple layers, amplitude can propagate between all
@@ -373,40 +315,9 @@ the "allowed directions of movement" in the solution space. With the
 standard mixer, QAOA explores the solution space by walking through
 the hypercube of bitstrings one bit at a time.
 
-### How the Cost and Mixer Work Together
-
-Let's now combine everything conceptually:
-
-1.  **Superposition step**\
-    All bitstrings start with equal amplitude.
-
-2.  **Cost step**\
-    Each bitstring receives a phase based on how good its cut value is.
-
-3.  **Mixer step**\
-    Amplitudes are shuffled between nearby bitstrings.
-
-4.  **Interference occurs**\
-    Because good and bad solutions had different phases, some
-    interference becomes constructive and some destructive.
-
-5.  **Probabilities shift**\
-    After interference, some bitstrings become more likely to appear
-    upon measurement.
-
-6.  **Repeat for p layers**\
-    Each layer refines this redistribution of probability.
-
-This is the true optimization engine inside QAOA:
--   The cost operator scores.
--   The mixer operator moves.
--   Interference turns phase into probability.
-
 ### Mixer Is Problem-Independent
 
-One beautiful aspect of QAOA is that:
--   The cost operator depends on the problem (MAXCUT in our case).
--   The mixer operator does not.
+One aspect to note in QAOA is that while the cost operator depends on the problem (MAXCUT in our case), the mixer operator does not.
 
 The same mixer Hamiltonian $H_{B} = \sum_{}^{}X_{i}$ is used for:
 -   MAXCUT
@@ -415,19 +326,33 @@ The same mixer Hamiltonian $H_{B} = \sum_{}^{}X_{i}$ is used for:
 -   scheduling
 -   and many other unconstrained optimization problems.
 
-This clean separation is one of the reasons QAOA is so modular and
+This separation is one of the reasons QAOA is modular and
 reusable.
 
-## One Full QAOA Layer Quantum Circuit
+## Putting it All Together: An Illustrative QAOA Quantum Circuit
 
-At this point, we have specified the QAOA layer :
-1.  For every edge $(i,j)$, apply:
+At this point, we have fully specified the QAOA layer -- the cost unitary followed by the mixer unitary. We have also seen how each of these unitaries are realized in quantum circuits.
+
+The full circuit for QAOA is put together as:
+
+1.  **Superposition:** setup full superposition
+
+    i.  apply hadamard to all N qubits
+
+2.  **QAOA layers:** each state given a phase based on its cost value, create interference to increase amplitudes of good states, and reduce it for bad states
+
+    i.  For every edge $(i,j)$, apply the sequence of gates: 
     $CNOT(i \rightarrow j)\ \ Rz( - \gamma)\ \ CNOT(i \rightarrow j)$
-2.  For every qubit $i$, apply: $Rx(2\beta)$
 
-Repeat this entire block $p$ times, then measure.
+    ii.  For every qubit $i$, apply: $Rx(2\beta)$
 
-To make things even more specific, below is an example of a QAOA 
+    iii. and, repeat this pair of operators $p$ times.
+
+3. **Perform Measurement operation:** run the circuit multishot to get estimate of probability distribution
+
+### An Illustrative QAOA Quantum Circuit
+
+Finally, to illustrate a realistic circuit, below is an example of a QAOA 
 circuit for 5-node graph with edges (0,1), (1,2), (2,3), (3,0), (1,4), and (4,2).
 
 <img src="./images/QAOAblog/QAOAblog-02-image01.PNG" width="300">
@@ -448,12 +373,6 @@ q004 -[H]--#-----------------------------------------------------[X]-[Rz]-[X]-[.
 creg ======#================================================================================#=======#==v==
            #                                                                                #       #
 ```
-
-
-There is now nothing abstract left. Every component of QAOA is a
-concrete, executable gate sequence.
-
-
 
 ## Getting Hands-on with QAOA Implementation in Python
 
