@@ -348,7 +348,7 @@ In the limit of very large $p$, QAOA approaches adiabatic quantum
 optimization. But in practice, even small $p$ values often give
 surprisingly good results.
 
-> **A sidebar**: Mixer unitary causes amplitudes to flow between
+> **A sidebar**: The standard mixer unitary causes amplitudes to flow between
 > neighboring states, those that differ by a bit flip. And, QAOA applies
 > the cost and mixer unitaries multiple times, in $p$ layers. Each layer
 > can propagate amplitude further through the solution space.
@@ -374,7 +374,7 @@ surprisingly good results.
 
 The cost Hamiltonian turns out to be as following. For now you can check
 it to be correct by constructing it by hand for a small number of
-vertices and edges. In a sequel to this post, we will get a bit deeper
+vertices and edges. In a [sequel to this post](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/QAOAblog-02.md), we will get a bit deeper
 into the rationale for this.
 
 $$H_{C} = \sum_{\left( i,j \right) \in E}^{}{\frac{1}{2}\ (I - Z_{i}Z_{j})}$$
@@ -400,6 +400,8 @@ qi  ---*------------------*---
 .      |                  |
 qj  --[X]--[Rz(-gamma)]--[X]--
 ```
+
+Now, on to the mixer unitary. The standard mixer hamiltonian, $H_B$, is given as
 
 $$H_{B} = \sum_{i = 1}^{N}X_{i}$$
 

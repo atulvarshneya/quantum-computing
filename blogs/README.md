@@ -33,7 +33,7 @@ Because QAOA is conceptually simple, mathematically elegant, and
 practical to implement, it has become a popular example for learning
 quantum optimization.
 
-  * [QAOA Step by Step: A Closer Look into Cost and Mixer Operators](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/QAOAblog-02.md), *To be posted soon. Stay tuned.*<br>
+  * [QAOA Step by Step: A Closer Look into Cost and Mixer Operators](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/QAOAblog-02.md), March 10, 2026<br>
   In the previous post in this series, we explored the overall structure of QAOA:
 superposition, alternating cost and mixer operators, layered depth, and
 classical parameter optimization. We kept the discussion intentionally
@@ -56,6 +56,8 @@ Grover's algorithm can be used to solve it.
 * Is Superposition more fundamental than Entanglement: A Perspective, *To be posted soon. Stay tuned.*<br>
 
 * Why I find it easer to understand Quantum Computing through Many-Worlds interpretation, *To be posted soon. Stay tuned.*<br>
+
+* What is measurement afterall, *To be posted soon. Stay tuned.*<br>
 
 * Noise in Quantum Computers, *To be posted soon. Stay tuned.*<br>
 <!--

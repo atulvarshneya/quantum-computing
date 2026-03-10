@@ -227,7 +227,7 @@ converts this signal into measurable probability differences.
 ## Mixer Unitary Operator
 
 The mixer operator allows
-QAOA to explore the space of solutions,  and  bias the measurements toward good cuts.
+QAOA to explore the space of solutions, and it biases the measurements toward good cuts.
 To do this the mixer operator does the following:
 -   mixes amplitudes between different bitstrings,
 -   allows interference between good and bad solutions,
@@ -250,7 +250,7 @@ independently.
 
 At this point let us recall a sidebar we saw in the previous companion blog --
 
-> **A sidebar**: Mixer unitary causes amplitudes to flow between 
+> **A sidebar**: The standard mixer unitary causes amplitudes to flow between 
 neighboring states, those that differ by a bit flip. And, QAOA 
 applies the cost and mixer unitaries multiple times, in $p$ 
 layers. Each layer can propagate amplitude further through the 
