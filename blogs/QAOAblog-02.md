@@ -216,7 +216,7 @@ number of edges, not $2^{N}$. This makes QAOA scalable on near-term hardware.
 ### What the Cost Operator Physically Does
 
 After applying the cost operator, 
-$U_{C}(\gamma)\ket{x} \rightarrow e^{- i \gamma H_C(x)}\ket{x} = e^{- i \gamma C\left( x \right)}\ket{x}$,
+$U_{C}(\gamma)\ket{x} \rightarrow e^{- i \gamma H_C}\ket{x} = e^{- i \gamma C\left( x \right)}\ket{x}$,
 all $2^{N}$ basis states still exist in superposition, only their phases
 change per their cost. Good cuts and bad cuts now carry different quantum phases.
 
