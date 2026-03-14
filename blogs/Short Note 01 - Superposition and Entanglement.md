@@ -6,7 +6,7 @@ Two of the most frequently discussed ideas in quantum computing are superpositio
 
 # Let us start with a simple thought experiment.
 
-Imagine a particle whose position is in a quantum superposition of two possible locations, $A$ and $B$. In dirac notation we might write its state as
+Imagine a particle whose position is in a quantum superposition of two possible locations, $A$ and $B$. In Dirac notation we might write its state as
 
 $$
 \ket{\psi} = \alpha\ket{A} + \beta\ket{B}
@@ -68,15 +68,15 @@ This perspective does not diminish the importance of entanglement. On the contra
 
 The following figures present the idea in a visual form to make it easy to form a mental picture.
 
-Consider Particle $1$ (shown in red) at a location $A$, and Particle $2$ (shown ib blue) moving towards it on its path. As Particle $2$ get at location $A$, the particles interact and in this situation they *scatter*.
+Consider Particle $1$ (shown in red) at a location $A$, and Particle $2$ (shown in blue) moving towards it on its path. As Particle $2$ gets at location $A$, the particles interact and in this situation they *scatter*.
 
 <img src="./images/SN01-superposition-entanglement/Short Notes 01 - image01.png" width="600">
 
-However, if Particle $1$ is at location $B$, i.e., is not on the path of Particle $2$, they do not interact, so Partcle $1$ stays undisturbed and Particle $2$ continues on *straight*.
+However, if Particle $1$ is at location $B$, i.e., is not on the path of Particle $2$, they do not interact, so Particle $1$ stays undisturbed and Particle $2$ continues on *straight*.
 
 <img src="./images/SN01-superposition-entanglement/Short Notes 01 - image02.png" width="600">
 
-Now, consider Particle $1$ is in superposition, such that there are non-$0$ probabilities of it being at location $A$ and at location $B$. When Particle $2$ passes through, both the interactions as shown in the previous two figures occur. Hence Particles $1$ and $2$ would be in two correlated, or entangled, states - either Particle $1$ at location $B$ with Particle 2 gone through *straight*, OR Particle $1$ and Particle $2$ *scattered*.
+Now, consider Particle $1$ is in superposition, such that there are non-zero probabilities of it being at location $A$ and at location $B$. When Particle $2$ passes through, both the interactions as shown in the previous two figures occur. Hence Particles $1$ and $2$ would be in two correlated, or entangled, states - either Particle $1$ at location $B$ with Particle 2 gone through *straight*, OR Particle $1$ and Particle $2$ *scattered*.
 
 <img src="./images/SN01-superposition-entanglement/Short Notes 01 - image03.png" width="600">
 
