@@ -76,7 +76,7 @@ However, if Particle $1$ is at location $B$, i.e., is not on the path of Particl
 
 <img src="./images/SN01-superposition-entanglement/Short Notes 01 - image02.png" width="600">
 
-Now, consider Particle $1$ is in superposition, such that there are non-zero probabilities of it being at location $A$ and at location $B$. When Particle $2$ passes through, both the interactions as shown in the previous two figures occur. Hence Particles $1$ and $2$ would be in two correlated, or entangled, states - either Particle $1$ at location $B$ with Particle 2 gone through *straight*, OR Particle $1$ and Particle $2$ *scattered*.
+Now, consider Particle $1$ is in superposition, such that there are non-zero probabilities of it being at location $A$ and at location $B$. When Particle $2$ passes through, both the interactions as shown in the previous two figures occur. Hence Particles $1$ and $2$ would be in superposition of two correlated, or entangled, states - Particle $1$ at location $B$ with Particle 2 gone through *straight*, AND Particle $1$ and Particle $2$ *scattered*.
 
 <img src="./images/SN01-superposition-entanglement/Short Notes 01 - image03.png" width="600">
 
@@ -85,5 +85,7 @@ Now, consider Particle $1$ is in superposition, such that there are non-zero pro
 To summarize the entire note in 1 line, I would say
 
 $$\text{Superposition} + \text{Interaction} \longrightarrow \text{Entanglement}$$
+
+that is, entanglement often emerges from superposition combined with interaction.
 
 Hope you found this short note helpful.
