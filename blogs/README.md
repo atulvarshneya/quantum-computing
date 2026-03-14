@@ -39,7 +39,7 @@ superposition, alternating cost and mixer operators, layered depth, and
 classical parameter optimization. We kept the discussion intentionally
 at a high-level so we could clearly see the architecture without getting
 buried in equations.<br>
-In this post we zoom-in a bit into some mathematical details of the Cost and
+In this post we zoom-in a bit on some mathematical details of the Cost and
 Mixer Hamiltonians and their corresponding unitaries used in the QAOA's
 quantum circuit. We continue to use MAXCUT as the running example to explore QAOA.
 
