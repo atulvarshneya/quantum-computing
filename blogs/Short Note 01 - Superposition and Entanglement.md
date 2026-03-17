@@ -2,7 +2,7 @@
 Is Superposition More Fundamental Than Entanglement? — A Perspective
 </h1>
 
-Two of the most frequently discussed ideas in quantum computing are superposition and entanglement. They are often presented as separate “mysteries” of quantum mechanics, each with its own strange and counter-intuitive implications. Entanglement in particular is sometimes portrayed as the most profound feature of quantum theory. However, from a practitioner’s perspective, it can be helpful to view these two ideas in a slightly different way: entanglement can often be understood as emerging from superposition combined with interaction.
+Two of the most frequently discussed ideas in quantum computing are superposition and entanglement. They are often presented as separate “mysteries” of quantum mechanics, each with its own strange and counter-intuitive implications. Entanglement in particular is sometimes portrayed as the most profound feature of quantum theory. However, here we present these two ideas in a way which should help develop a clear intuition about them: we basically show how entanglement can be understood as emerging often from superposition combined with interaction.
 
 # Let us start with a simple thought experiment.
 
@@ -37,7 +37,7 @@ $$
 \alpha \ket{A'}\ket{\text{scattered}} + \beta\ket{B}\ket{\text{straight}}
 $$
 
-This state can no longer be written as a simple product of independent states for the two particles. The state of one particle is now correlated with the state of the other. In other words, **the particles have become entangled**. Note $A'$ is the new position of the first particle after the scattering interaction with the second particle.
+This state can no longer be written as a simple product of independent states for the two particles. The state of one particle is now correlated with the state of the other. In other words, **the particles have become entangled**. Note $A'$ is the new position of the first particle after the interaction with the second particle.
 
 Seen this way, entanglement arises naturally from two ingredients:
 
@@ -56,13 +56,13 @@ $$
 \frac{1}{\sqrt{2}}\left(\ket{00} + \ket{11}\right)
 $$
 
-Here again we see the same structure: superposition followed by conditional interaction leads to entanglement.
+We see the same structure: superposition followed by conditional interaction leads to entanglement.
 
 Strictly speaking, superposition and entanglement describe different properties of quantum states. Superposition can exist even in a single isolated system, while entanglement is a property of composite systems containing multiple parts. Yet operationally, entanglement almost always emerges through the mechanism described above.
 
 For this reason, it can be useful to think of superposition as the raw quantum ingredient, and entanglement as a relational structure that arises when superposed systems interact.
 
-This perspective does not diminish the importance of entanglement. On the contrary, entanglement is the resource that powers many quantum algorithms and protocols. But recognizing how naturally it grows out of superposition can make the conceptual landscape of quantum computing feel a little less mysterious—and a lot more intuitive.
+This perspective does not diminish the importance of entanglement. On the contrary, entanglement is the resource that powers many quantum algorithms and protocols. But recognizing how naturally it grows out of superposition can make the conceptual landscape of quantum computing feel a little less mysterious and a lot more intuitive.
 
 # Visual Depiction
 
