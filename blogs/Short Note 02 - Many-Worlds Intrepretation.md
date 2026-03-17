@@ -1,17 +1,15 @@
 <h1 style="text-align: center;">
-The Everettian Many-Worlds Interpretation
+The Everettian Many-Worlds Interpretation of Quantum Mechanics
 </h1>
 
-**TODO: Get the actual qtrace outputs and plug them in**
+<p style="text-align: center;"> <em>An Intuitive Guide to Many-Worlds Interpretation (MWI) for Quantum Computing Practitioners</em></p>
 
-*An Intuitive Guide for Quantum Computing Practitioners*
-
-# 1. Introduction
+# Introduction
 
 Quantum mechanics is perhaps the most precisely tested theory in all of
 science. Yet nearly a century after its formulation, physicists still
-disagree about what it means. The mathematical formalism --- the
-Schrödinger equation, wavefunctions, operators --- is agreed upon. The
+disagree about what it means. The mathematical formalism, the
+Schrödinger equation, wavefunctions, and operators, is agreed upon. The
 disagreement is about interpretation: what is the wavefunction, and what
 happens when we measure a quantum system?
 
@@ -36,7 +34,7 @@ Qucircuit. The goal is to give you a mental model that is useful when
 reasoning about superposition, entanglement, and measurement in quantum
 circuits.
 
-# 2. Branches: What They Actually Are
+# Branches: What They Actually Are
 
 In MWI, the wavefunction is not a tool for computing probabilities of a
 single outcome. It is a complete description of *all* coexisting
@@ -62,11 +60,11 @@ This is not just philosophical rebranding. The distinction has concrete
 consequences for how we reason about interference, entanglement, and the
 behaviour of quantum algorithms, as we will see.
 
-# 3. Watching a Branch Form Using A Single Qubit
+# Watching a Branch Form Using A Single Qubit
 
 Let us make this concrete with a circuit. We apply a Hadamard gate to a
 single qubit initialized in $\ket{0}$. The Hadamard gate is the
-canonical "branching" gate --- it takes a definite state and puts it
+canonical "branching" gate, it takes a definite state and puts it
 into an equal superposition:
 
 $$H\ket{0} = \frac{1}{\sqrt{2}}\left( \ket{0} + \ket{1} \right)$$
@@ -76,9 +74,14 @@ two equally weighted branches, one where the qubit is $\ket{0}$ and
 one where it is $\ket{1}$. Both are real.
 
 Let us run this on the simulator and observe the statevector evolving in
-real time (we use Qucircuit's Qdeb backend and set qtrace=True):
+real time (we use `Qucircuit`'s `Qdeb` backend and set `qtrace=True`).
 
-*Code --- Single qubit branching via Hadamard*
+> [Qucircuit](https://github.com/atulvarshneya/quantum-computing/tree/master) is
+a full-featured open-source quantum computing simulator that I developed to support
+educational and experimental work in quantum algorithms. You can install
+Qucircuit in just a few seconds using `pip install qucircuit`.
+
+*Code: Single qubit branching via Hadamard*
 
 ```python
 import qckt
@@ -109,14 +112,14 @@ MEASURED Qubit[0] = [0] with probability = 0.5
 ```
 
 The output shows exactly what MWI describes. After the Hadamard, the
-statevector has two non-zero entries --- two branches, each carrying
+statevector has two non-zero entries, two branches, each carrying
 amplitude $\frac{1}{\sqrt{2}}$. The squared magnitude of each amplitude
 gives the probability: $\left( \frac{1}{\sqrt{2}} \right)^{2} = 0.5$ for
 each branch. When we measure, we as observers become entangled with the
 qubit and *find ourselves in one of the two branches*. The other branch
-does not disappear --- it simply no longer interacts with us.
+does not disappear, it simply no longer interacts with us.
 
-# 4. Entanglement: Branches Becoming Correlated
+# Entanglement: Branches Becoming Correlated
 
 In the [Short Note on superposition and
 entanglement](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/Short%20Note%2001%20-%20Superposition%20and%20Entanglement.md),
@@ -126,7 +129,7 @@ entanglement is what happens when the branches of two systems become
 correlated.
 
 Consider two qubits. Before any interaction, their branches are
-independent --- knowing the state of one tells you nothing about the
+independent; knowing the state of one tells you nothing about the
 other. After a conditional operation (like a CNOT gate applied to a
 qubit in superposition), the branches become locked together: each
 branch of the first qubit now has a definite corresponding state in the
@@ -142,14 +145,14 @@ In MWI language, this state has exactly two branches. Branch 1: both
 qubits are $0$. Branch 2: both qubits are $1$. There is no branch where
 qubit 0 is $0$ and qubit 1 is $1$, or vice versa. The branches are
 perfectly correlated. This correlation is not a signal or a causal
-influence --- it is simply the structure of the wavefunction.
+influence, it is simply the structure of the wavefunction.
 
-# 5. Code Example --- Entanglement as Branch Correlation
+# Code Example: Entanglement as Branch Correlation
 
 Let us trace through the Bell state circuit step by step and watch the
 branch structure evolve in the statevector:
 
-*Code --- Building a Bell state, tracing branch evolution*
+*Code: Building a Bell state, tracing branch evolution*
 
 ```python
 import qckt
@@ -200,12 +203,12 @@ MEASURED Qubit[1, 0] = [1, 1] with probability = 0.5
 
 And, the output of multishot run
 
-{0: 496, 3: 504}    <- we see only |00> and |11> outcomes, each approximately 50% of the time>
+{0: 496, 3: 504}    <- we see only 0 (|00>) and 3 (|11>) outcomes, each approximately 50% of the time
 ```
 
 The trace tells the story precisely. After the Hadamard, the two
-branches are independent --- qubit 1 is 0 in both. After the CNOT, the
-branches are correlated --- qubit 1 has been forced to match qubit 0 in
+branches are independent, qubit 1 is 0 in both. After the CNOT, the
+branches are correlated, qubit 1 has been forced to match qubit 0 in
 each branch. The states $\ket{01}$ and $\ket{10}$ have zero amplitude: those
 branches do not exist in this wavefunction.
 
@@ -216,14 +219,14 @@ one branch. The perfect correlation is not due to any signal between the
 qubits at measurement time, the correlation was baked into the branch
 structure the moment the CNOT was applied.
 
-# 6. Measurement: You Are Part of the Wavefunction Too
+# Measurement: You Are Part of the Wavefunction Too
 
 This is where MWI makes its boldest claim, and where it most cleanly
 resolves the measurement problem.
 
-In Copenhagen, measurement is a special physical process that collapses
+In Copenhagen interpretation, measurement is a special physical process that collapses
 the wavefunction. The observer is treated as external to the quantum
-system --- a classical entity that peers in and forces a definite
+system, as a classical entity that peers in and forces a definite
 outcome. But this is conceptually awkward: where exactly is the boundary
 between the quantum system and the classical observer? No such boundary
 exists in nature.
@@ -243,12 +246,12 @@ the other.
 
 The probability of ending up in each branch is given by the Born rule:
 $|amplitude|^{2}$. In MWI, deriving the Born rule from first principles
-is non-trivial (more on this in Section 9), but *operationally* the rule
-is the same as in Copenhagen. The difference is conceptual:
-probabilities in MWI are not about which outcome *will happen* --- they
+is non-trivial (more on this in the last section of this note), but *operationally* the rule
+is the same as in Copenhagen interpretation. The difference is conceptual:
+probabilities in MWI are not about which outcome *will happen*, they
 are about which branch *you will find yourself in*.
 
-# 7. Decoherence: Why Branches Feel Classical
+# Decoherence: Why Branches Feel Classical
 
 A natural objection to MWI: if all branches are real and the
 wavefunction never collapses, why do we never experience superposition
@@ -290,7 +293,7 @@ noise is a decoherence channel, a pathway by which your computational
 branches become entangled with, and effectively lost to, the
 environment.
 
-# 8. A Practitioner's Takeaway
+# A Practitioner's Takeaway
 
 MWI is not just philosophical comfort. It provides a concrete mental
 model for reasoning about quantum circuits:
@@ -320,7 +323,7 @@ model for reasoning about quantum circuits:
 I find that using MWI framing makes the mechanisms of quantum algorithms
 considerably more transparent.
 
-# 9. Honest Caveats
+# Honest Caveats
 
 MWI is a preference, not settled science. Two open problems deserve
 acknowledgment:
@@ -328,8 +331,8 @@ acknowledgment:
 **The preferred basis problem**. MWI says the universe branches, but the
 Schrödinger equation alone does not specify *which basis* the branching
 occurs in. Why do we branch into states like $\ket{alive}$ and $\ket{dead}$ rather
-than their superpositions? Decoherence theory largely resolves this ---
-environmental interactions select a preferred "pointer basis" --- but
+than their superpositions? Decoherence theory largely resolves this,
+environmental interactions select a preferred "pointer basis", but
 the resolution is still debated at the foundational level.
 
 **The probability problem**. In MWI, all branches exist. What does it
