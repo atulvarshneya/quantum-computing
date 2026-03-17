@@ -53,9 +53,10 @@ Grover's algorithm can be used to solve it.
 
 ## Short Notes
 
-* Is Superposition more fundamental than Entanglement: A Perspective, *To be posted soon. Stay tuned.*<br>
+* [Is Superposition More Fundamental Than Entanglement? — A Perspective](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/Short%20Note%2001%20-%20Superposition%20and%20Entanglement.md), March 17, 2026<br>
+Two of the most frequently discussed ideas in quantum computing are superposition and entanglement. They are often presented as separate “mysteries” of quantum mechanics, each with its own strange and counter-intuitive implications. This note written from a practitioner’s perspective, presents these two ideas in a way which should help develop a clear intuition about them: it basically shows how entanglement can be understood as emerging often from superposition combined with interaction.
 
-* Why I find it easer to understand Quantum Computing through Many-Worlds interpretation, *To be posted soon. Stay tuned.*<br>
+* Many-Worlds interpretation of Quantum Mechanics, *To be posted soon. Stay tuned.*<br>
 
 * What is measurement afterall, *To be posted soon. Stay tuned.*<br>
 
