@@ -60,7 +60,7 @@ Two of the most frequently discussed ideas in quantum computing are superpositio
 Quantum mechanics is incredibly successful yet there is still debate on what it *means*.
 What really happens when we measure a quantum system? Does the wavefunction collapse? And if so, why?
 The Everettian Many-Worlds Interpretation (MWI) offers a striking alternative: measurement is simply entanglement, and every possible outcome continues to exist in separate branches.
-This short note explores MWI from a practitioner’s perspective — building an intuitive mental model for superposition, entanglement, and quantum circuits.
+This short note explores MWI from a practitioner’s perspective, building an intuitive mental model for superposition, entanglement, and quantum circuits.
 
 * What is measurement afterall, *To be posted soon. Stay tuned.*<br>
 
