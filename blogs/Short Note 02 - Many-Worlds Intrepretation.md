@@ -73,8 +73,8 @@ In MWI terms: after the Hadamard gate, the universe has branched into
 two equally weighted branches, one where the qubit is $\ket{0}$ and
 one where it is $\ket{1}$. Both are real.
 
-Let us run this on the simulator and observe the statevector evolving in
-real time (we use `Qucircuit`'s `Qdeb` backend and set `qtrace=True`).
+Let us run this on the `Qucircuit` simulator and observe the statevector evolving in
+real time (we use `Qdeb` backend and set `qtrace=True`).
 
 > [Qucircuit](https://github.com/atulvarshneya/quantum-computing/tree/master) is
 a full-featured open-source quantum computing simulator that I developed to support
@@ -134,7 +134,7 @@ other. After a conditional operation (like a CNOT gate applied to a
 qubit in superposition), the branches become locked together: each
 branch of the first qubit now has a definite corresponding state in the
 second qubit. The two systems can no longer be described independently.
-This is entanglement.
+This is entanglement  - the second qubit has *measured* the first qubit.
 
 The canonical example is the Bell state, created by a Hadamard on qubit
 $0$ followed by a CNOT:
@@ -203,7 +203,7 @@ MEASURED Qubit[1, 0] = [1, 1] with probability = 0.5
 
 And, the output of multishot run
 
-{0: 496, 3: 504}    <- we see only 0 (|00>) and 3 (|11>) outcomes, each approximately 50% of the time
+{0: 496, 3: 504}    <- we see only 0 (00) and 3 (11) outcomes, each approximately 50% of the time
 ```
 
 The trace tells the story precisely. After the Hadamard, the two
@@ -213,7 +213,7 @@ each branch. The states $\ket{01}$ and $\ket{10}$ have zero amplitude: those
 branches do not exist in this wavefunction.
 
 The multi-shot run confirms this: over $1000$ measurements, we see only
-$\ket{00}$ and $\ket{11}$ outcomes, each approximately $50\%$ of the
+$00$ and $11$ outcomes, each approximately $50\%$ of the
 time. Each shot is the simulator (or a real quantum computer) sampling
 one branch. The perfect correlation is not due to any signal between the
 qubits at measurement time, the correlation was baked into the branch
@@ -255,7 +255,7 @@ are about which branch *you will find yourself in*.
 
 A natural objection to MWI: if all branches are real and the
 wavefunction never collapses, why do we never experience superposition
-in everyday life? Why does a cat never seem to be simultaneously alive
+in everyday life? Why does [a cat](https://en.wikipedia.org/wiki/Schr%C3%B6dinger%27s_cat) never seem to be simultaneously alive
 and dead?
 
 The answer is **decoherence**. When a quantum system interacts with its
@@ -269,7 +269,7 @@ entanglement](https://github.com/atulvarshneya/quantum-computing/blob/master/blo
 that interference between two branches requires them to overlap, i.e.,
 mathematically, their inner product must be non-zero. Once a branch is
 entangled with a macroscopic environment, its environmental state is
-orthogonal to the other branch's environmental state. Their inner
+basically orthogonal to the other branch's environmental state. Their inner
 product is effectively zero. The interference among branches becomes
 practically impossible.
 

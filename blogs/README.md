@@ -56,7 +56,11 @@ Grover's algorithm can be used to solve it.
 * [Is Superposition More Fundamental Than Entanglement? — A Perspective](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/Short%20Note%2001%20-%20Superposition%20and%20Entanglement.md), March 17, 2026<br>
 Two of the most frequently discussed ideas in quantum computing are superposition and entanglement. They are often presented as separate “mysteries” of quantum mechanics, each with its own strange and counter-intuitive implications. This note written from a practitioner’s perspective, presents these two ideas in a way which should help develop a clear intuition about them: it basically shows how entanglement can be understood as emerging often from superposition combined with interaction.
 
-* Many-Worlds interpretation of Quantum Mechanics, *To be posted soon. Stay tuned.*<br>
+* [Many-Worlds interpretation of Quantum Mechanics](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/Short%20Note%2002%20-%20Many-Worlds%20Intrepretation.md), March 24, 2026<br>
+Quantum mechanics is incredibly successful yet there is still debate on what it *means*.
+What really happens when we measure a quantum system? Does the wavefunction collapse? And if so, why?
+The Everettian Many-Worlds Interpretation (MWI) offers a striking alternative: measurement is simply entanglement, and every possible outcome continues to exist in separate branches.
+This short note explores MWI from a practitioner’s perspective — building an intuitive mental model for superposition, entanglement, and quantum circuits.
 
 * What is measurement afterall, *To be posted soon. Stay tuned.*<br>
 
