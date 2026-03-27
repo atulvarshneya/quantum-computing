@@ -5,6 +5,7 @@ import qckt.Gates as gts
 import qckt.gatesutils as gutils
 import qckt.noisemodel as ns
 from qckt.qException import QCktException
+import numpy as np
 
 
 class GateWrapper:
@@ -122,6 +123,8 @@ class QCkt:
 			op = q.to_fullmatrix(self.nqubits)
 			if op is not None: ## Border, Probe gates return None
 				oplist.append(op)
+		if len(oplist) == 0:
+			return np.matrix(np.eye(2**self.nqubits),dtype=complex)
 		opmat = gutils.combine_opmatrices_seq(oplist)
 		return opmat
 

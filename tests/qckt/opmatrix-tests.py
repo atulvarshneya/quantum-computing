@@ -47,3 +47,60 @@ if res:
 	print("===================")
 	print("BOTH SVECS ARE SAME")
 	print("===================")
+
+
+## =======================================================================
+## Test for empty circuit to_opMatrix() - should return identity operator
+## =======================================================================
+print()
+print('================================================')
+print('Testing empty circuit to_opMatrix() - should return identity operator')
+print('================================================')
+
+ckop = qckt.QCkt(4)
+ckop.draw()
+op = ckop.to_opMatrix()
+
+ck1 = qckt.QCkt(4)
+ck1.H(0)
+ck1.CX(0,1)
+ck1.Probe("Original Circuit")
+ck1.draw()
+
+job1 = qckt.Job(ck1)
+bk = Qdeb()
+bk.runjob(job1)
+svec1 = job1.get_svec()
+
+print("====================================")
+
+qckt.define_gate("EMTCKT",op)
+
+ck2 = qckt.QCkt(4)
+ck2.H(0)
+ck2.CX(0,1)
+ck2.EMTCKT(3,2,1,0)  # This should not do anything as the op is identity
+ck2.Probe("Using op from to_opMatrix()")
+ck2.draw()
+
+job2 = qckt.Job(ck2)
+bk = Qdeb()
+bk.runjob(job2)
+svec2 = job2.get_svec()
+
+
+### compare the two svecs
+res = True
+if len(svec1.value) != len(svec2.value):
+	print("ERROR - svecs are different - lengths unequal",len(svec1),len(svec2))
+	res = False
+else:
+	for i in range(len(svec1.value)):
+		if svec1.value[i] != svec2.value[i]:
+			print("ERROR - svecs are different",i,": ",svec1.value[i], " != ",svec2.value[i])
+			res = False
+if res:
+	print()
+	print("===================")
+	print("BOTH SVECS ARE SAME")
+	print("===================")

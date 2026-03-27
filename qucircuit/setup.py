@@ -5,7 +5,7 @@ with open('RELEASE-splash.md', 'r') as file:
 
 setup(
     name='qucircuit',
-    version='3.0',
+    version='3.1',
     license='GPL',
     author='Atul Varshneya',
     author_email='atul.varshneya@gmail.com',
