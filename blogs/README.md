@@ -12,6 +12,13 @@ This blog is designed for curious computer scientists, software engineers, and t
 </div>
 
 ## Blog Posts
+* Early Quantum Algorithms, *To be posted soon. Stay tuned.*<br>
+I am starting a series of blog posts on early quantum algorithms which bring to fore several key concepts behind designing quantum algorithms. These early algorithms demonstrated that for certain problems quantum computing speedups are beyond what can be achieved by classical computers. As always, my posts will be accompanied by tutorial style  code which you can run on your own computers. The series will comprise of the following posts -
+  * Deutsch–Jozsa (first algorithm that hinted towards exponential speedup)
+  * Bernstein–Vazirani (spotlight on phase kick-back)
+  * Simon’s Algorithm (true exponential speedup)
+  * Shor’s Algorithm, multi-part post (a highly impactful exponential speedup)
+
 * QAOA Step by Step<br>
 This is a short series of posts that explains Quantum Approximate Optimization Algorithm (QAOA) 
 from a practitioner's perspective. The posts focus on guiding the reader to implement this algorithm
@@ -50,6 +57,9 @@ algorithm works, then we introduce the *dinner party problem* which
 involves identifying a set of friends that can be invited together to a
 party satisfying a set of constraints. And then we explain how
 Grover's algorithm can be used to solve it.
+
+* Posts series on Quantum Machine Learning, *To be posted soon. Stay tuned.*<br>
+This will be a major series I am planning to write. I expect it to be several individual posts, spread over several months.
 
 ## Short Notes
 
