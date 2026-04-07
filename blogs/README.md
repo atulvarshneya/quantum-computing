@@ -12,12 +12,14 @@ This blog is designed for curious computer scientists, software engineers, and t
 </div>
 
 ## Blog Posts
-* Early Quantum Algorithms, *To be posted soon. Stay tuned.*<br>
-I am starting a series of blog posts on early quantum algorithms which bring to fore several key concepts behind designing quantum algorithms. These early algorithms demonstrated that for certain problems quantum computing speedups are beyond what can be achieved by classical computers. As always, my posts will be accompanied by tutorial style  code which you can run on your own computers. The series will comprise of the following posts -
-  * Deutsch–Jozsa (first algorithm that hinted towards exponential speedup)
-  * Bernstein–Vazirani (spotlight on phase kick-back)
-  * Simon’s Algorithm (true exponential speedup)
-  * Shor’s Algorithm, multi-part post (a highly impactful exponential speedup)
+* Early Quantum Algorithms<br>
+I am starting a series of blog posts on early quantum algorithms which bring to fore several key concepts behind designing quantum algorithms. These early algorithms demonstrated that for certain problems quantum computing speedups are beyond what can be achieved by classical computers. As always, my posts will be accompanied by tutorial style code which you can run on your own computers. The series will comprise of the following posts -
+  * [Deutsch–Jozsa (first steps toward exponential quantum speedup)](https://github.com/atulvarshneya/quantum-computing/blob/master/blogs/Early%20Algorithms%20-%2001%20Deutsch-Jozsa%20Algorithm.md), April 7, 2026<br>
+  In this post, we explore two of the earliest quantum algorithms — Deutsch’s algorithm (1985) and its generalization, the Deutsch–Jozsa algorithm (1992). These are not just historical curiosities; they introduce the core ideas behind quantum speedup: superposition, phase kickback, and interference.<br>
+
+  * Bernstein–Vazirani (spotlight on phase kick-back), *To be posted soon. Stay tuned.*
+  * Simon’s Algorithm (true exponential speedup), *To be posted soon. Stay tuned.*
+  * Shor’s Algorithm, multi-part post (a highly impactful exponential speedup), *To be posted soon. Stay tuned.*
 
 * QAOA Step by Step<br>
 This is a short series of posts that explains Quantum Approximate Optimization Algorithm (QAOA) 
