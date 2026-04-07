@@ -2,6 +2,7 @@
 
 <p style="text-align: center;"> <em>The Deutsch–Jozsa Breakthrough: The First Step Toward Exponential Quantum Speedup</em></p>
 
+# Introduction
 
 One of the most striking claims about quantum computing is that it can solve certain problems exponentially faster than classical computers.
 
@@ -10,7 +11,12 @@ But how does that actually happen?
 In this post, we’ll explore two of the earliest quantum algorithms — Deutsch’s algorithm (1985) and its generalization, the Deutsch–Jozsa algorithm (1992). These are not just historical curiosities; they introduce the core ideas behind quantum speedup: superposition, phase kickback, and interference.
 
 As companions to this post, there are two Python notebooks - [Deutsch's algorithm](https://github.com/atulvarshneya/quantum-computing/blob/master/examples/qckt/Well-Known%20Algorithms/deutsch-qckt.ipynb), [Deutsch-Jozsa algorithm](https://github.com/atulvarshneya/quantum-computing/blob/master/examples/qckt/Well-Known%20Algorithms/deutsch-jozsa-qckt.ipynb) - that have code for implementing these algorithms. 
-These notebooks are written leveraging [Qucircuit](https://github.com/atulvarshneya/quantum-computing/tree/master), a full-featured free to use quantum computing simulator that I developed.
+These notebooks are written to run on `Qucircuit` simulator.
+
+> [Qucircuit](https://github.com/atulvarshneya/quantum-computing/tree/master) is
+a full-featured free to use quantum computing simulator that I developed to support
+educational and experimental work in quantum algorithms. You can install
+Qucircuit in just a few seconds using `pip install qucircuit`.
 
 <!--
 Superposition in quantum computers points towards the potential for
@@ -40,7 +46,7 @@ algorithm was the first to show the power of quantum computing by
 demonstrating a problem that a quantum computer could solve in **one** step,
 while a classical computer required **two**.
 
-It is good to start with this algorithm here as it demonstrated speedup
+It is good to start with this algorithm as it demonstrated speedup
 by leveraging superposition and interference, thus paving the way for
 future algorithms.
 
