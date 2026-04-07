@@ -214,10 +214,15 @@ The final hadamard undoes the superposition, and the phase acquired in the previ
 
 Hadamard on a state $\ket{x}$ is written as
 
-$$H\ket{x} \rightarrow \left\{ \begin{array}{r}
+$$
+\begin{equation*}
+H\ket{x} \rightarrow
+\begin{cases}
 \frac{1}{\sqrt{2}}\left( \ket{0} + \ket{1} \right),\ if\ x = 0 \\
 \frac{1}{\sqrt{2}}\left( \ket{0} - \ket{1} \right),\ if\ x = 1
-\end{array} \right.\ $$
+\end{cases}
+\end{equation*}
+$$
 
 Which in a compact form can be written as the following, lets call this "equation 1"
 
@@ -247,10 +252,15 @@ $$U_{f}\left( \ket{x}\ket{-}  \right) \rightarrow \frac{1}{\sqrt{2}}\ket{x}\left
 
 And, for the two possible values of $f(x)$
 
-$$U_{f}\left( \ket{x}\ket{-} \right) \rightarrow \left\{ \begin{array}{l}
+$$
+\begin{equation*}
+U_{f}\left( \ket{x}\ket{-} \right) \rightarrow
+\begin{cases}
 \frac{1}{\sqrt{2}}\ket{x}\left( \ket{0} - \ket{1} \right) = \ket{x}\ket{-},\ if\ f(x) = 0 \\
 \frac{1}{\sqrt{2}}\ket{x}\left( \ket{1} - \ket{0} \right) = - \ket{x}\ket{-},\ if\ f(x) = 1
-\end{array} \right.\ $$
+\end{cases}
+\end{equation*}
+$$
 
 Or, in a compact form, it can be written as the following, lets call it "equation 3"
 
