@@ -1,6 +1,6 @@
-# Early Quantum Algorithms - Part 1: Deutsch-Jozsa algorithm
+# Deutsch–Jozsa Algorithm: The First Step Toward Quantum Speedup
 
-<p style="text-align: center;"> <em>The Deutsch–Jozsa Breakthrough: The First Steps Toward Exponential Quantum Speedup</em></p>
+<p style="text-align: center;"> <em>The Deutsch–Jozsa Breakthrough: The First Step Toward Exponential Quantum Speedup</em></p>
 
 
 One of the most striking claims about quantum computing is that it can solve certain problems exponentially faster than classical computers.
@@ -359,6 +359,8 @@ some very important concepts which are often useful in designing quantum
 algorithms.
 
 # Key takeaways from these two quantum algorithms
+
+<!--
 1. Where is superposition used?  
 input qubit(s) initialized to all possible input values
 
@@ -367,6 +369,20 @@ oracle encodes function values into phase of input qubit(s)
 
 3. Where does interference happen?  
 final Hadamard(s) cause constructive/destructive interference to have a 100% or 0% probability for measuring $0$ for constant or balanced $f(x)$, respectively
+-->
+
+1. **Superposition**  
+We evaluate the function on all inputs simultaneously.
+
+2. **Phase Kickback**  
+Function values are encoded as phases.
+
+3. **Interference**  
+Constructive/destructive interference reveals global structure.
+
+4. **Measurement**  
+The final measurement extracts that property directly.
+
 
 # Getting hands-on with the algorithms discussed here
 
