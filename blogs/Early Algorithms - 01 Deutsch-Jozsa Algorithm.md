@@ -145,7 +145,7 @@ future algorithms.
 ## Problem statement
 
 Deutsch\'s algorithm solves a simple problem. Consider a
-function $f(x)$ that takes a single bit (i.e. 0 or 1) as input and
+function $f(x)$ that takes a single bit (i.e. 0 or 1) as input and
 returns a single bit (i.e. 0 or 1) as output. It is promised that $f(x)$
 is either constant, or balanced -
 
@@ -169,7 +169,7 @@ Since the function takes a single bit as input and gives a single bit output, th
 
 It's easy to see that classically we would have to call the function
 twice to determine if it\'s constant or balanced. For example, we might
-call the function with input 0 and learn that the output is $f(0) = 1$.
+call the function with input 0 and learn that the output is $f(0) = 1$.
 Looking at the table above, we see two possible outcomes with this --
 the last two rows. So, we still can't tell whether it is constant or
 balanced. So, we would have to call the function a second time with
@@ -202,7 +202,7 @@ output qubit  |0> -[X]-[H]--------|    |--------------
                            Ψ1   Ψ2       Ψ3     Ψ4
 ```
 
-The input qubit as wella as the output qubit are initially in state $\ket{0}$. The input qubit is put in superposition by applying Hadamard operation.
+The input qubit as well as the output qubit are initially in state $\ket{0}$. The input qubit is put in superposition by applying Hadamard operation.
 
 The output qubit is put in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit in $\ket{-}$ causes the phase kick-back -- the input that leads to output being 1, causes that input to acquire the phase of a $-ve$ sign.
 
@@ -245,8 +245,7 @@ However, more generally, lets assume the output qubit is not prepared as $\ket{0
 
 $$U_{f}\left( \ket{x}\ket{y} \right) \rightarrow \ket{x}\ket{y \oplus f(x)}$$
 
-An interesting thing happens if we prepare the output qubit as
-$\ket{-}$, i.e.,$\frac{1}{\sqrt{2}}\left( \ket{0} - \ket{1} \right)$
+An interesting thing happens if we prepare the output qubit as $\ket{-}$, i.e., $\frac{1} {\sqrt{2}} \left( \ket{0} - \ket{1} \right)$
 
 $$U_{f}\left( \ket{x}\ket{-}  \right) \rightarrow \frac{1}{\sqrt{2}}\ket{x}\left( \ket{0 \oplus f(x)} - \ket{1 \oplus f(x)} \right)$$
 
@@ -278,7 +277,7 @@ Lets examine the state of the qubits at each step of the running of this circuit
 
 ### Step 1 - $\psi_{1}$ - preparing output qubit
 
-The sequence of X followed by H gates, prepares the output qubit in $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right) $ state. I.e.,
+The sequence of X followed by H gates, prepares the output qubit in $\frac{1} {\sqrt{2}} \left( \ket{0} - \ket{1} \right)$ state. I.e.,
 
 $$\psi_{1} = \ket{0} \frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right) = \ket{0}\ket{-}$$
 
@@ -308,7 +307,6 @@ We can now ignore the output qubit, since we are going to measure only
 the input qubit. To zoom in on the state of the input qubit, let us expand the summation over $z$, and then expand the summation over $x$,
 
 $$\frac{1}{2}\sum_{x = 0}^{1}\left( ( - 1)^{x\  \cdot 0 + f(x)}\ket{0} + ( - 1)^{(x \cdot 1) + f(x)}\ket{1} \right)
-
 = \frac{1}{2}\sum_{x = 0}^{1}\left( ( - 1)^{f(x)}\ket{0} + ( - 1)^{x + f(x)}\ket{1} \right)$$
 
 $$= \frac{1}{2}\left( ( - 1)^{f(0)}\ket{0} + ( - 1)^{f(0)}\ket{1} + ( - 1)^{f(1)}\ket{0} + ( - 1)^{1 + f(1)}\ket{1} \right)$$
