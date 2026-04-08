@@ -87,8 +87,8 @@ Deutsch algorithm requires only 1 call to the function to determines that.
 
 The core ideas behind Deutsch's algorithm are the following. Each of these are explained  with rigor in the next section.
 
-1. **Superposition**: It creates a superposition in the inut so it presents both the possible inputs to the oracle simultaneously.
-2. **Phase kick-back**: This is a trick used often in quantum algorithms where the output value of the oracle leads to the change in the phase of the corresponding input. Note that the superposed inputs leading to output of 0 and output of 1 develop different phase. This encodes the function's output as a phase which makes quantum interference possible.
+1. **Superposition**: It creates a superposition in the input qubits so it presents both the possible inputs to the oracle simultaneously.
+2. **Phase kick-back**: This is a trick used often in quantum algorithms where the output value of the oracle leads to the change in the phase of the corresponding input. Note that the superposed inputs leading to output of 0 and output of 1 develop different phases. This encodes the function's outputs as phase on the corresponding inputs which makes quantum interference possible.
 3. **Interference**: Having done these steps, the final step engineers an interference among the states of the input qubit such that the state converges to a single definite value (i.e., either $\ket{0}$ or $\ket{1}$), thus the measurement extracts that answer with 100% certainity.
 
 ## Specifics of the Deutsch's algorithm
@@ -106,17 +106,20 @@ output qubit  |0> -[X]-[H]--------|    |--------------
                            Ψ1   Ψ2       Ψ3     Ψ4
 ```
 
-The input qubit as well as the output qubit are initially in state $\ket{0}$. The input qubit is put in superposition by applying Hadamard operation.
+While we will get into more details further down, here are the key elements of this circuit.
 
-The output qubit is prepared in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit in $\ket{-}$ causes the phase kick-back -- the input that leads to output being 1, causes that input to acquire the phase of a $-ve$ sign.
-
-The final hadamard undoes the superposition, and the phase acquired in the previous steps leads to an interference which puts the input qubit in one of $\ket{0}$ or in $\ket{1}$ states which is the answer extracted by performing measurement on it.
+* The input qubit as well as the output qubit are initially in state $\ket{0}$.
+* The input qubit is put in superposition by applying Hadamard operation.
+* The output qubit is prepared in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit's being in $\ket{-}$ causes the phase kick-back -- the input that leads to output being 1, causes that input to acquire the phase of a $-ve$ sign.
+* The final hadamard undoes the superposition, and the phase acquired in the previous steps leads to an interference which puts the input qubit in one of $\ket{0}$ or in $\ket{1}$ states which is the answer extracted by performing measurement on it.
 
 ### Some mathematical groundwork for understanding the working of Deutsch's algorithm
 
 **Hadamard operation**
 
-Hadamard on a state $\ket{x}$ is written as
+> I am assuming the audience has some introductory knowedge of quantum computing, hence some familiarity with the basic quantum computing gates, such as Hadamard. Therefore, the math below is not so much to introduce the basic gate, but more to tell the story of, and, how to think about the working of the algorithm.
+
+Application of Hadamard on a state $\ket{x}$ is expressed as
 
 $$
 \begin{equation*}
@@ -138,11 +141,11 @@ $$\boxed{H\ket{0}\rightarrow\frac{1}{\sqrt{2}}\sum_{x = 0}^{1}\ket{x}}$$
 
 **Oracle operation and phase kick-back**
 
-Now, lets look at the oracle provided for the problem. For $\ket{x}$ in any one of the computational basis states,
+Now, lets look at the oracle provided for the problem. For the input qubit in any one of the computational basis states $\ket{x}$, and the output qubit in state $\ket{0}$, the oracle's operation can be written as
 
 $$U_{f}\left( \ket{x}\ket{0} \right) \rightarrow \ket{x}\ket{f(x)}$$
 
-However, more generally, lets assume the output qubit is not prepared as $\ket{0}$ but as state $\ket{y}$. Since every quantum operation must be reversible, the operation of the oracle would be:
+However, more generally, lets assume the output qubit is not prepared to be in $\ket{0}$ but in state $\ket{y}$. Since quantum operations must be reversible, the operation of the oracle would be:
 
 $$U_{f}\left( \ket{x}\ket{y} \right) \rightarrow \ket{x}\ket{y \oplus f(x)}$$
 
@@ -239,7 +242,7 @@ $$\left| \frac{1}{2} \left( {( - 1)^0+( - 1)^1} \right) \right|^2 = \left| \frac
 In other words, the probability to measure $\ket{0}$ evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will be 
 $\ket{0}$ if and only if $f(x)$ is constant, and it will be the only other state $\ket{1}$ if $f(x)$ is balanced.
 
-Thus, Deutsch algorithm performs only **one** query to the function to determine the type of the function.
+Thus, you see how Deutsch algorithm performs only **one** query to the function to determine the type of the function.
 
 # Deutsch-Jozsa algorithm
 
@@ -299,7 +302,7 @@ Hadamard on a multi-qubit state $\ket{x}, where\ x=x_{n-1}, x_{n-2} ... x_1, x_0
 $$\boxed{H^{\otimes n}\ket{x} \rightarrow \frac{1}{\sqrt{2^n}} \sum_{z = 0}^{2^n-1}{\left( -1 \right)^{x \cdot z}\ket{z}}}$$
 $$where\ x \cdot z = x_{n-1} z_{n-1} + x_{n-2} z_{n-2} + ... + x_0 z_0\ \text{ is the sum of the bitwise products}$$
 
-Thus, if $\ket{x}=\ket{0}^{\otimes n}$, this becomes as the following. ("equation 5")
+Thus, if $\ket{x}=\ket{0}^{\otimes n}$, it becomes as the following. ("equation 5")
 
 $$\boxed{H^{\otimes n}\ket{0}^{\otimes n}\rightarrow\frac{1}{\sqrt{2^n}}\sum_{x = 0}^{2^n-1}\ket{x}}$$
 
@@ -315,7 +318,7 @@ Here also we examine the state of the qubits at each step of the running of the 
 
 ### Step 1 - $\psi_{1}$ - preparing output qubit
 
-The output qubit is prepared in $\frac{1} {\sqrt{2}} \left( \ket{0} - \ket{1} \right)$ state. I.e.,
+The output qubit is prepared in $\frac{1} {\sqrt{2}} \left( \ket{0} - \ket{1} \right)$ state by applying X and then H. I.e.,
 
 $$\psi_{1} = \ket{0}^{\otimes n} \frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right) = \ket{0}^{\otimes n}\ket{-}$$
 
@@ -353,7 +356,7 @@ Therefore, the probability for measuring $k=0$
 
 $$\left| {\sum_{x = 0}^{2^n-1}\frac{1}{2^n}{( - 1)^{f(x)}}} \right|^2$$
 
-which evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will yield 
+which evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will be 
 $\ket{0}^{\otimes n}$ (all zeros) if and only if $f(x)$ is constant and will yield some other state if $f(x)$ is balanced.
 
 Thus, Deutsch-Jozsa algorithm performs only **one** query to the function to determine the type of the function. This is **exponential** speedup over *deterministic* classical algorithms.
