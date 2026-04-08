@@ -233,6 +233,7 @@ if\ f(x) = 1\ \text{for both inputs}: & \left| \frac{1}{2} \left( {( - 1)^1+( - 
 $$
 
 * If the function is balanced, one output of $f(x)$ will be $0$ and the other output will be $1$, thus the terms in the summation will cancel each other and the expression will evaluate to $0$.
+
 $$\left| \frac{1}{2} \left( {( - 1)^0+( - 1)^1} \right) \right|^2 = \left| \frac{1}{2} \left( 1 - 1 \right) \right|^2 = 0$$
 
 In other words, the probability to measure $\ket{0}$ evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will be 
@@ -352,8 +353,8 @@ Therefore, the probability for measuring $k=0$
 
 $$\left| {\sum_{x = 0}^{2^n-1}\frac{1}{2^n}{( - 1)^{f(x)}}} \right|^2$$
 
-which evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will be 
-$\ket{0}^{\otimes n}$ (all zeros) if and only if f(x)} is constant and will yield some other state if f(x)} is balanced.
+which evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will yield 
+$\ket{0}^{\otimes n}$ (all zeros) if and only if $f(x)$ is constant and will yield some other state if $f(x)$ is balanced.
 
 Thus, Deutsch-Jozsa algorithm performs only **one** query to the function to determine the type of the function. This is **exponential** speedup over *deterministic* classical algorithms.
 
