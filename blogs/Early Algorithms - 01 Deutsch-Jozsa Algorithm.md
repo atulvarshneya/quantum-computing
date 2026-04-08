@@ -1,7 +1,5 @@
 # Deutsch–Jozsa Algorithm: The First Step Toward Quantum Speedup
 
-<p style="text-align: center;"> <em>The Deutsch–Jozsa Breakthrough: The First Step Toward Exponential Quantum Speedup</em></p>
-
 # Introduction
 
 One of the most striking claims about quantum computing is that it can solve certain problems exponentially faster than classical computers.
@@ -62,7 +60,7 @@ is either constant, or balanced -
 -   A balanced function is one where the output is 0 for one input and 1
     for the other input.
 
-The function is provided as a "black-box", an oracle, such that we cannot look inside it to see how it works. So, when we refer to it as a quantum operator, we call it $U_f$.
+The function is provided as a "black-box", an oracle, such that we cannot look inside it to see how it works. We refer to it as a quantum operator $U_f$.
 
 The problem is to determine if the function is constant or balanced with as few evaluations as possible.
 
@@ -83,7 +81,7 @@ the last two rows. So, we still can't tell whether it is constant or
 balanced. So, we would have to call the function a second time with
 input 1 to determine that.
 
-**Deutsch algorithm requires only 1 call to the function to determines that.**
+Deutsch algorithm requires only 1 call to the function to determines that.
 
 ## The Quantum Trick - the core intuition
 
@@ -92,8 +90,6 @@ The core ideas behind Deutsch's algorithm are the following. Each of these are e
 1. **Superposition**: It creates a superposition in the inut so it presents both the possible inputs to the oracle simultaneously.
 2. **Phase kick-back**: This is a trick used often in quantum algorithms where the output value of the oracle leads to the change in the phase of the corresponding input. Note that the superposed inputs leading to output of 0 and output of 1 develop different phase. This encodes the function's output as a phase which makes quantum interference possible.
 3. **Interference**: Having done these steps, the final step engineers an interference among the states of the input qubit such that the state converges to a single definite value (i.e., either $\ket{0}$ or $\ket{1}$), thus the measurement extracts that answer with 100% certainity.
-
-Lets now get into the specifics of the algorithm.
 
 ## Specifics of the Deutsch's algorithm
 
@@ -132,16 +128,13 @@ if\ x = 1 : & \frac{1}{\sqrt{2}}\left( \ket{0} - \ket{1} \right),
 \end{equation*}
 $$
 
-Which in a compact form can be written as the following. Lets call this "equation 1"
+Which can be written in a compact form as the following. ("equation 1")
 
 $$\boxed{H\ket{x} \rightarrow \frac{1}{\sqrt{2}} \sum_{z = 0}^{1}{\left( -1 \right)^{x \cdot z}\ket{z}}}$$
 
-Thus if $\ket{x}=\ket{0}$, this becomes as the following. Lets call this "equation 2".
+For $\ket{x}=\ket{0}$, it reduces to the following. ("equation 2")
 
 $$\boxed{H\ket{0}\rightarrow\frac{1}{\sqrt{2}}\sum_{x = 0}^{1}\ket{x}}$$
-
-
-Writing in these compact forms comes in handy later on, so stay with me on this.
 
 **Oracle operation and phase kick-back**
 
@@ -169,7 +162,7 @@ if\ f(x) = 1 : & \frac{1}{\sqrt{2}}\ket{x}\left( \ket{1} - \ket{0} \right) = - \
 \end{equation*}
 $$
 
-Or, in a compact form, it can be written as the following. Lets call it "equation 3"
+Or, in a compact form, it can be written as the following. ("equation 3")
 
 $$\boxed{U_{f}\left( \ket{x}\ket{-} \right)\rightarrow\left(-1 \right)^{f\left( x \right)}\ket{x} \ket{-}}$$
 
@@ -227,13 +220,23 @@ Now the trick is to evaluate the probability of measuring $\ket{z}=\ket{0}$, whi
 
 $$\left| {\sum_{x = 0}^{1}\frac{1}{2}{( - 1)^{x \cdot 0 + f(x)}}} \right|^2 = \left| {\sum_{x = 0}^{1}\frac{1}{2}{( - 1)^{f(x)}}} \right|^2$$
 
-So, the probabilities of measuring $\ket{0}$
-* If the function is constant, the summation in the above will be cumulative and evaluate to 1 -- specifically, if $f(x)$ is $0$ for both inputs, the expression will evaluate to 
-$\left| \frac{1}{2} \left( {( - 1)^0+( - 1)^0} \right) \right|^2 = \left| \frac{1}{2} \left( 2 \right) \right|^2 = 1$, and, if $f(x)$ is $1$ for both inputs, the expression will evaluate to $\left| \frac{1}{2} \left( {( - 1)^1+( - 1)^1} \right) \right|^2 = \left| \frac{1}{2} \left( -2 \right) \right|^2 = 1$.
-* If the function is balanced, one output of $f(x)$ will be $0$ and the other output will be $1$, thus the terms in the summation will cancel each other and the expression will evaluate to $0$ -- $\left| \frac{1}{2} \left( {( - 1)^0+( - 1)^1} \right) \right|^2 = \left| \frac{1}{2} \left( 1 - 1 \right) \right|^2 = 0$
+So, the probabilities of measuring $\ket{0}$ --
+* If the function is constant, the summation in the above will be cumulative and will evaluate to 1.
+
+$$
+\begin{equation*}
+\begin{cases}
+if\ f(x) = 0\ \text{for both inputs}: & \left| \frac{1}{2} \left( {( - 1)^0+( - 1)^0} \right) \right|^2 = \left| \frac{1}{2} \left( 2 \right) \right|^2 = 1,\\
+if\ f(x) = 1\ \text{for both inputs}: & \left| \frac{1}{2} \left( {( - 1)^1+( - 1)^1} \right) \right|^2 = \left| \frac{1}{2} \left( -2 \right) \right|^2 = 1
+\end{cases}
+\end{equation*}
+$$
+
+* If the function is balanced, one output of $f(x)$ will be $0$ and the other output will be $1$, thus the terms in the summation will cancel each other and the expression will evaluate to $0$.
+$$\left| \frac{1}{2} \left( {( - 1)^0+( - 1)^1} \right) \right|^2 = \left| \frac{1}{2} \left( 1 - 1 \right) \right|^2 = 0$$
 
 In other words, the probability to measure $\ket{0}$ evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will be 
-$\ket{0}$ (all zeros) if and only if f(x)} is constant and it will be the only other state $\ket{1}$ if f(x)} is balanced.
+$\ket{0}$ if and only if $f(x)$ is constant, and it will be the only other state $\ket{1}$ if $f(x)$ is balanced.
 
 Thus, Deutsch algorithm performs only **one** query to the function to determine the type of the function.
 
@@ -290,18 +293,18 @@ The math groundwork for Deutsch-Jozsa algorithm is very similar to that for Deut
 
 **Hadamard operation on multiple qubits**
 
-Hadamard on a multi-qubit state $\ket{x}, where\ x=x_{n-1}, x_{n-2} ... x_1, x_0$ is written as the following. Lets call it "equation 4"
+Hadamard on a multi-qubit state $\ket{x}, where\ x=x_{n-1}, x_{n-2} ... x_1, x_0$ is written as the following. ("equation 4")
 
 $$\boxed{H^{\otimes n}\ket{x} \rightarrow \frac{1}{\sqrt{2^n}} \sum_{z = 0}^{2^n-1}{\left( -1 \right)^{x \cdot z}\ket{z}}}$$
 $$where\ x \cdot z = x_{n-1} z_{n-1} + x_{n-2} z_{n-2} + ... + x_0 z_0\ \text{ is the sum of the bitwise products}$$
 
-Thus, if $\ket{x}=\ket{0}^{\otimes n}$, this becomes as the following. Lets call it "equation 5".
+Thus, if $\ket{x}=\ket{0}^{\otimes n}$, this becomes as the following. ("equation 5")
 
 $$\boxed{H^{\otimes n}\ket{0}^{\otimes n}\rightarrow\frac{1}{\sqrt{2^n}}\sum_{x = 0}^{2^n-1}\ket{x}}$$
 
 **Oracle operation and phase kick-back**
 
-This remains the same as shown for Deutsch algorithm, except that $\ket{x}$ is $n$ qubits here. Lets call it "equation 6"
+This remains the same as shown for Deutsch algorithm, except that $\ket{x}$ is $n$ qubits here. ("equation 6")
 
 $$\boxed{U_{f}\left( \ket{x}\ket{-} \right)\rightarrow\left(-1 \right)^{f\left( x \right)}\ket{x} \ket{-}}$$
 
@@ -356,7 +359,7 @@ Thus, Deutsch-Jozsa algorithm performs only **one** query to the function to det
 
 ## Caveat
 
-Note that Deutsch-Jozsa demonstrates speed up compared to 
+Note that Deutsch-Jozsa demonstrates exponential speed up compared to 
 *deterministic* classical algorithms, if compared with randomized
 classical algorithms the advantage disappears. In a subsequent post we
 will go over Simon's algorithm, which is considered the first strong
@@ -376,6 +379,8 @@ oracle encodes function values into phase of input qubit(s)
 3. Where does interference happen?  
 final Hadamard(s) cause constructive/destructive interference to have a 100% or 0% probability for measuring $0$ for constant or balanced $f(x)$, respectively
 -->
+
+The key concepts to take away from these algorithm, which form the basis of several other quantum algorithms, are the following:
 
 1. **Superposition**  
 We evaluate the function on all inputs simultaneously.
