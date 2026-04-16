@@ -16,26 +16,6 @@ a full-featured free to use quantum computing simulator that I developed to supp
 educational and experimental work in quantum algorithms. You can install
 Qucircuit in just a few seconds using `pip install qucircuit`.
 
-<!--
-Superposition in quantum computers points towards the potential for
-performing exponentially large computations compared to classical
-computers. While such massive speedup is achievable for only certain
-problems, it still makes the field full of promise. Even if not all the way to exponential speeedup,
-exploiting its power to perform well beyond what is possible with
-classical computers, e.g., Grover's algorithm yields quadratic speedup,
-is itself a great advantage and motivation for this area of study.
-
-In this post we learn about the Deutsch-Jozsa algorithm (1992) which is
-considered the first example of a quantum algorithm to demonstrate an
-exponential speedup over *deterministic* classical algorithms. It solves
-a specific "black box" problem in *one* query, whereas deterministic
-classical algorithms require an exponential number of queries *in the
-worst case*. This exponential speedup isn't about clever programming; it 
-is about exploiting the fundamental laws of quantum mechanics; specifically, 
-leveraging the principles of quantum superposition and 
-interference, to solve this problem with such a speedup.
--->
-
 # First the narrower version - Deutsch's algorithm
 
 We start this post with the narrower version of this algorithm, Deutsch's
@@ -60,7 +40,7 @@ is either constant, or balanced -
 -   A balanced function is one where the output is 0 for one input and 1
     for the other input.
 
-The function is provided as a "black-box", an oracle, such that we cannot look inside it to see how it works. We refer to it as a quantum operator $U_f$.
+The function is provided as a "black-box" quantum operator, an oracle, such that we cannot look inside it to see how it works. We refer to this quantum operator as $U_f$.
 
 The problem is to determine if the function is constant or balanced with as few evaluations as possible.
 
@@ -83,6 +63,7 @@ input 1 to determine that.
 
 Deutsch algorithm requires only 1 call to the function to determines that.
 
+<!--
 ## The Quantum Trick - the core intuition
 
 The core ideas behind Deutsch's algorithm are the following. Each of these are explained  with rigor in the next section.
@@ -90,6 +71,7 @@ The core ideas behind Deutsch's algorithm are the following. Each of these are e
 1. **Superposition**: It creates a superposition in the input qubits so it presents both the possible inputs to the oracle simultaneously.
 2. **Phase kick-back**: This is a trick used often in quantum algorithms where the output value of the oracle leads to the change in the phase of the corresponding input. Note that the superposed inputs leading to output of 0 and output of 1 develop different phases. This encodes the function's outputs as phase on the corresponding inputs which makes quantum interference possible.
 3. **Interference**: Having done these steps, the final step engineers an interference among the states of the input qubit such that the state converges to a single definite value (i.e., either $\ket{0}$ or $\ket{1}$), thus the measurement extracts that answer with 100% certainity.
+-->
 
 ## Specifics of the Deutsch's algorithm
 
