@@ -92,7 +92,7 @@ While we will get into more details further down, here are the key elements of t
 
 * The input qubit as well as the output qubit are initially in state $\ket{0}$.
 * The input qubit is put in superposition by applying Hadamard operation.
-* The output qubit is prepared in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit's being in $\ket{-}$ causes the phase kick-back when $U_f$ is applied -- the input that leads to $f(x)=1$, acquires the phase of a $-ve$ sign.
+* The output qubit is prepared in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit's being in $\ket{-}$ causes the phase kick-back (explained below) when $U_f$ is applied -- the input that leads to $f(x)=1$, acquires the phase of a $-ve$ sign.
 * The final hadamard undoes the superposition, and the phase acquired in the previous steps leads to an interference which puts the input qubit in one of $\ket{0}$ or in $\ket{1}$ states which is the answer extracted by performing measurement on it.
 
 The next couple of sections get into the math of the algorithm. If you wish you can skip them. The final section of this article, 'How These Algorithms Work', summarizes the core ideas in plain English.
@@ -240,6 +240,7 @@ Deutsch and Jozsa showed that using a quantum computer the determination could b
 
 As we go into the details of Deutsch-Jozsa algorithm, I have intentionally kept the discussion completely parallel to the discussion of the Deutsch's algorithm to make it very straight forward to follow.
 
+<!--
 ## The Same Quantum Trick as in Deutsch's Algorithm
 
 The technique used for this remaines basically the same as for Deutsch's algorithm -
@@ -247,6 +248,7 @@ The technique used for this remaines basically the same as for Deutsch's algorit
 1. **Superposition**: It creates a superposition in the input so it presents all $2^n$ possible inputs to the oracle simultaneously.
 2. **Phase kick-back**: the output values of the oracle leads to the change in the phase of the corresponding input.
 3. **Interference**: engineer an interference among the states of the input qubit to get a definite answer -- if the function is constant, the input state converges to $\pm \ket{0}^{\otimes n}$ (all $n$ qubits = $\ket{0}$, with amplitude of $\pm 1$), and if balanced, then some state other than $\ket{0}^{\otimes n}$.
+-->
 
 ## Specifics of the Deutsch-Jozsa algorithm
 
