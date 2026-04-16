@@ -110,8 +110,10 @@ While we will get into more details further down, here are the key elements of t
 
 * The input qubit as well as the output qubit are initially in state $\ket{0}$.
 * The input qubit is put in superposition by applying Hadamard operation.
-* The output qubit is prepared in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit's being in $\ket{-}$ causes the phase kick-back -- the input that leads to output being 1, causes that input to acquire the phase of a $-ve$ sign.
+* The output qubit is prepared in the state $\frac{1}{\sqrt{2}} \left( \ket{0} - \ket{1} \right)$, commonly represented as $\ket{-}$. Output qubit's being in $\ket{-}$ causes the phase kick-back when $U_f$ is applied -- the input that leads to $f(x)=1$, acquires the phase of a $-ve$ sign.
 * The final hadamard undoes the superposition, and the phase acquired in the previous steps leads to an interference which puts the input qubit in one of $\ket{0}$ or in $\ket{1}$ states which is the answer extracted by performing measurement on it.
+
+The next couple of sections get into the math of the algorithm. If you wish you can skip them. The final section of this article, 'How These Algorithms Work', summarizes the core ideas in plain English.
 
 ### Some mathematical groundwork for understanding the working of Deutsch's algorithm
 
@@ -246,7 +248,7 @@ Thus, you see how Deutsch algorithm performs only **one** query to the function 
 
 # Deutsch-Jozsa algorithm
 
-Deutsch's algorithm was an important first step in demonstrating how quantum computers could be more efficient than classical computers, but improvement it demonstrated was fairly modest: it required **one** query, compared to **two** in the classical case. But something remarkable happens when we scale this idea to n-bit inputs. 
+Deutsch's algorithm was an important first step in demonstrating how quantum computers could be more efficient than classical computers, but improvement it demonstrated was fairly modest: it required **one** query, compared to **two** in the classical case. But something remarkable happens when we scale this idea to $n$-bit inputs. 
 
 In 1992, David Deutsch and Richard Jozsa, extended the original algorithm to more qubits. The problem statement was similar: determine whether a function is balanced or constant with as few evaluations as possible. But this time, the function had $n$ bits of input and the same $1$ bit of output, i.e., it mapped $f:\{0,1\}^n \rightarrow \{0,1\}$.
 
@@ -290,6 +292,8 @@ q006 -[X]-[H]---------|      |---------------
 ```
 
 The subsequent discussion refers to it.
+
+Again, if you wish you can skip the next two sections which go into the math of this algorithm. The final section of this article, 'How These Algorithms Work', summarizes the core ideas in plain English.
 
 ### Mathematical groundwork for understanding the working of Deutsch-Jozsa algorithm
 
@@ -371,32 +375,22 @@ case of exponential speedup. In any case, Deutsch-Jozsa helps understand
 some very important concepts which are often useful in designing quantum
 algorithms.
 
-# Key takeaways from these two quantum algorithms
+# Intuitive Insight: How These Algorithms Work
 
-<!--
-1. Where is superposition used?  
-input qubit(s) initialized to all possible input values
+The key concepts to take away from these algorithms, which form the basis of several other quantum algorithms, are the following:
 
-2. Where does phase kickback happen?  
-oracle encodes function values into phase of input qubit(s)
+1. **Quantum Superposition**  
+One key idea in these, and a lot of other, algorithms is that instead of operating on *one* input value at a time operate on *all* possible values *simultaneously*. This is the idea of **quantum superposition**. Applying a hadamard gate on each of the the $n$ input qubits puts them in superposition of the all possible $2^n$ values with equal amplitude for each. Thus the algorithm operates on the entire solution space simultaneously.
 
-3. Where does interference happen?  
-final Hadamard(s) cause constructive/destructive interference to have a 100% or 0% probability for measuring $0$ for constant or balanced $f(x)$, respectively
--->
-
-The key concepts to take away from these algorithm, which form the basis of several other quantum algorithms, are the following:
-
-1. **Superposition**  
-We evaluate the function on all inputs simultaneously.
-
-2. **Phase Kickback**  
-Function values are encoded as phases.
+2. **Encode a Property of the Problem in the Inputs**  
+Next, a computation specific to the problem is performed. The objective is to encode certain property specific to the problem in the inputs. In these two algorithms the mechanism of **Phase Kickback** is used - the specific property it encodes is the function $f(x)$'s value, and they way it encodes it is in form of adding a phase to each of the inputs. Since the inputs are in a superposition of all possible $2^n$ values, this happens for all inputs in one go -- phase kick-back leads to each of the inputs that evaluate $f(x)$ to $1$ to acquire a phase of $-1$.
 
 3. **Interference**  
-Constructive/destructive interference reveals global structure.
+Having encoded the input with the appropriate property of the problem, the next step is the real magic of the algorithm, which is effected by causing an interference among the input values. Different algorithms use different operators for causing such intereference.<br>
+In general the interference is used to boost (through constructive intereference) the amplitudes of the states of interest, and diminish (through destructive interference) the other ones. In these algoithms boosting is all the way to a 100% probability of measurement, and diminishing is to reduce it to 0% probability of measurement. In other words, the interference here leads to only the specific state(s) of interest to survive and the other(s) to vanish - specifically, if $f(x)$ is constant, the amplitude of state $\ket{0}$ goes to $1.0$, i.e., the probability of its measurement to 100%, else, if $f(x)$ is balanced, the amplitude of $\ket{0}$ goes down to $0.0$, so some state other than $\ket{0}$ will be measured.
 
 4. **Measurement**  
-The final measurement extracts that property directly.
+Finally, the measurement extracts the result of this interference, and that provides the solution to the problem. In these two algorithms the solution is based on whether state $\ket{0}$ was measured, or some other state.
 
 
 # Getting hands-on with the algorithms discussed here
