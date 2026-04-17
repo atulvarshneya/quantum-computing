@@ -129,7 +129,7 @@ Now, lets look at the oracle provided for the problem. For the input qubit in an
 
 $$U_{f}\left( \ket{x}\ket{0} \right) \rightarrow \ket{x}\ket{f(x)}$$
 
-However, more generally speaking, the output qubit can be assumed to be in state $\ket{y}$. And, the oracle is taken to performs $\otimes$, i.e., XOR, operation on the output qubit as the following:
+However, more generally speaking, the output qubit can be assumed to be in state $\ket{y}$. And, the oracle is taken to performs $\oplus$, i.e., XOR, operation on the output qubit as the following:
 
 $$U_{f}\left( \ket{x}\ket{y} \right) \rightarrow \ket{x}\ket{y \oplus f(x)}$$
 
