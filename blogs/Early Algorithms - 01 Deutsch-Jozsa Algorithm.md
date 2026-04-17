@@ -129,7 +129,7 @@ Now, lets look at the oracle provided for the problem. For the input qubit in an
 
 $$U_{f}\left( \ket{x}\ket{0} \right) \rightarrow \ket{x}\ket{f(x)}$$
 
-However, more generally, lets assume the output qubit is not prepared to be in $\ket{0}$ but in state $\ket{y}$. Since quantum operations must be reversible, the operation of the oracle would be:
+However, more generally speaking, the output qubit can be assumed to be in state $\ket{y}$. And, the oracle is taken to performs $\otimes$, i.e., XOR, operation on the output qubit as the following:
 
 $$U_{f}\left( \ket{x}\ket{y} \right) \rightarrow \ket{x}\ket{y \oplus f(x)}$$
 
@@ -223,7 +223,7 @@ $$
 
 $$\left| \frac{1}{2} \left( {( - 1)^0+( - 1)^1} \right) \right|^2 = \left| \frac{1}{2} \left( 1 - 1 \right) \right|^2 = 0$$
 
-In other words, the probability to measure $\ket{0}$ evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). In other words, the final measurement will be 
+In other words, the probability to measure $\ket{0}$ evaluates to $1$ if $f(x)$ is constant (*constructive interference*) and $0$ if $f(x)$ is balanced (*destructive interference*). Therefore, the final measurement will be 
 $\ket{0}$ if and only if $f(x)$ is constant, and it will be the only other state $\ket{1}$ if $f(x)$ is balanced.
 
 Thus, you see how Deutsch algorithm performs only **one** query to the function to determine the type of the function.
