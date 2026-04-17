@@ -121,7 +121,7 @@ $$\boxed{H\ket{x} \rightarrow \frac{1}{\sqrt{2}} \sum_{z = 0}^{1}{\left( -1 \rig
 
 For $\ket{x}=\ket{0}$, it reduces to the following. ("equation 2")
 
-$$\boxed{H\ket{0}\rightarrow\frac{1}{\sqrt{2}}\sum_{x = 0}^{1}\ket{x}}$$
+$$\boxed{H\ket{0}\rightarrow\frac{1}{\sqrt{2}}\sum_{z = 0}^{1}\ket{z}}$$
 
 **Oracle operation and phase kick-back**
 
@@ -232,7 +232,7 @@ Thus, you see how Deutsch algorithm performs only **one** query to the function 
 
 Deutsch's algorithm was an important first step in demonstrating how quantum computers could be more efficient than classical computers, but improvement it demonstrated was fairly modest: it required **one** query, compared to **two** in the classical case. But something remarkable happens when we scale this idea to $n$-bit inputs. 
 
-In 1992, David Deutsch and Richard Jozsa, extended the original algorithm to more qubits. The problem statement was similar: determine whether a function is balanced or constant with as few evaluations as possible. But this time, the function had $n$ bits of input and the same $1$ bit of output, i.e., it mapped $f:\{0,1\}^n \rightarrow \{0,1\}$.
+In 1992, David Deutsch and Richard Jozsa, extended the original algorithm to more qubits. The problem statement was similar: determine whether a function is balanced or constant with as few evaluations as possible. But this time, the function had $n$ bits of input and the same $1$ bit of output, i.e., it mapped $f:\\{0,1\\}^n \rightarrow \{0,1\}$.
 
 With $n$ bits, the input can have $2^n$ unique values - $0, 1, ..., \left( 2^n-1 \right)$. So, in a balanced function, $2^{n-1}$ inputs would have outputs as $0$, and the other $2^{n-1}$ inputs would have outputs as $1$. Thus in the worst case, a classical computer could get the first $2^{n-1}$ queries to the oracle give the same output, but it would not be posssible to determine if it is a constant function without making $1$ more query. That is, in the worst case it would require $2^{n-1} + 1$ queries, implying a $O(2^n)$ time complexity.
 
@@ -292,7 +292,7 @@ $$where\ x \cdot z = x_{n-1} z_{n-1} + x_{n-2} z_{n-2} + ... + x_0 z_0\ \text{ i
 
 Thus, if $\ket{x}=\ket{0}^{\otimes n}$, it becomes as the following. ("equation 5")
 
-$$\boxed{H^{\otimes n}\ket{0}^{\otimes n}\rightarrow\frac{1}{\sqrt{2^n}}\sum_{x = 0}^{2^n-1}\ket{x}}$$
+$$\boxed{H^{\otimes n}\ket{0}^{\otimes n}\rightarrow\frac{1}{\sqrt{2^n}}\sum_{z = 0}^{2^n-1}\ket{z}}$$
 
 **Oracle operation and phase kick-back**
 
@@ -325,6 +325,7 @@ $$\psi_{3} = \frac{1}{\sqrt{2^n}}\sum_{x = 0}^{2^n-1}{( - 1)^{f(x)}\ket{x}}\ket{
 ### Step 4 - $\psi_{4}$ - Final Hadamard on the input qubit
 
 Finally, Hadamard is applied on input qubit again, so using equation 4
+
 $$\psi_{4} = \frac{1}{\sqrt{2^n}}\sum_{x = 0}^{1}{( - 1)^{f(x)}\left( \sum_{z = 0}^{2^n-1}{\frac{1}{\sqrt{2^n}}( - 1)^{x \cdot z}\ket{z}} \right)}\ket{-}$$
 
 
@@ -364,14 +365,14 @@ algorithms.
 The key concepts to take away from these algorithms, which form the basis of several other quantum algorithms, are the following:
 
 1. **Quantum Superposition**  
-One key idea in these, and a lot of other, algorithms is that instead of operating on *one* input value at a time operate on *all* possible values *simultaneously*. This is the idea of **quantum superposition**. Applying a hadamard gate on each of the the $n$ input qubits puts them in superposition of the all possible $2^n$ values with equal amplitude for each. Thus the algorithm operates on the entire solution space simultaneously.
+One key idea in these, and a lot of other, algorithms is that instead of operating on *one* input value at a time, operate on *all* possible values *simultaneously*. This is the idea of **quantum superposition**. Applying a hadamard gate on each of the the $n$ input qubits puts them in superposition of the all possible $2^n$ values with equal amplitude for each. Thus the algorithm operates on the entire solution space simultaneously.
 
 2. **Encode a Property of the Problem in the Inputs**  
 Next, a computation specific to the problem is performed. The objective is to encode certain property specific to the problem in the inputs. In these two algorithms the mechanism of **Phase Kickback** is used - the specific property it encodes is the function $f(x)$'s value, and they way it encodes it is in form of adding a phase to each of the inputs. Since the inputs are in a superposition of all possible $2^n$ values, this happens for all inputs in one go -- phase kick-back leads to each of the inputs that evaluate $f(x)$ to $1$ to acquire a phase of $-1$.
 
 3. **Interference**  
 Having encoded the input with the appropriate property of the problem, the next step is the real magic of the algorithm, which is effected by causing an interference among the input values. Different algorithms use different operators for causing such intereference.<br>
-In general the interference is used to boost (through constructive intereference) the amplitudes of the states of interest, and diminish (through destructive interference) the other ones. In these algoithms boosting is all the way to a 100% probability of measurement, and diminishing is to reduce it to 0% probability of measurement. In other words, the interference here leads to only the specific state(s) of interest to survive and the other(s) to vanish - specifically, if $f(x)$ is constant, the amplitude of state $\ket{0}$ goes to $1.0$, i.e., the probability of its measurement to 100%, else, if $f(x)$ is balanced, the amplitude of $\ket{0}$ goes down to $0.0$, so some state other than $\ket{0}$ will be measured.
+In general the interference is used to boost (through constructive intereference) the amplitudes of the states of interest, and diminish (through destructive interference) the other ones. In the algoithms discussed in this post, the boosting is all the way to a 100% probability of measurement, and diminishing is to reduce it to 0% probability of measurement. In other words, the interference here leads to only the specific state(s) of interest to survive and the other(s) to vanish - specifically, if $f(x)$ is constant, the amplitude of state $\ket{0}$ goes to $1.0$, i.e., the probability of its measurement to 100%, and, if $f(x)$ is balanced, the amplitude of $\ket{0}$ goes down to $0.0$, so some state other than $\ket{0}$ will be measured.
 
 4. **Measurement**  
 Finally, the measurement extracts the result of this interference, and that provides the solution to the problem. In these two algorithms the solution is based on whether state $\ket{0}$ was measured, or some other state.
