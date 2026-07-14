@@ -46,7 +46,7 @@ The problem is to determine if the function is constant or balanced with as few 
 
 Since the function takes a single bit as input and gives a single bit output, there are only four possible functions.
 
-| $f(0)$ | $f(1)$ | |
+| f(0) | f(1) | |
 |:-----:|:-----:|-----|
 | 0 | 0 | constant |
 | 0 | 1 | balanced |
@@ -285,7 +285,7 @@ The math groundwork for Deutsch-Jozsa algorithm is very similar to that for Deut
 
 **Hadamard operation on multiple qubits**
 
-Hadamard on a multi-qubit state $\ket{x}, where\ x=x_{n-1}, x_{n-2} ... x_1, x_0$ is written as the following. ("equation 4")
+Hadamard on each qubit of a multi-qubit state $\ket{x}, where\ x=x_{n-1}, x_{n-2} ... x_1, x_0$ is written as the following. ("equation 4")
 
 $$\boxed{H^{\otimes n}\ket{x} \rightarrow \frac{1}{\sqrt{2^n}} \sum_{z = 0}^{2^n-1}{\left( -1 \right)^{x \cdot z}\ket{z}}}$$
 $$where\ x \cdot z = x_{n-1} z_{n-1} + x_{n-2} z_{n-2} + ... + x_0 z_0\ \text{ is the sum of the bitwise products}$$
