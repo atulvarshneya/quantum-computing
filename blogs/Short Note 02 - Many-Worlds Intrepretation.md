@@ -43,7 +43,7 @@ fully real, self-consistent version of the world.
 
 Consider a single qubit in a superposition state:
 
-$$\ket{\psi} = \alpha\ket{0} + \ket{1}$$
+$$\ket{\psi} = \alpha\ket{0} + \beta\ket{1}$$
 
 Copenhagen says: the qubit has no definite value; when measured, it
 *collapses* to $\ket{0}$ with probability $|\alpha|^{2}$, or
